@@ -24,7 +24,8 @@ Aplikasi manajemen infrastruktur website untuk web house / agensi digital. Diban
 - **Backend**: PHP 8.3 + Laravel 13
 - **Database**: SQLite (development) / MySQL (production)
 - **Frontend**: Blade Templates + Tailwind CSS v4
-- **Charts**: Chart.js v4
+- **Charts**: Chart.js v4 (via CDN)
+- **Confirmation Dialog**: SweetAlert2 v11 (via CDN)
 - **Build Tool**: Vite
 - **Icons**: Custom SVG inline components
 
@@ -161,3 +162,19 @@ Dark mode tersimpan di `localStorage` browser dan persisten antar sesi.
 | GET | `/websites/{id}` | Ambil data website (JSON untuk modal) |
 | POST | `/dropdown/add` | Tambah opsi dropdown |
 | POST | `/dropdown/remove` | Hapus opsi dropdown |
+
+---
+
+## 📝 Catatan untuk Developer
+
+### Modal Form
+Modal CRUD di-include **langsung di `layouts/app.blade.php`** (bukan di masing-masing section view).
+Ini disengaja agar modal selalu berada di root `<body>` dan `position: fixed` berfungsi relatif terhadap viewport, bukan terkekang oleh div scroll parent.
+
+> ⚠️ **Jangan** memindahkan `@include('components.modal-form')` ke dalam `@section('content')` di section views — modal akan terkekang oleh container scrollable dan tampil tidak di tengah.
+
+### Tailwind CSS v4 Dark Mode
+Tailwind v4 mengubah default dark mode dari class-based ke `prefers-color-scheme`. Konfigurasi `@custom-variant dark` di `app.css` diperlukan agar `dark:` classes bekerja dengan toggle class `.dark` di `<html>`.
+
+### SweetAlert2
+Semua konfirmasi delete dan input dropdown menggunakan SweetAlert2. SweetAlert2 dimuat via CDN di `layouts/app.blade.php` dan otomatis menyesuaikan dark/light mode.
