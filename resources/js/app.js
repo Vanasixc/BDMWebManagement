@@ -42,8 +42,8 @@ window.closeSidebar = function () {
 };
 
 function applySidebarState() {
-    const sidebar  = document.getElementById('sidebar');
-    const overlay  = document.getElementById('sidebar-overlay');
+    const sidebar   = document.getElementById('sidebar');
+    const overlay   = document.getElementById('sidebar-overlay');
     const iconOpen  = document.getElementById('hamburger-icon-open');
     const iconClose = document.getElementById('hamburger-icon-close');
 
@@ -52,16 +52,31 @@ function applySidebarState() {
     const isMobile = window.innerWidth < 768;
 
     if (isMobile) {
-        sidebar.style.transform = sidebarOpen ? 'translateX(0)' : 'translateX(-100%)';
-        if (overlay) overlay.style.display = sidebarOpen ? 'block' : 'none';
+        // Gunakan classList — hindari konflik dengan Tailwind v4 native CSS translate property
+        if (sidebarOpen) {
+            sidebar.classList.add('sidebar-open');
+        } else {
+            sidebar.classList.remove('sidebar-open');
+        }
+
+        // Overlay: gunakan style langsung agar tidak konflik dengan Tailwind
+        if (overlay) {
+            overlay.style.display       = sidebarOpen ? 'block' : 'none';
+            overlay.style.pointerEvents = sidebarOpen ? 'auto' : 'none';
+        }
     } else {
-        sidebar.style.width = sidebarOpen ? (currentSidebarWidth + 'px') : '0px';
+        // Desktop: kontrol via width
+        sidebar.classList.remove('sidebar-open'); // bersihkan class mobile
+        sidebar.style.width    = sidebarOpen ? (currentSidebarWidth + 'px') : '0px';
         sidebar.style.overflow = sidebarOpen ? '' : 'hidden';
-        if (overlay) overlay.style.display = 'none';
+        if (overlay) {
+            overlay.style.display       = 'none';
+            overlay.style.pointerEvents = 'none';
+        }
     }
 
-    if (iconOpen)  iconOpen.classList.toggle('hidden', sidebarOpen);
-    if (iconClose) iconClose.classList.toggle('hidden', !sidebarOpen);
+    if (iconOpen)  iconOpen.style.display  = sidebarOpen ? 'none' : 'block';
+    if (iconClose) iconClose.style.display = sidebarOpen ? 'block' : 'none';
 }
 
 // =============================================
@@ -458,6 +473,11 @@ window.addDropdownOption = function (page, key) {
             if (!value || value.trim() === '') return 'Opsi tidak boleh kosong!';
         },
         reverseButtons: true,
+        // Pastikan SweetAlert tampil di atas modal (z-index: 9999)
+        didOpen: () => {
+            const swalContainer = document.querySelector('.swal2-container');
+            if (swalContainer) swalContainer.style.zIndex = '99999';
+        },
     }).then(result => {
         if (!result.isConfirmed || !result.value) return;
 
@@ -495,6 +515,11 @@ window.removeDropdownOption = function (page, key, option) {
             cancelButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
         },
         reverseButtons: true,
+        // Pastikan SweetAlert tampil di atas modal (z-index: 9999)
+        didOpen: () => {
+            const swalContainer = document.querySelector('.swal2-container');
+            if (swalContainer) swalContainer.style.zIndex = '99999';
+        },
     }).then(result => {
         if (!result.isConfirmed) return;
 

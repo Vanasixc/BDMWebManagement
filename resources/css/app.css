@@ -240,10 +240,30 @@ html.dark .modal-btn-cancel:hover { background: #334155; }
 
 
 /* =============================================
-   SIDEBAR TRANSITION
+   SIDEBAR — MOBILE / DESKTOP CONTROL
    ============================================= */
-#sidebar {
-    transition: width 0.3s ease, transform 0.3s ease;
+
+/* === Desktop (>= 768px): selalu visible, transition width === */
+@media (min-width: 768px) {
+    #sidebar {
+        transform: translateX(0) !important;
+        transition: width 0.3s ease;
+    }
+}
+
+/* === Mobile (< 768px): tersembunyi secara default === */
+@media (max-width: 767px) {
+    #sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        /* Pastikan width tetap untuk animasi slide */
+        width: 256px !important;
+    }
+
+    /* Muncul saat class .sidebar-open aktif */
+    #sidebar.sidebar-open {
+        transform: translateX(0);
+    }
 }
 
 /* =============================================

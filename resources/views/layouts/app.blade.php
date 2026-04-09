@@ -28,7 +28,7 @@
     <div
         id="sidebar-overlay"
         onclick="closeSidebar()"
-        class="fixed inset-0 bg-black/60 z-30 hidden md:hidden transition-opacity duration-300"
+        style="display:none; position:fixed; inset:0; z-index:35; background:rgba(0,0,0,0.6); pointer-events:none;"
     ></div>
 
     {{-- ============================================
@@ -37,8 +37,10 @@
     <aside
         id="sidebar"
         style="width: 256px;"
-        class="fixed md:relative z-40 h-full bg-slate-900 text-slate-300 flex flex-col shrink-0
-               -translate-x-full md:translate-x-0"
+        class="fixed md:relative z-40 h-full flex flex-col shrink-0
+               bg-white border-r border-slate-200 text-slate-700
+               dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300
+               transition-colors duration-300"
     >
         {{-- Logo --}}
         <div class="p-5 flex items-center gap-3 min-w-[200px]">
@@ -48,7 +50,7 @@
                         d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
                 </svg>
             </div>
-            <span class="font-bold text-lg text-white truncate whitespace-nowrap">WH-Manager</span>
+            <span class="font-bold text-lg text-slate-900 dark:text-white truncate whitespace-nowrap">WH-Manager</span>
         </div>
 
         {{-- Nav Menu --}}
@@ -75,7 +77,7 @@
                 class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition group text-sm font-medium
                        {{ $currentRoute === $item['id']
                           ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                          : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}"
+                          : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white' }}"
             >
                 @include('components.icon', ['name' => $item['icon'], 'class' => 'w-5 h-5 shrink-0'])
                 <span class="truncate">{{ $item['label'] }}</span>
@@ -84,12 +86,12 @@
         </nav>
 
         {{-- User info + Logout --}}
-        <div class="p-3 border-t border-slate-800 min-w-[200px]">
+        <div class="p-3 border-t border-slate-200 dark:border-slate-800 min-w-[200px]">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button
                     type="submit"
-                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-400 hover:bg-rose-500/20 transition text-sm font-medium"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/20 transition text-sm font-medium"
                 >
                     <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
@@ -104,7 +106,7 @@
             id="sidebar-resizer"
             class="hidden md:flex absolute right-0 top-0 bottom-0 w-2 items-center justify-center transition"
         >
-            <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-4 h-4 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"/>
             </svg>
         </div>
