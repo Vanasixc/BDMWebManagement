@@ -7,8 +7,8 @@
     <meta name="description" content="@yield('meta_description', 'WebHouse Manager — Kelola infrastruktur website klien Anda.')" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     {{-- Favicon: ganti file public/favicon.png untuk mengubah icon loading & browser tab --}}
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="png" href="favicon.png" />
+    <link rel="shortcut icon" type="png" href="favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     {{-- Dark mode: jalankan sebelum CSS untuk hindari flash --}}
