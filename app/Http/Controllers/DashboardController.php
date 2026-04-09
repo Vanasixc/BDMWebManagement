@@ -12,7 +12,7 @@ class DashboardController extends Controller
         $websites = Website::all();
 
         $stats = [
-            'active'   => $websites->where('status', 'Aktif')->count(),
+            'active'   => $websites->where('status', 'Active')->count(),
             'inactive' => $websites->where('status', 'InActive')->count(),
             'suspend'  => $websites->where('status', 'Suspend')->count(),
         ];
@@ -21,12 +21,12 @@ class DashboardController extends Controller
             if (!$w->hosting_exp_date) return false;
             $days = $w->days_remaining;
             return $days > 0 && $days <= 30;
-        })->values();
+        })->sortBy('days_remaining')->values();
 
         $expired = $websites->filter(function ($w) {
             if (!$w->hosting_exp_date) return false;
             return $w->days_remaining < 0;
-        })->values();
+        })->sortBy('days_remaining')->values();
 
         // Data revenue hardcoded (bisa dijadikan model tersendiri nantinya)
         $revenueData = [

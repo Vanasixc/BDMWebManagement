@@ -54,13 +54,15 @@
    ============================================= */
 #sidebar-resizer {
     cursor: col-resize;
+    width: 4px !important;
+    background-color: transparent;
     transition: background-color 0.2s;
 }
 #sidebar-resizer:hover {
-    background-color: rgba(59, 130, 246, 0.4);
+    background-color: rgba(59, 130, 246, 0.35);
 }
 #sidebar-resizer.is-resizing {
-    background-color: rgba(59, 130, 246, 0.6);
+    background-color: rgba(59, 130, 246, 0.5);
 }
 
 /* =============================================
@@ -276,8 +278,26 @@ html.dark .modal-btn-cancel:hover { background: #334155; }
 /* =============================================
    ACCOUNT MODAL BOX — Dark Mode
    ============================================= */
+
+/* Modal box background & text */
 html.dark #account-modal-overlay > div {
     background: #1e293b;
     color: #f1f5f9;
 }
 
+/* Header */
+html.dark #account-modal-overlay .modal-hdr {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+/* Footer */
+html.dark #account-modal-overlay .modal-ftr {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+/* Body area (form body) */
+html.dark #account-modal-overlay > div > form > div:not(.modal-ftr) {
+    background: #1e293b;
+}

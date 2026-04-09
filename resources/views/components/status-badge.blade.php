@@ -4,7 +4,7 @@
 --}}
 @php
     $colors = [
-        'Aktif'    => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+        'Active'   => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
         'InActive' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
         'Suspend'  => 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
     ];

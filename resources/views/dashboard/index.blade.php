@@ -14,7 +14,7 @@
     <div class="p-5 md:p-6 rounded-xl shadow-sm border flex items-center justify-between
                 bg-white border-gray-100 dark:bg-slate-800 dark:border-slate-700">
         <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Website Aktif</p>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Website Active</p>
             <h3 class="text-3xl font-extrabold mt-1 tabular-nums">{{ $stats['active'] }}</h3>
         </div>
         <div class="p-3.5 rounded-xl bg-emerald-500 shadow-lg shadow-emerald-500/30">
@@ -194,7 +194,7 @@ const statusCtx = document.getElementById('statusChart');
 new Chart(statusCtx, {
     type: 'doughnut',
     data: {
-        labels: ['Aktif', 'InActive', 'Suspend'],
+        labels: ['Active', 'InActive', 'Suspend'],
         datasets: [{
             data: [{{ $stats['active'] }}, {{ $stats['inactive'] }}, {{ $stats['suspend'] }}],
             backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],

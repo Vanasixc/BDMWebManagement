@@ -52,6 +52,7 @@ class WebsiteController extends Controller
             ['key' => 'website',          'label' => 'Website'],
             ['key' => 'domain_exp_date',  'label' => 'Exp Domain',  'date' => true],
             ['key' => 'hosting_exp_date', 'label' => 'Exp Hosting', 'date' => true],
+            ['key' => 'days_remaining',   'label' => 'Sisa Hari',   'computed' => true, 'days_col' => true],
             ['key' => 'reminder_status',  'label' => 'Status',      'reminder_badge' => true, 'computed' => true],
         ],
     ];
@@ -76,8 +77,10 @@ class WebsiteController extends Controller
         $websites    = $query->paginate($perPage)->withQueryString();
         $columns     = $this->sectionColumns[$section] ?? $this->sectionColumns['master'];
         $dropdowns   = DropdownConfig::forPage($section);
+        $allWebsites = Website::all();
+        $statsData   = $this->buildStatsData($section, $allWebsites);
 
-        return view("sections.{$section}", compact('websites', 'columns', 'section', 'search', 'perPage', 'dropdowns'));
+        return view("sections.{$section}", compact('websites', 'columns', 'section', 'search', 'perPage', 'dropdowns', 'allWebsites', 'statsData'));
     }
 
     /**
@@ -131,7 +134,7 @@ class WebsiteController extends Controller
             'url'              => 'required|string|max:200',
             'type'             => 'required|string',
             'technology'       => 'required|string',
-            'status'           => 'required|in:Aktif,InActive,Suspend',
+            'status'           => 'required|in:Active,InActive,Suspend',
             'internal_pic'     => 'required|string',
             'service_package'  => 'nullable|string',
             'created_year'     => 'nullable|date',
@@ -159,5 +162,71 @@ class WebsiteController extends Controller
             'pay_status'       => 'nullable|in:Lunas,Belum',
             'invoice_date'     => 'nullable|date',
         ];
+    }
+
+    /**
+     * Hitung statistik agregat per section untuk visualisasi.
+     */
+    private function buildStatsData(string $section, $all): array
+    {
+        return match ($section) {
+            'master' => [
+                'active'   => $all->where('status', 'Active')->count(),
+                'inactive' => $all->where('status', 'InActive')->count(),
+                'suspend'  => $all->where('status', 'Suspend')->count(),
+                'total'    => $all->count(),
+            ],
+            'domain' => [
+                'tier_low'    => $all->filter(fn($w) => ($w->domain_price ?? 0) < 100000)->count(),
+                'tier_mid'    => $all->filter(fn($w) => ($w->domain_price ?? 0) >= 100000 && ($w->domain_price ?? 0) <= 200000)->count(),
+                'tier_high'   => $all->filter(fn($w) => ($w->domain_price ?? 0) > 200000)->count(),
+                'providers'   => $all->whereNotNull('domain_provider')->groupBy('domain_provider')
+                                     ->map->count()->sortDesc()->take(6)->toArray(),
+                'avg_price'   => (int) $all->whereNotNull('domain_price')->avg('domain_price'),
+            ],
+            'hosting' => [
+                'expiry_cards' => $all->whereNotNull('hosting_exp_date')
+                    ->map(fn($w) => [
+                        'website'  => $w->website,
+                        'client'   => $w->client,
+                        'exp_date' => $w->hosting_exp_date?->format('d/m/Y'),
+                        'days'     => $w->days_remaining,
+                        'status'   => $w->reminder_status,
+                    ])
+                    ->sortBy('days')->values()->toArray(),
+            ],
+            'akses' => [
+                'has_admin_url'    => $all->filter(fn($w) => !empty($w->admin_url))->count(),
+                'has_extra_access' => $all->filter(fn($w) => !empty($w->extra_access))->count(),
+                'has_password_loc' => $all->filter(fn($w) => !empty($w->password_loc))->count(),
+                'total'            => $all->count(),
+            ],
+            'finansial' => [
+                'total_revenue' => $all->sum('sell_price'),
+                'total_domain'  => $all->sum('domain_price'),
+                'total_hosting' => $all->sum('hosting_price'),
+                'total_margin'  => $all->sum(fn($w) => $w->margin),
+                'lunas'         => $all->where('pay_status', 'Lunas')->count(),
+                'belum'         => $all->where('pay_status', 'Belum')->count(),
+                'margins'       => $all->map(fn($w) => [
+                    'website' => $w->website ?? $w->client,
+                    'margin'  => $w->margin,
+                ])->sortByDesc('margin')->take(8)->values()->toArray(),
+            ],
+            'reminder' => [
+                'aman'    => $all->filter(fn($w) => $w->reminder_status === 'Aman')->count(),
+                'siaga'   => $all->filter(fn($w) => $w->reminder_status === 'Segera')->count(),
+                'darurat' => $all->filter(fn($w) => in_array($w->reminder_status, ['Kritis','Expired']))->count(),
+                'deadlines' => $all->whereNotNull('hosting_exp_date')
+                    ->map(fn($w) => [
+                        'website'  => $w->website,
+                        'days'     => $w->days_remaining,
+                        'status'   => $w->reminder_status,
+                        'exp_date' => $w->hosting_exp_date?->format('d/m/Y'),
+                    ])
+                    ->sortBy('days')->take(8)->values()->toArray(),
+            ],
+            default => [],
+        };
     }
 }

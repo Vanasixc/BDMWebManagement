@@ -1,0 +1,467 @@
+================================================================================
+                    DOKUMENTASI APLIKASI WH-Manager
+                    Web House Management System
+================================================================================
+
+Dibuat     : 2026
+Versi      : 1.0.0
+Deskripsi  : Aplikasi manajemen data infrastruktur website klien perusahaan.
+             Membantu tim internal dalam memantau, mengelola, dan menganalisis
+             data website, domain, hosting, akses, keuangan, dan pengingat
+             expire hosting milik klien.
+
+
+================================================================================
+  I. TEKNOLOGI & STACK YANG DIGUNAKAN
+================================================================================
+
+  Backend
+  -------
+  - PHP                 >= 8.3
+  - Laravel Framework   ^13.0         (framework utama MVC)
+  - Laravel Tinker      ^3.0          (REPL untuk debugging via CLI)
+  - Database            SQLite         (file-based, ringan untuk development)
+
+  Frontend
+  --------
+  - Tailwind CSS v4     ^4.2.2        (utility-first CSS framework)
+  - Vite                ^8.0.0        (build tool & dev server aset frontend)
+  - laravel-vite-plugin ^3.0.0        (integrasi Vite dengan Laravel)
+  - @tailwindcss/vite   ^4.2.2        (plugin Tailwind untuk Vite)
+  - Axios               ^1.11.0       (HTTP client, tersedia namun belum dipakai aktif)
+  - Blade               (bawaan Laravel — templating engine HTML)
+
+  CDN Eksternal (dimuat di browser)
+  ----------------------------------
+  - Chart.js v4.4.4     (visualisasi grafik & diagram — doughnut, bar, line)
+  - SweetAlert2 v11     (dialog konfirmasi hapus data yang interaktif)
+  - Google Fonts        (Inter — tipografi utama aplikasi)
+
+  Dev Tools
+  ---------
+  - concurrently        ^9.0.1        (jalankan beberapa proses sekaligus saat dev)
+  - laravel/pail        ^1.2.5        (real-time log viewer CLI)
+  - laravel/pint        ^1.27         (PHP code style fixer)
+  - fakerphp/faker      ^1.23         (generate data dummy untuk seeder)
+
+
+================================================================================
+  II. STRUKTUR AUTENTIKASI & HAK AKSES
+================================================================================
+
+  Role yang tersedia:
+  -------------------
+  1. superAdmin  — Akses penuh ke semua halaman termasuk Manajemen Akun.
+  2. admin       — Akses ke semua halaman kecuali Manajemen Akun.
+
+  Mekanisme Login:
+  ----------------
+  - User mengisi username dan password di halaman /login.
+  - Laravel session-based authentication (bawaan, tanpa package tambahan).
+  - Route yang memerlukan login dilindungi middleware "auth".
+  - Route /akun dilindungi middleware tambahan "role:superAdmin".
+  - Setelah login berhasil, user diarahkan ke /dashboard.
+  - Logout dilakukan via POST ke /logout (dilindungi CSRF).
+
+  Redirect:
+  ---------
+  - Mengakses "/" → otomatis redirect ke /dashboard.
+  - Jika belum login → redirect ke /login.
+
+
+================================================================================
+  III. HALAMAN DAN CONTENT
+================================================================================
+
+------------------------------------------------------------------------
+  1. DASHBOARD  (/dashboard)
+------------------------------------------------------------------------
+
+  Deskripsi:
+    Halaman ringkasan utama yang memperlihatkan kondisi keseluruhan
+    infrastruktur website klien secara sekilas.
+
+  Konten:
+    a) 3 Stat Card (atas)
+       - Website Active  : jumlah website dengan status "Active"
+       - InActive        : jumlah website dengan status "InActive"
+       - Suspend         : jumlah website dengan status "Suspend"
+
+    b) Tabel "Akan Expired (30 Hari)"
+       - Menampilkan website yang hosting-nya akan habis dalam 0-30 hari.
+       - Kolom: Client, Tgl Expired, Sisa Hari.
+       - Diurutkan ascending berdasarkan sisa hari (paling mepet di atas).
+
+    c) Tabel "Sudah Expired (Telat Bayar)"
+       - Menampilkan website yang hosting-nya sudah melewati tanggal expired.
+       - Kolom: Client, Tgl Expired, Hari Terlewat.
+       - Diurutkan dari yang paling lama expired.
+
+    d) Bar Chart — Progres Pendapatan & Margin
+       - Menampilkan data revenue dan margin tahunan (2021-2024).
+       - Data saat ini hardcoded sebagai contoh/placeholder.
+
+    e) Doughnut Chart — Status Website
+       - Proporsi Active / InActive / Suspend secara visual melingkar.
+
+
+------------------------------------------------------------------------
+  2. MASTER TABLE  (/master)
+------------------------------------------------------------------------
+
+  Deskripsi:
+    Data induk seluruh website klien. Menjadi referensi utama yang
+    berisi informasi umum setiap website.
+
+  Visualisasi (di atas tabel):
+    a) 3 Mini Stat Card — jumlah website Active, InActive, Suspend
+    b) Doughnut Chart — distribusi status website + persentase tiap status
+    c) Total website terdaftar
+
+  Tabel Data:
+    Kolom: No, Nama Client, PIC, Nama Website, Jenis Website, Status, PIC Internal, Action.
+
+  Fitur Tabel:
+    - Tambah website baru via modal form lengkap
+    - Edit data website
+    - Hapus website (konfirmasi SweetAlert2)
+    - Cari berdasarkan nama client atau website
+    - Atur jumlah baris per halaman (10 / 25 / 50)
+    - Pagination
+    - Edit Table: konfigurasi dropdown pilihan (jenis website, teknologi, dll)
+
+
+------------------------------------------------------------------------
+  3. DOMAIN  (/domain)
+------------------------------------------------------------------------
+
+  Deskripsi:
+    Menampilkan informasi domain dari setiap website klien termasuk
+    provider, tanggal registrasi/expired, dan biaya tahunan.
+
+  Visualisasi (di atas tabel):
+    a) Pricing Tier Cards — pengelompokan domain berdasarkan harga/tahun:
+       - Ekonomis  : Rp 0 – 100.000
+       - Standar   : Rp 100.001 – 200.000
+       - Premium   : > Rp 200.000
+       - Rata-rata harga domain per tahun
+    b) Distribusi Domain Provider — horizontal bar chart proporsi
+       per penyedia domain (Niagahoster, Domainesia, Rumahweb, dll)
+
+  Tabel Data:
+    Kolom: No, Client, Domain (URL), Provider, Tgl Registrasi, Tgl Expired,
+           Harga/Tahun, Action.
+
+
+------------------------------------------------------------------------
+  4. HOSTING  (/hosting)
+------------------------------------------------------------------------
+
+  Deskripsi:
+    Mengelola data server/hosting setiap website termasuk tipe hosting,
+    provider, kapasitas storage, lokasi server, dan tanggal expired.
+
+  Visualisasi (di atas tabel):
+    Expiry Timeline Cards — satu card per website yang menampilkan:
+    - Nama website & client
+    - Tanggal expired hosting
+    - Progress bar sisa hari (ramping, berwarna sesuai urgensi)
+    - Badge status (Aman / Segera / Kritis / Expired)
+
+    Warna progress bar:
+    - Hijau  : Aman (> 30 hari)
+    - Kuning : Segera (7-30 hari)
+    - Merah  : Kritis (< 7 hari) atau Expired
+
+  Tabel Data:
+    Kolom: No, Website, Jenis Hosting, Provider, Storage (GB),
+           Lokasi Server, Tgl Expired, Action.
+
+
+------------------------------------------------------------------------
+  5. AKSES  (/akses)
+------------------------------------------------------------------------
+
+  Deskripsi:
+    Menyimpan data akses admin setiap website seperti URL admin panel,
+    akses tambahan (cPanel, FTP, SSH), dan lokasi penyimpanan password.
+
+  Visualisasi (di atas tabel):
+    3 Stat Card dengan progress bar kelengkapan data:
+    a) URL Admin Tercatat  — berapa website sudah memiliki URL admin
+    b) Extra Akses Tersedia — berapa website memiliki data akses tambahan
+    c) Password Tersimpan  — berapa website sudah mencatat lokasi password
+
+    Setiap card menampilkan: jumlah (X/Total) dan persentase kelengkapan.
+
+  Tabel Data:
+    Kolom: No, URL Admin, Akses Tambahan, Simpan Password Di, Catatan, Action.
+
+
+------------------------------------------------------------------------
+  6. FINANSIAL  (/finansial)
+------------------------------------------------------------------------
+
+  Deskripsi:
+    Mengelola data keuangan setiap website klien meliputi harga jual,
+    biaya domain, biaya hosting, margin keuntungan, dan status pembayaran.
+
+  Visualisasi (di atas tabel):
+    a) 4 Summary Cards:
+       - Total Pendapatan  (total sell_price seluruh website)
+       - Total B. Domain   (total domain_price seluruh website)
+       - Total B. Hosting  (total hosting_price seluruh website)
+       - Total Margin      (total margin bersih seluruh website)
+
+    b) Status Pembayaran — horizontal progress bar:
+       - Proporsi website berstatus "Lunas" vs "Belum Lunas"
+       - Menampilkan jumlah dan persentase masing-masing
+
+    c) Margin per Website (Bar Chart Horizontal):
+       - Menampilkan top 8 website berdasarkan nilai margin tertinggi
+       - Warna hijau = margin positif, merah = margin negatif
+       - Batas sumbu X dihitung dinamis (dibulatkan ke atas ke kelipatan
+         Rp 1 juta dari margin tertinggi)
+       - Label sumbu menggunakan satuan "juta" (contoh: Rp 8 juta)
+
+  Tabel Data:
+    Kolom: No, Client, Harga Jual, B. Domain, B. Hosting, Margin, Status, Action.
+
+
+------------------------------------------------------------------------
+  7. REMINDER  (/reminder)
+------------------------------------------------------------------------
+
+  Deskripsi:
+    Halaman pengingat status expired hosting seluruh website.
+    Memudahkan tim untuk melihat website mana yang perlu segera diperpanjang.
+
+  Visualisasi (di atas tabel):
+    a) 3 Status Card:
+       - Aman    : website dengan sisa hosting > 30 hari
+       - Siaga   : website dengan sisa hosting 3–30 hari
+       - Darurat : website dengan sisa hosting < 3 hari atau sudah expired
+
+    b) Legend penjelasan kategori status
+
+    c) Deadline Hosting Terdekat — daftar bergaya timeline:
+       - Menampilkan hingga 8 website dengan hosting paling mendekati expired
+       - Tiap item: nama website, badge status, sisa hari, progress bar, tgl expired
+       - Diurutkan ascending berdasarkan sisa hari (paling kritis di atas)
+
+  Tabel Data:
+    Kolom: No, Website, Exp Domain, Exp Hosting, Sisa Hari, Status, Action.
+
+    Kolom "Sisa Hari" berwarna:
+    - Hijau  : aman (> 30 hari)
+    - Kuning : siaga (3–30 hari)
+    - Merah  : darurat atau expired
+
+
+------------------------------------------------------------------------
+  8. MANAJEMEN AKUN  (/akun)  [superAdmin only]
+------------------------------------------------------------------------
+
+  Deskripsi:
+    Halaman khusus superAdmin untuk mengelola akun pengguna yang dapat
+    login ke sistem. Admin biasa tidak dapat mengakses halaman ini.
+
+  Fitur:
+    - Menampilkan daftar semua akun terdaftar (nama, username, role)
+    - Tambah akun baru via modal form
+    - Edit data akun (nama, email, role, password)
+    - Hapus akun (kecuali akun superAdmin tidak bisa dihapus)
+
+
+================================================================================
+  IV. PERHITUNGAN & LOGIKA BISNIS
+================================================================================
+
+  1. SISA HARI HOSTING (days_remaining)
+  ----------------------------------------
+  Method     : getDaysRemainingAttribute() — model Website.php
+  Rumus      : Carbon::now()->diffInDays(hosting_exp_date, false)
+  Keterangan : Menghitung selisih hari antara hari ini (server time) dengan
+               tanggal expired hosting. Nilai negatif berarti sudah lewat.
+               Contoh: jika hari ini 9 Apr 2026 dan exp 20 Mei 2026 → +41 hari.
+               Jika exp 1 Mar 2026 → -39 hari (sudah expired 39 hari lalu).
+
+  2. STATUS REMINDER (reminder_status)
+  ----------------------------------------
+  Method     : getReminderStatusAttribute() — model Website.php
+  Logika     :
+    days_remaining < 0   → "Expired"
+    days_remaining < 7   → "Kritis"
+    days_remaining < 30  → "Segera"
+    lainnya              → "Aman"
+
+  Kategori dashboard reminder (page Reminder):
+    Darurat = Kritis + Expired (sisa < 3 hari atau sudah expired)
+    Siaga   = Segera (3–30 hari)
+    Aman    = Aman (> 30 hari)
+
+  3. MARGIN KEUNTUNGAN (margin)
+  ----------------------------------------
+  Method     : getMarginAttribute() — model Website.php
+  Rumus      :
+    monthly_hosting = hosting_price / 12
+    margin = sell_price - (domain_price + monthly_hosting)
+
+  Keterangan : Biaya hosting dikonversi ke bulanan (dibagi 12) karena
+               sell_price diasumsikan per bulan. Domain dihitung penuh.
+               Margin negatif berarti perusahaan merugi pada klien tersebut.
+
+  Contoh perhitungan:
+    sell_price     = Rp 3.000.000
+    domain_price   = Rp 150.000
+    hosting_price  = Rp 1.200.000
+    monthly_hosting= 1.200.000 / 12 = 100.000
+    margin         = 3.000.000 - (150.000 + 100.000) = Rp 2.750.000 ✓
+
+  4. BATAS ATAS GRAFIK MARGIN (dinamis)
+  ----------------------------------------
+  Lokasi     : finansial.blade.php (JavaScript Chart.js)
+  Rumus      : Math.ceil(maxMargin / 1.000.000) * 1.000.000
+  Keterangan : Temukan margin tertinggi, lalu bulatkan ke atas ke kelipatan
+               Rp 1 juta terdekat.
+  Contoh     :
+    margin tertinggi = Rp 7.555.000 → batas atas = Rp 8.000.000
+    margin tertinggi = Rp 7.000.001 → batas atas = Rp 8.000.000
+    margin tertinggi = Rp 6.000.000 → batas atas = Rp 6.000.000 (pas)
+
+  5. STATISTIK PRICING TIER DOMAIN
+  ----------------------------------------
+  Lokasi     : WebsiteController::buildStatsData() — section 'domain'
+  Logika     :
+    tier_low  = domain_price < 100.000
+    tier_mid  = domain_price >= 100.000 AND <= 200.000
+    tier_high = domain_price > 200.000
+    avg_price = rata-rata domain_price seluruh website (non-null)
+
+  6. KELENGKAPAN DATA AKSES
+  ----------------------------------------
+  Lokasi     : WebsiteController::buildStatsData() — section 'akses'
+  Logika     :
+    has_admin_url    = count website di mana admin_url tidak kosong
+    has_extra_access = count website di mana extra_access tidak kosong
+    has_password_loc = count website di mana password_loc tidak kosong
+    Persentase = (count / total) * 100
+
+
+================================================================================
+  V. KOMPONEN REUSABLE (BLADE COMPONENTS)
+================================================================================
+
+  - data-table.blade.php
+    Tabel data utama yang dipakai di semua halaman section (Master, Domain,
+    Hosting, Akses, Finansial, Reminder). Mendukung pagination, search,
+    per-page selector, tombol tambah, dan tombol edit table (dropdown config).
+
+  - icon.blade.php
+    Library icon SVG inline (gaya Lucide Icons). Dipakai di seluruh tampilan
+    dengan parameter "name" dan "class".
+    Icon tersedia: layout-dashboard, database, globe, server, key, dollar-sign,
+    bell, users, check-circle, clock, alert-triangle, plus, edit, trash, eye,
+    settings, x, search, shield-check, bar-chart-2, link, lock, credit-card,
+    tag, calendar, trending-up.
+
+  - status-badge.blade.php
+    Badge warna untuk kolom Status website:
+    Active   → hijau, InActive → kuning, Suspend → merah.
+
+  - reminder-badge.blade.php
+    Badge warna untuk kolom Status reminder:
+    Aman → hijau, Segera → kuning, Kritis → merah, Expired → merah tua.
+
+  - modal-form.blade.php
+    Modal form global untuk tambah/edit data website (dipakai semua section).
+    Dimuat sekali di layout utama (body level) agar tidak terganggu
+    CSS transform dari animasi halaman.
+
+
+================================================================================
+  VI. DATABASE
+================================================================================
+
+  Engine    : SQLite (file: database/database.sqlite)
+
+  Tabel Utama:
+  ------------
+  - users
+    id, name, email, password, role (admin/superAdmin), timestamps
+
+  - websites
+    id, client, pic, website, url, type, technology, status,
+    internal_pic, service_package, created_year, note, phone, email,
+    domain_provider, domain_email, domain_reg_date, domain_exp_date, domain_price,
+    hosting_type, hosting_provider, storage, ip_server, location,
+    hosting_email, hosting_exp_date, hosting_price,
+    admin_url, extra_access, password_loc,
+    sell_price, pay_system, pay_status, invoice_date,
+    timestamps
+
+  - dropdown_configs
+    Menyimpan opsi-opsi dropdown yang bisa dikustomisasi per section/page.
+    Contoh: pilihan jenis website, teknologi, hosting provider, dll.
+    id, page, key, options (JSON), timestamps
+
+  Data Dummy (Seeder):
+  --------------------
+  Total 10 website dummy dengan variasi:
+  - Status  : 7 Active, 1 InActive, 2 Suspend
+  - Hosting provider: Niagahoster, Hostinger, Rumahweb, DigitalOcean, AWS, Vercel
+  - Domain provider : Niagahoster, Domainesia, Rumahweb, Cloudflare, Pandi
+  - Tipe website    : Profile, Blog, E-Commerce, Landing Page, Portal, Portfolio
+
+
+================================================================================
+  VII. FITUR UMUM DI SEMUA HALAMAN SECTION
+================================================================================
+
+  - Search          : Pencarian real-time berdasarkan nama client atau website
+  - Pagination      : Navigasi halaman dengan custom pagination style
+  - Per-page        : Pilih tampil 10 / 25 / 50 baris per halaman
+  - Add Data        : Form modal untuk input data baru
+  - Edit Data       : Form modal pre-filled dengan data yang dipilih
+  - Delete Data     : Konfirmasi hapus via SweetAlert2 (dialog animasi)
+  - Edit Table      : Kustomisasi opsi dropdown (nilai pilihan di form modal)
+  - Dark Mode       : Toggle terang/gelap, tersimpan di localStorage
+  - Responsive      : Sidebar collapsible untuk tampilan mobile
+  - Sidebar Resize  : Sidebar bisa diubah lebarnya dengan drag (desktop)
+
+
+================================================================================
+  VIII. CARA MENJALANKAN APLIKASI (Development)
+================================================================================
+
+  1. Install dependensi PHP:
+     composer install
+
+  2. Salin file environment:
+     copy .env.example .env
+     php artisan key:generate
+
+  3. Jalankan migrasi dan seeder:
+     php artisan migrate
+     php artisan db:seed
+
+  4. Install dependensi Node.js:
+     npm install
+
+  5. Build aset frontend (CSS/JS):
+     npm run build
+     -- atau untuk development dengan hot-reload:
+     npm run dev
+
+  6. Jalankan server Laravel:
+     php artisan serve
+
+  7. Buka browser: http://localhost:8000
+
+  Catatan: Untuk menjalankan semua proses sekaligus (server + vite + log):
+     composer dev
+
+
+================================================================================
+                          END OF DOKUMENTASI
+================================================================================

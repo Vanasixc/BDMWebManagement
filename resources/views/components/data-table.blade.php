@@ -109,6 +109,15 @@
                             </span>
                         @elseif (!empty($col['reminder_badge']))
                             @include('components.reminder-badge', ['status' => $website->reminder_status])
+                        @elseif (!empty($col['days_col']))
+                            @if (!$website->hosting_exp_date)
+                                <span class="text-slate-400">-</span>
+                            @else
+                                @php $d = $website->days_remaining; @endphp
+                                <span class="font-bold tabular-nums {{ $d < 0 ? 'text-rose-600 dark:text-rose-400' : ($d <= 3 ? 'text-rose-500 dark:text-rose-400' : ($d <= 30 ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')) }}">
+                                    {{ $d < 0 ? 'Telat '.abs($d).'h' : $d.' hari' }}
+                                </span>
+                            @endif
                         @elseif (!empty($col['currency']))
                             @if (!empty($col['computed']) && $col['key'] === 'margin')
                                 <span class="font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
