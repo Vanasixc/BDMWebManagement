@@ -1,6 +1,6 @@
-# WebHouse Manager
+# BDMWebManagement
 
-Aplikasi manajemen infrastruktur website untuk web house / agensi digital. Dibangun dengan **Laravel 13** dan **Tailwind CSS**.
+Aplikasi manajemen infrastruktur website. Dibangun dengan **Laravel 13** dan **Tailwind CSS**.
 
 ---
 
@@ -83,8 +83,6 @@ Buka di browser: **http://127.0.0.1:8000**
 | Super Admin | `superAdmin` | `superAdmin` |
 | Admin | `admin` | `admin` |
 
-> ⚠️ **Wajib ganti password** setelah deploy ke production!
-
 ---
 
 ## 📁 Struktur Direktori Penting
@@ -164,17 +162,3 @@ Dark mode tersimpan di `localStorage` browser dan persisten antar sesi.
 | POST | `/dropdown/remove` | Hapus opsi dropdown |
 
 ---
-
-## 📝 Catatan untuk Developer
-
-### Modal Form
-Modal CRUD di-include **langsung di `layouts/app.blade.php`** (bukan di masing-masing section view).
-Ini disengaja agar modal selalu berada di root `<body>` dan `position: fixed` berfungsi relatif terhadap viewport, bukan terkekang oleh div scroll parent.
-
-> ⚠️ **Jangan** memindahkan `@include('components.modal-form')` ke dalam `@section('content')` di section views — modal akan terkekang oleh container scrollable dan tampil tidak di tengah.
-
-### Tailwind CSS v4 Dark Mode
-Tailwind v4 mengubah default dark mode dari class-based ke `prefers-color-scheme`. Konfigurasi `@custom-variant dark` di `app.css` diperlukan agar `dark:` classes bekerja dengan toggle class `.dark` di `<html>`.
-
-### SweetAlert2
-Semua konfirmasi delete dan input dropdown menggunakan SweetAlert2. SweetAlert2 dimuat via CDN di `layouts/app.blade.php` dan otomatis menyesuaikan dark/light mode.
