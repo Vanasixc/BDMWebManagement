@@ -27,8 +27,6 @@
 
     {{-- ============================================
          LOADING SCREEN
-         Hilang otomatis setelah halaman selesai dimuat.
-         Ganti /favicon.png untuk mengganti icon di tengah.
          ============================================ --}}
     <div id="page-loader"
          style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;
@@ -36,7 +34,6 @@
                 background:var(--loader-bg, #f8fafc);
                 transition:opacity 0.35s ease, visibility 0.35s ease;">
 
-        {{-- Icon / Logo — ganti /favicon.png untuk kustomisasi --}}
         <div style="position:relative;width:72px;height:72px;">
             {{-- Spinner ring --}}
             <svg style="position:absolute;inset:0;width:72px;height:72px;animation:loader-spin 1s linear infinite;"
@@ -45,8 +42,7 @@
                 <path d="M36 4 a32 32 0 0 1 32 32" stroke="#3b82f6" stroke-width="5"
                       stroke-linecap="round"/>
             </svg>
-            {{-- Favicon icon di tengah --}}
-            <img src="/favicon.png"
+            <img src="logo_BDM.svg"
                  alt="Loading"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                  style="position:absolute;inset:10px;width:52px;height:52px;
@@ -72,7 +68,7 @@
     </style>
 
     {{-- ============================================
-         MOBILE OVERLAY (saat sidebar terbuka di HP)
+         MOBILE OVERLAY
          ============================================ --}}
     <div
         id="sidebar-overlay"
@@ -257,7 +253,6 @@
 
     {{-- ============================================
          MODAL GLOBAL — DI SINI, LANGSUNG DI DALAM BODY
-         BUKAN di dalam content/main agar tidak terkekang div apapun
          ============================================ --}}
     @include('components.modal-form')
 
