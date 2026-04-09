@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@yield('title', 'Dashboard') — WH Manager</title>
-    <meta name="description" content="@yield('meta_description', 'WebHouse Manager — Kelola infrastruktur website klien Anda.')" />
+    <title>@yield('title', 'Dashboard') — Banjar Digital Media</title>
+    <meta name="description" content="@yield('meta_description', 'Banjar Digital Media — Web Client Management')" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     {{-- Favicon: ganti file public/favicon.png untuk mengubah icon loading & browser tab --}}
-    <link rel="icon" type="png" href="favicon.png" />
-    <link rel="shortcut icon" type="png" href="favicon.png" />
+    <link rel="icon" type="png" href="favicon.ico" />
+    <link rel="shortcut icon" type="png" href="favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     {{-- Dark mode: jalankan sebelum CSS untuk hindari flash --}}
@@ -252,7 +252,7 @@
     </main>
 
     {{-- ============================================
-         MODAL GLOBAL — DI SINI, LANGSUNG DI DALAM BODY
+         MODAL GLOBAL
          ============================================ --}}
     @include('components.modal-form')
 
@@ -278,13 +278,11 @@
                 loader.style.visibility = 'hidden';
                 setTimeout(function() { loader.remove(); }, 380);
             }
-            // Hilang saat DOM siap
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', hideLoader);
             } else {
                 hideLoader();
             }
-            // Fallback: paksa hilang setelah 5 detik jika ada yang lambat
             setTimeout(hideLoader, 5000);
         })();
     </script>
