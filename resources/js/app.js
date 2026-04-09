@@ -246,7 +246,80 @@ window.openModalEditTable = function () {
 
 window.submitModalForm = function () {
     const form = document.getElementById('modal-dynamic-form');
-    if (form) form.submit();
+    if (!form) return;
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const isAdd  = currentModalMode === 'add';
+    const formData = new FormData(form);
+
+    // Untuk PUT method (edit), FormData sudah include _method=PUT via hidden field
+    fetch(form.action, {
+        method: 'POST',   // Laravel method-spoofing lewat _method field
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': CSRF,
+        },
+        body: formData,
+    })
+    .then(async r => {
+        // Jika redirect (success) atau JSON
+        if (r.redirected || r.ok) {
+            closeModal();
+            Swal.fire({
+                icon: 'success',
+                title: isAdd ? 'Data Ditambahkan!' : 'Data Diperbarui!',
+                text: isAdd
+                    ? 'Data website baru berhasil ditambahkan.'
+                    : 'Perubahan data website berhasil disimpan.',
+                timer: 1800,
+                showConfirmButton: false,
+                background: isDark ? '#1e293b' : '#ffffff',
+                color: isDark ? '#f1f5f9' : '#0f172a',
+                customClass: {
+                    popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
+                },
+            }).then(() => location.reload());
+        } else {
+            // Error (mis. validasi 422)
+            let errMsg = 'Terjadi kesalahan. Periksa kembali data yang diisi.';
+            try {
+                const json = await r.json();
+                if (json.errors) {
+                    errMsg = Object.values(json.errors).flat().join('<br>');
+                } else if (json.message) {
+                    errMsg = json.message;
+                }
+            } catch (_) {}
+
+            Swal.fire({
+                icon: 'error',
+                title: isAdd ? 'Gagal Menambahkan!' : 'Gagal Menyimpan!',
+                html: errMsg,
+                confirmButtonColor: '#3B82F6',
+                confirmButtonText: 'Tutup',
+                background: isDark ? '#1e293b' : '#ffffff',
+                color: isDark ? '#f1f5f9' : '#0f172a',
+                customClass: {
+                    popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
+                    confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+                },
+                didOpen: () => {
+                    const sc = document.querySelector('.swal2-container');
+                    if (sc) sc.style.zIndex = '99999';
+                }
+            });
+        }
+    })
+    .catch(() => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Koneksi Gagal',
+            text: 'Tidak dapat terhubung ke server. Periksa koneksi internet kamu.',
+            confirmButtonColor: '#3B82F6',
+            background: isDark ? '#1e293b' : '#ffffff',
+            color: isDark ? '#f1f5f9' : '#0f172a',
+        });
+    });
 };
 
 // Fetch website data via AJAX then render form
@@ -329,7 +402,7 @@ function renderForm(data, readonly) {
         case 'master': {
             const types = dd['type'] || ['Profile', 'Blog', 'Berita'];
             const techs = dd['technology'] || ['WordPress', 'Laravel'];
-            const statuses = dd['status'] || ['Aktif', 'InActive', 'Suspend'];
+            const statuses = dd['status'] || ['Active', 'InActive', 'Suspend'];
             const pics = dd['internalPic'] || ['Iqbal'];
             html += inp('Nama Client', 'client', v.client);
             html += inp('PIC', 'pic', v.pic);

@@ -91,6 +91,9 @@ class WebsiteController extends Controller
         $validated = $request->validate($this->validationRules());
         Website::create($validated);
 
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true, 'message' => 'Data website berhasil ditambahkan!']);
+        }
         return back()->with('success', 'Data website berhasil ditambahkan!');
     }
 
@@ -102,6 +105,9 @@ class WebsiteController extends Controller
         $validated = $request->validate($this->validationRules());
         $website->update($validated);
 
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true, 'message' => 'Data website berhasil diperbarui!']);
+        }
         return back()->with('success', 'Data website berhasil diperbarui!');
     }
 

@@ -1,9 +1,4 @@
 @import 'tailwindcss';
-
-/* =============================================
-   TAILWIND V4: Aktifkan class-based dark mode
-   (default v4 pakai prefers-color-scheme, bukan class)
-   ============================================= */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -15,9 +10,6 @@
     --font-sans: 'Inter', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
 }
 
-/* =============================================
-   CUSTOM BASE STYLES
-   ============================================= */
 @layer base {
     * {
         box-sizing: border-box;
@@ -32,7 +24,6 @@
         -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
         width: 5px;
         height: 5px;
@@ -49,9 +40,7 @@
     }
 }
 
-/* =============================================
-   RESIZABLE SIDEBAR
-   ============================================= */
+
 #sidebar-resizer {
     cursor: col-resize;
     width: 4px !important;
@@ -65,9 +54,7 @@
     background-color: rgba(59, 130, 246, 0.5);
 }
 
-/* =============================================
-   ANIMATIONS
-   ============================================= */
+
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -95,7 +82,6 @@
     animation: scaleIn 0.25s ease-out both;
 }
 
-/* Staggered children animation */
 .stagger-children > * {
     animation: fadeInUp 0.35s ease-out both;
 }
@@ -106,11 +92,7 @@
 .stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
 .stagger-children > *:nth-child(6) { animation-delay: 0.30s; }
 
-/* =============================================
-   MODAL — Plain CSS (no Tailwind conflict risk)
-   ============================================= */
 
-/* Overlay: full viewport, always on top */
 #modal-overlay {
     display: none;
     position: fixed;
@@ -119,7 +101,6 @@
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    /* Centering */
     align-items: center;
     justify-content: center;
     padding: 1rem;
@@ -129,7 +110,6 @@
     display: flex;
 }
 
-/* Modal box: fixed width, bounded height */
 #modal-box {
     position: relative;
     width: 100%;
@@ -148,7 +128,6 @@ html.dark #modal-box {
     color: #f1f5f9;
 }
 
-/* Modal Header */
 .modal-hdr {
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid #e2e8f0;
@@ -186,7 +165,6 @@ html.dark .modal-hdr {
 }
 .modal-close-btn:hover { background: rgba(100,116,139,0.15); }
 
-/* Modal Body: scrollable */
 #modal-body {
     padding: 1.5rem 2rem;
     overflow-y: auto;
@@ -194,7 +172,6 @@ html.dark .modal-hdr {
     min-height: 0;
 }
 
-/* Modal Footer */
 .modal-ftr {
     padding: 1rem 1.5rem;
     border-top: 1px solid #e2e8f0;
@@ -210,7 +187,6 @@ html.dark .modal-ftr {
     background: #0f172a;
 }
 
-/* Footer Buttons */
 .modal-btn-cancel {
     padding: 0.6rem 1.5rem;
     border-radius: 0.5rem;
@@ -241,11 +217,7 @@ html.dark .modal-btn-cancel:hover { background: #334155; }
 .modal-btn-save:hover { background: #2563eb; }
 
 
-/* =============================================
-   SIDEBAR — MOBILE / DESKTOP CONTROL
-   ============================================= */
 
-/* === Desktop (>= 768px): selalu visible, transition width === */
 @media (min-width: 768px) {
     #sidebar {
         transform: translateX(0) !important;
@@ -253,51 +225,38 @@ html.dark .modal-btn-cancel:hover { background: #334155; }
     }
 }
 
-/* === Mobile (< 768px): tersembunyi secara default === */
 @media (max-width: 767px) {
     #sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
-        /* Pastikan width tetap untuk animasi slide */
-        width: 256px !important;
     }
 
-    /* Muncul saat class .sidebar-open aktif */
     #sidebar.sidebar-open {
         transform: translateX(0);
     }
 }
 
-/* =============================================
-   TABLE NUMERIC
-   ============================================= */
+
 .tabular-nums {
     font-variant-numeric: tabular-nums;
 }
 
-/* =============================================
-   ACCOUNT MODAL BOX — Dark Mode
-   ============================================= */
 
-/* Modal box background & text */
 html.dark #account-modal-overlay > div {
     background: #1e293b;
     color: #f1f5f9;
 }
 
-/* Header */
 html.dark #account-modal-overlay .modal-hdr {
     background: #0f172a;
     border-color: #334155;
 }
 
-/* Footer */
 html.dark #account-modal-overlay .modal-ftr {
     background: #0f172a;
     border-color: #334155;
 }
 
-/* Body area (form body) */
 html.dark #account-modal-overlay > div > form > div:not(.modal-ftr) {
     background: #1e293b;
 }

@@ -6,6 +6,9 @@
     <title>@yield('title', 'Dashboard') — WH Manager</title>
     <meta name="description" content="@yield('meta_description', 'WebHouse Manager — Kelola infrastruktur website klien Anda.')" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    {{-- Favicon: ganti file public/favicon.png untuk mengubah icon loading & browser tab --}}
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     {{-- Dark mode: jalankan sebelum CSS untuk hindari flash --}}
@@ -21,6 +24,52 @@
 <body class="h-screen overflow-hidden flex font-sans transition-colors duration-300
              bg-slate-50 text-slate-900
              dark:bg-slate-900 dark:text-slate-100">
+
+    {{-- ============================================
+         LOADING SCREEN
+         Hilang otomatis setelah halaman selesai dimuat.
+         Ganti /favicon.png untuk mengganti icon di tengah.
+         ============================================ --}}
+    <div id="page-loader"
+         style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;
+                align-items:center;justify-content:center;gap:20px;
+                background:var(--loader-bg, #f8fafc);
+                transition:opacity 0.35s ease, visibility 0.35s ease;">
+
+        {{-- Icon / Logo — ganti /favicon.png untuk kustomisasi --}}
+        <div style="position:relative;width:72px;height:72px;">
+            {{-- Spinner ring --}}
+            <svg style="position:absolute;inset:0;width:72px;height:72px;animation:loader-spin 1s linear infinite;"
+                 viewBox="0 0 72 72" fill="none">
+                <circle cx="36" cy="36" r="32" stroke="#e2e8f0" stroke-width="5"/>
+                <path d="M36 4 a32 32 0 0 1 32 32" stroke="#3b82f6" stroke-width="5"
+                      stroke-linecap="round"/>
+            </svg>
+            {{-- Favicon icon di tengah --}}
+            <img src="/favicon.png"
+                 alt="Loading"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                 style="position:absolute;inset:10px;width:52px;height:52px;
+                        border-radius:10px;object-fit:contain;" />
+            {{-- Fallback jika favicon.png belum ada --}}
+            <div style="display:none;position:absolute;inset:10px;width:52px;height:52px;
+                        border-radius:10px;background:#3b82f6;
+                        align-items:center;justify-content:center;">
+                <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="white">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                </svg>
+            </div>
+        </div>
+
+        <p style="font-family:Inter,sans-serif;font-size:13px;font-weight:600;
+                  color:#94a3b8;letter-spacing:0.05em;">Memuat halaman...</p>
+    </div>
+
+    <style>
+        @keyframes loader-spin { to { transform: rotate(360deg); } }
+        .dark #page-loader { --loader-bg: #0f172a; }
+    </style>
 
     {{-- ============================================
          MOBILE OVERLAY (saat sidebar terbuka di HP)
@@ -227,5 +276,25 @@
 
     {{-- Page-specific modals (di-inject ke body level, bebas dari transform container) --}}
     @stack('modals')
+    {{-- Script dismiss loading screen --}}
+    <script>
+        (function() {
+            var loader = document.getElementById('page-loader');
+            function hideLoader() {
+                if (!loader) return;
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+                setTimeout(function() { loader.remove(); }, 380);
+            }
+            // Hilang saat DOM siap
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', hideLoader);
+            } else {
+                hideLoader();
+            }
+            // Fallback: paksa hilang setelah 5 detik jika ada yang lambat
+            setTimeout(hideLoader, 5000);
+        })();
+    </script>
 </body>
 </html>

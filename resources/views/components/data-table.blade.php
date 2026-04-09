@@ -55,7 +55,7 @@
                 </div>
             </form>
 
-            <div class="flex gap-2 w-full sm:w-auto">
+            <div class="flex gap-2 w-full sm:w-auto items-center">
                 {{-- Edit Table (dropdown config) --}}
                 <button
                     onclick="openModalEditTable()"
@@ -67,14 +67,16 @@
                     Edit Table
                 </button>
 
-                {{-- Tambah --}}
-                <button
-                    onclick="openModalAdd()"
-                    class="flex-1 sm:flex-none justify-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-700 transition shadow-sm"
-                >
-                    @include('components.icon', ['name' => 'plus', 'class' => 'w-4 h-4'])
-                    Tambah
-                </button>
+                @if ($section === 'master')
+                    {{-- Tombol Tambah hanya di Master Table --}}
+                    <button
+                        onclick="openModalAdd()"
+                        class="flex-1 sm:flex-none justify-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-700 transition shadow-sm"
+                    >
+                        @include('components.icon', ['name' => 'plus', 'class' => 'w-4 h-4'])
+                        Tambah
+                    </button>
+                @endif
             </div>
         </div>
     </div>
