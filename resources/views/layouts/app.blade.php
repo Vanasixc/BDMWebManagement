@@ -228,5 +228,8 @@
 
     {{-- Page-specific scripts --}}
     @stack('scripts')
+
+    {{-- Page-specific modals (di-inject ke body level, bebas dari transform container) --}}
+    @stack('modals')
 </body>
 </html>

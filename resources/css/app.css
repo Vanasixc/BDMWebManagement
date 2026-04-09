@@ -272,3 +272,12 @@ html.dark .modal-btn-cancel:hover { background: #334155; }
 .tabular-nums {
     font-variant-numeric: tabular-nums;
 }
+
+/* =============================================
+   ACCOUNT MODAL BOX — Dark Mode
+   ============================================= */
+html.dark #account-modal-overlay > div {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+

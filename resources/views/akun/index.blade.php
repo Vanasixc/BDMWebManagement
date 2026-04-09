@@ -64,80 +64,123 @@
         @endforeach
     </div>
 </div>
+@endsection
 
-{{-- Account Modal --}}
+{{-- ============================================================
+     ACCOUNT MODAL — dipush ke body level agar position:fixed
+     tidak terganggu oleh CSS transform dari animate-fade-in-up
+     ============================================================ --}}
+@push('modals')
 <div
     id="account-modal-overlay"
-    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] items-center justify-center p-4"
-    style="display:none"
     onclick="closeAccountModal(event)"
+    style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        overflow-y: auto;
+    "
 >
-    <div class="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden bg-white dark:bg-slate-800"
-         onclick="event.stopPropagation()">
-
-        <div class="p-5 border-b flex justify-between items-center bg-gray-50 dark:bg-slate-900 border-gray-100 dark:border-slate-700">
-            <h3 id="account-modal-title" class="text-base font-bold">Tambah Akun</h3>
-            <button onclick="closeAccountModal()" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+    {{-- Modal Box : gunakan CSS yang sama dengan #modal-box global --}}
+    <div
+        onclick="event.stopPropagation()"
+        style="
+            position: relative;
+            width: 100%;
+            max-width: 30rem;
+            max-height: calc(100dvh - 2rem);
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: scaleIn 0.22s ease-out both;
+        "
+    >
+        {{-- Header — gunakan .modal-hdr dari app.css --}}
+        <div class="modal-hdr">
+            <h3 id="account-modal-title">Tambah Akun</h3>
+            <button onclick="closeAccountModal()" class="modal-close-btn" aria-label="Tutup">
                 @include('components.icon', ['name' => 'x', 'class' => 'w-5 h-5'])
             </button>
         </div>
 
-        <form id="account-modal-form" method="POST" class="p-6 space-y-4">
+        {{-- Form: body + footer di dalam form agar submit bekerja --}}
+        <form id="account-modal-form" method="POST" style="display:flex; flex-direction:column; flex:1; min-height:0;">
             @csrf
             <input type="hidden" name="_method" id="account-method" value="POST"/>
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-slate-500 dark:text-slate-400">Nama / Username</label>
-                <input type="text" name="name" id="account-name" required
-                    class="w-full px-4 py-2.5 border rounded-xl text-sm outline-none transition
-                           border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white
-                           focus:ring-2 focus:ring-blue-500"/>
-            </div>
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-slate-500 dark:text-slate-400">Email</label>
-                <input type="email" name="email" id="account-email" required
-                    class="w-full px-4 py-2.5 border rounded-xl text-sm outline-none transition
-                           border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white
-                           focus:ring-2 focus:ring-blue-500"/>
-            </div>
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-slate-500 dark:text-slate-400">Role Akses</label>
-                <select name="role" id="account-role" required
-                    class="w-full px-4 py-2.5 border rounded-xl text-sm outline-none transition
-                           border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white
-                           focus:ring-2 focus:ring-blue-500">
-                    <option value="admin">admin</option>
-                    <option value="superAdmin">superAdmin</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-slate-500 dark:text-slate-400">Password <span id="pw-hint" class="normal-case font-normal text-slate-400">(kosongkan jika tidak diubah)</span></label>
-                <input type="password" name="password" id="account-password" autocomplete="new-password"
-                    class="w-full px-4 py-2.5 border rounded-xl text-sm outline-none transition
-                           border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white
-                           focus:ring-2 focus:ring-blue-500"/>
-            </div>
-            <div id="pw-confirm-wrap">
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-slate-500 dark:text-slate-400">Konfirmasi Password</label>
-                <input type="password" name="password_confirmation" autocomplete="new-password"
-                    class="w-full px-4 py-2.5 border rounded-xl text-sm outline-none transition
-                           border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white
-                           focus:ring-2 focus:ring-blue-500"/>
+
+            {{-- Body — sama dengan #modal-body dari app.css --}}
+            <div style="padding: 1.5rem 2rem; overflow-y: auto; flex: 1; min-height: 0;">
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Nama / Username</label>
+                        <input type="text" name="name" id="account-name" required
+                            class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
+                                   bg-white border-gray-300 text-slate-900
+                                   dark:bg-slate-700 dark:border-slate-600 dark:text-white
+                                   focus:ring-2 focus:ring-blue-500"/>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Email</label>
+                        <input type="email" name="email" id="account-email" required
+                            class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
+                                   bg-white border-gray-300 text-slate-900
+                                   dark:bg-slate-700 dark:border-slate-600 dark:text-white
+                                   focus:ring-2 focus:ring-blue-500"/>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Role Akses</label>
+                        <select name="role" id="account-role" required
+                            class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
+                                   bg-white border-gray-300 text-slate-900
+                                   dark:bg-slate-700 dark:border-slate-600 dark:text-white
+                                   focus:ring-2 focus:ring-blue-500">
+                            <option value="admin">admin</option>
+                            <option value="superAdmin">superAdmin</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Password
+                            <span id="pw-hint" class="normal-case font-normal text-slate-400">(kosongkan jika tidak diubah)</span>
+                        </label>
+                        <input type="password" name="password" id="account-password" autocomplete="new-password"
+                            class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
+                                   bg-white border-gray-300 text-slate-900
+                                   dark:bg-slate-700 dark:border-slate-600 dark:text-white
+                                   focus:ring-2 focus:ring-blue-500"/>
+                    </div>
+                    <div id="pw-confirm-wrap" class="space-y-1">
+                        <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Konfirmasi Password</label>
+                        <input type="password" name="password_confirmation" autocomplete="new-password"
+                            class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
+                                   bg-white border-gray-300 text-slate-900
+                                   dark:bg-slate-700 dark:border-slate-600 dark:text-white
+                                   focus:ring-2 focus:ring-blue-500"/>
+                    </div>
+                </div>
             </div>
 
-            <div class="flex gap-3 pt-2">
-                <button type="button" onclick="closeAccountModal()"
-                    class="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 transition">
-                    BATAL
-                </button>
-                <button type="submit"
-                    class="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition">
-                    SIMPAN
-                </button>
+            {{-- Footer — gunakan .modal-ftr dari app.css --}}
+            <div class="modal-ftr">
+                <button type="button" onclick="closeAccountModal()" class="modal-btn-cancel">BATAL</button>
+                <button type="submit" class="modal-btn-save">SIMPAN PERUBAHAN</button>
             </div>
         </form>
     </div>
 </div>
+@endpush
 
+@push('scripts')
 <script>
 function openAddAccountModal() {
     document.getElementById('account-modal-title').textContent = 'Tambah Akun Baru';
@@ -149,6 +192,7 @@ function openAddAccountModal() {
     document.getElementById('account-password').value = '';
     document.getElementById('pw-hint').style.display = 'none';
     document.getElementById('account-modal-overlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
 }
 function openEditAccountModal(user) {
     document.getElementById('account-modal-title').textContent = 'Edit Akun';
@@ -160,10 +204,12 @@ function openEditAccountModal(user) {
     document.getElementById('account-password').value = '';
     document.getElementById('pw-hint').style.display = '';
     document.getElementById('account-modal-overlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
 }
 function closeAccountModal(e) {
     if (e && e.target !== document.getElementById('account-modal-overlay')) return;
     document.getElementById('account-modal-overlay').style.display = 'none';
+    document.body.style.overflow = '';
 }
 </script>
-@endsection
+@endpush
