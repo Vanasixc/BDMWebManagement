@@ -93,13 +93,10 @@
     >
         {{-- Logo --}}
         <div class="p-5 flex items-center gap-3 min-w-[200px]">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shrink-0">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                </svg>
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0">
+                <i><img src="logo_BDM.svg" alt="BDM"></i>
             </div>
-            <span class="font-bold text-lg text-slate-900 dark:text-white truncate whitespace-nowrap">WH-Manager</span>
+            <span class="font-bold text-lg text-slate-900 dark:text-white truncate whitespace-nowrap">Banjar Digital Media</span>
         </div>
 
         {{-- Nav Menu --}}

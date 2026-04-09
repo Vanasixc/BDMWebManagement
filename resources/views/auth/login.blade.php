@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login — WH Manager</title>
+    <title>Login Banjar Digital Media Web Management</title>
     <meta name="description" content="Masuk ke WebHouse Manager untuk mengelola infrastruktur website klien Anda." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -31,18 +31,16 @@
 
             {{-- Logo --}}
             <div class="flex justify-center mb-6">
-                <div class="w-14 h-14 md:w-16 md:h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 md:w-9 md:h-9" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                    </svg>
+                <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center">
+                    <i><img src="logo_BDM.svg" alt="BDM"></i>
                 </div>
             </div>
 
             <h1 class="text-xl md:text-2xl font-bold text-center text-gray-800 dark:text-white">
-                WebHouse Manager
+                Banjar Digital Media <br> Web Management
             </h1>
             <p class="text-center mt-1 mb-7 text-xs md:text-sm text-gray-500 dark:text-slate-400">
-                Silahkan login untuk mengelola infrastruktur
+                Silahkan login untuk mengelola website client
             </p>
 
             {{-- Error: username --}}
