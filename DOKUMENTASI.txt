@@ -1,15 +1,8 @@
 ================================================================================
-                    DOKUMENTASI APLIKASI WH-Manager
-                    Web House Management System
+                    DOKUMENTASI BDMWebManagement
 ================================================================================
 
 Dibuat     : 2026
-Versi      : 1.0.0
-Deskripsi  : Aplikasi manajemen data infrastruktur website klien perusahaan.
-             Membantu tim internal dalam memantau, mengelola, dan menganalisis
-             data website, domain, hosting, akses, keuangan, dan pengingat
-             expire hosting milik klien.
-
 
 ================================================================================
   I. TEKNOLOGI & STACK YANG DIGUNAKAN
