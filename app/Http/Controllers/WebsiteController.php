@@ -139,6 +139,63 @@ class WebsiteController extends Controller
     }
 
     /**
+     * Clear section columns only, row stays intact.
+     */
+    public function clear(Request $request, Website $website)
+    {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if ($user->isUser()) {
+            abort(403, 'Anda tidak memiliki akses untuk menghapus data');
+        }
+
+        $section = $request->input('section');
+
+        $sectionFields = [
+            'domain'   => [
+                'domain_provider' => null,
+                'domain_email'    => null,
+                'domain_reg_date' => null,
+                'domain_exp_date' => null,
+                'domain_price'    => 0,
+            ],
+            'hosting'  => [
+                'hosting_type'     => null,
+                'hosting_provider' => null,
+                'storage'          => 0,
+                'ip_server'        => null,
+                'location'         => null,
+                'hosting_email'    => null,
+                'hosting_exp_date' => null,
+                'hosting_price'    => 0,
+            ],
+            'akses'    => [
+                'admin_url'    => null,
+                'extra_access' => null,
+                'password_loc' => null,
+            ],
+            'finansial' => [
+                'sell_price'   => 0,
+                'pay_system'   => 'Tahunan',
+                'pay_status'   => 'Belum',
+                'invoice_date' => null,
+            ],
+        ];
+
+        if (!array_key_exists($section, $sectionFields)) {
+            abort(422, 'Section tidak valid untuk operasi clear.');
+        }
+
+        $website->update($sectionFields[$section]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true, 'message' => 'Data section berhasil direset!']);
+        }
+        return back()->with('success', 'Data section berhasil direset!');
+    }
+
+    /**
      * Ambil data website untuk modal (JSON).
      */
     public function show(Website $website)

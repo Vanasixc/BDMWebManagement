@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/websites',              [WebsiteController::class, 'store'])->name('websites.store');
         Route::put('/websites/{website}',     [WebsiteController::class, 'update'])->name('websites.update');
         Route::delete('/websites/{website}',  [WebsiteController::class, 'destroy'])->name('websites.destroy');
+        Route::patch('/websites/{website}/clear', [WebsiteController::class, 'clear'])->name('websites.clear');
 
         Route::post('/dropdown/add',    [DropdownConfigController::class, 'addOption'])->name('dropdown.add');
         Route::post('/dropdown/remove', [DropdownConfigController::class, 'removeOption'])->name('dropdown.remove');

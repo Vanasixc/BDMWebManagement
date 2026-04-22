@@ -190,6 +190,38 @@ window.confirmDelete = function (e, form) {
     return false;
 };
 
+window.confirmClear = function (e, form) {
+    e.preventDefault();
+
+    const isDark = document.documentElement.classList.contains('dark');
+
+    Swal.fire({
+        title: 'Reset Data?',
+        text: 'Data yang direset tidak bisa dikembalikan!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#EF4444',
+        cancelButtonColor: '#475569',
+        confirmButtonText: '<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> Ya, Hapus!',
+        cancelButtonText: 'Batal',
+        background: isDark ? '#1e293b' : '#ffffff',
+        color: isDark ? '#f1f5f9' : '#0f172a',
+        customClass: {
+            popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
+            title: 'font-bold text-base',
+            htmlContainer: 'text-sm',
+            confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+            cancelButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+        },
+        buttonsStyling: true,
+        reverseButtons: true,
+    }).then(result => {
+        if (result.isConfirmed) form.submit();
+    });
+
+    return false;
+};
+
 // =============================================
 // MODAL — CRUD
 // =============================================
