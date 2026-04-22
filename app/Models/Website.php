@@ -105,4 +105,36 @@ class Website extends Model
         return $query->where('client', 'like', "%{$keyword}%")
             ->orWhere('website', 'like', "%{$keyword}%");
     }
+
+    /**
+     * Check if user is superAdmin.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'superAdmin';
+    }
+
+    /**
+     * Check if user is admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user is regular user (read-only).
+     */
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
+
+    /**
+     * Check if user can modify data (superAdmin or admin).
+     */
+    public function canModify(): bool
+    {
+        return in_array($this->role, ['superAdmin', 'admin']);
+    }
 }

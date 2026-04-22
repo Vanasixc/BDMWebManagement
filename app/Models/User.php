@@ -11,11 +11,17 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'display_name', 'email', 'password', 'role', 'avatar',
+        'name',
+        'display_name',
+        'email',
+        'password',
+        'role',
+        'avatar',
     ];
 
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     protected function casts(): array
@@ -41,6 +47,16 @@ class User extends Authenticatable
     public function isSuperAdmin(): bool
     {
         return $this->role === 'superAdmin';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
     }
 
     /**

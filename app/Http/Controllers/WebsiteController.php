@@ -44,7 +44,7 @@ class WebsiteController extends Controller
             ['key' => 'client',       'label' => 'Client'],
             ['key' => 'sell_price',   'label' => 'Harga Jual',  'currency' => true],
             ['key' => 'domain_price', 'label' => 'B. Domain',   'currency' => true],
-            ['key' => 'hosting_price','label' => 'B. Hosting',  'currency' => true],
+            ['key' => 'hosting_price', 'label' => 'B. Hosting',  'currency' => true],
             ['key' => 'margin',       'label' => 'Margin',      'currency' => true, 'computed' => true, 'highlight' => 'emerald'],
             ['key' => 'pay_status',   'label' => 'Status',      'pay_badge' => true],
         ],
@@ -70,7 +70,7 @@ class WebsiteController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('client', 'like', "%{$search}%")
-                  ->orWhere('website', 'like', "%{$search}%");
+                    ->orWhere('website', 'like', "%{$search}%");
             });
         }
 
@@ -88,6 +88,10 @@ class WebsiteController extends Controller
      */
     public function store(Request $request)
     {
+        if (auth()->user()->isUser()) {
+            abort(403, 'Anda tidak memiliki akses untuk menambah data');
+        }
+
         $validated = $request->validate($this->validationRules());
         Website::create($validated);
 
@@ -102,6 +106,13 @@ class WebsiteController extends Controller
      */
     public function update(Request $request, Website $website)
     {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if ($user->isUser()) {
+            abort(403, 'Anda tidak memiliki akses untuk mengubah data');
+        }
+
         $validated = $request->validate($this->validationRules());
         $website->update($validated);
 
@@ -116,6 +127,13 @@ class WebsiteController extends Controller
      */
     public function destroy(Website $website)
     {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if ($user->isUser()) {
+            abort(403, 'Anda tidak memiliki akses untuk menghapus data');
+        }
+
         $website->delete();
         return back()->with('success', 'Data website berhasil dihapus!');
     }
@@ -187,7 +205,7 @@ class WebsiteController extends Controller
                 'tier_mid'    => $all->filter(fn($w) => ($w->domain_price ?? 0) >= 100000 && ($w->domain_price ?? 0) <= 200000)->count(),
                 'tier_high'   => $all->filter(fn($w) => ($w->domain_price ?? 0) > 200000)->count(),
                 'providers'   => $all->whereNotNull('domain_provider')->groupBy('domain_provider')
-                                     ->map->count()->sortDesc()->take(6)->toArray(),
+                    ->map->count()->sortDesc()->take(6)->toArray(),
                 'avg_price'   => (int) $all->whereNotNull('domain_price')->avg('domain_price'),
             ],
             'hosting' => [
@@ -222,7 +240,7 @@ class WebsiteController extends Controller
             'reminder' => [
                 'aman'    => $all->filter(fn($w) => $w->reminder_status === 'Aman')->count(),
                 'siaga'   => $all->filter(fn($w) => $w->reminder_status === 'Segera')->count(),
-                'darurat' => $all->filter(fn($w) => in_array($w->reminder_status, ['Kritis','Expired']))->count(),
+                'darurat' => $all->filter(fn($w) => in_array($w->reminder_status, ['Kritis', 'Expired']))->count(),
                 'deadlines' => $all->whereNotNull('hosting_exp_date')
                     ->map(fn($w) => [
                         'website'  => $w->website,
