@@ -59,6 +59,11 @@ class User extends Authenticatable
         return $this->role === 'user';
     }
 
+    public function canModify(): bool
+    {
+        return in_array($this->role, ['superAdmin', 'admin']);
+    }
+
     /**
      * Nama tampilan — gunakan display_name jika ada, fallback ke name.
      */

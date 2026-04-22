@@ -88,8 +88,8 @@ class WebsiteController extends Controller
      */
     public function store(Request $request)
     {
-        if (auth()->user()->isUser()) {
-            abort(403, 'Anda tidak memiliki akses untuk menambah data');
+        if (! auth()->user()->canModify()) {
+            abort(403, 'Anda tidak memiliki akses untuk menambah data.');
         }
 
         $validated = $request->validate($this->validationRules());
@@ -106,11 +106,8 @@ class WebsiteController extends Controller
      */
     public function update(Request $request, Website $website)
     {
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
-
-        if ($user->isUser()) {
-            abort(403, 'Anda tidak memiliki akses untuk mengubah data');
+        if (! auth()->user()->canModify()) {
+            abort(403, 'Anda tidak memiliki akses untuk mengubah data.');
         }
 
         $validated = $request->validate($this->validationRules());
@@ -127,11 +124,8 @@ class WebsiteController extends Controller
      */
     public function destroy(Website $website)
     {
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
-
-        if ($user->isUser()) {
-            abort(403, 'Anda tidak memiliki akses untuk menghapus data');
+        if (! auth()->user()->canModify()) {
+            abort(403, 'Anda tidak memiliki akses untuk menghapus data.');
         }
 
         $website->delete();
@@ -309,5 +303,68 @@ class WebsiteController extends Controller
             ],
             default => [],
         };
+    }
+
+    public function exportFinansial()
+    {
+        $websites = Website::orderBy('client')->get();
+
+        $filename = 'finansial_' . now()->format('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ];
+
+        $callback = function () use ($websites) {
+            $handle = fopen('php://output', 'w');
+
+            // BOM for Excel UTF-8 compatibility
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // Header row
+            fputcsv($handle, [
+                'No',
+                'Client',
+                'Website',
+                'URL',
+                'Harga Domain (Rp)',
+                'Harga Hosting (Rp)',
+                'Harga Hosting/Bulan (Rp)',
+                'Harga Jual (Rp)',
+                'Margin (Rp)',
+                'Sistem Bayar',
+                'Status Bayar',
+                'Tanggal Invoice',
+            ]);
+
+            // Data rows
+            foreach ($websites as $index => $w) {
+                $hostingPerBulan = round($w->hosting_price / 12);
+                $margin          = $w->sell_price - ($w->domain_price + $hostingPerBulan);
+
+                fputcsv($handle, [
+                    $index + 1,
+                    $w->client,
+                    $w->website,
+                    $w->url,
+                    $w->domain_price,
+                    $w->hosting_price,
+                    $hostingPerBulan,
+                    $w->sell_price,
+                    $margin,
+                    $w->pay_system,
+                    $w->pay_status,
+                    $w->invoice_date?->format('d/m/Y') ?? '-',
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

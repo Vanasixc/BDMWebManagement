@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/hosting',   [WebsiteController::class, 'index'])->defaults('section', 'hosting')->name('hosting');
     Route::get('/akses',     [WebsiteController::class, 'index'])->defaults('section', 'akses')->name('akses');
     Route::get('/finansial', [WebsiteController::class, 'index'])->defaults('section', 'finansial')->name('finansial');
+    Route::get('/finansial/export', [WebsiteController::class, 'exportFinansial'])->name('finansial.export');
     Route::get('/reminder',  [WebsiteController::class, 'index'])->defaults('section', 'reminder')->name('reminder');
 
     // Show detail — semua role bisa akses

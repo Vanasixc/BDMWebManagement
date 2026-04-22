@@ -144,6 +144,7 @@
                                    bg-white border-gray-300 text-slate-900
                                    dark:bg-slate-700 dark:border-slate-600 dark:text-white
                                    focus:ring-2 focus:ring-blue-500">
+                            <option value="user">user</option>
                             <option value="admin">admin</option>
                             <option value="superAdmin">superAdmin</option>
                         </select>

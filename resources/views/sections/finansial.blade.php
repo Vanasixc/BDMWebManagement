@@ -6,16 +6,28 @@
 @section('content')
 
 {{-- ============================================================
+     Header + Export Button
+     ============================================================ --}}
+<div class="flex justify-end mb-4">
+    <a
+        href="{{ route('finansial.export') }}"
+        class="justify-center bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 hover:bg-emerald-700 transition shadow-sm">
+        @include('components.icon', ['name' => 'download', 'class' => 'w-4 h-4'])
+        Export CSV
+    </a>
+</div>
+
+{{-- ============================================================
      VISUALISASI: Summary Cards Finansial
      ============================================================ --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
     @php
-        $finCards = [
-            ['label' => 'Total Pendapatan', 'value' => $statsData['total_revenue'], 'icon' => 'dollar-sign', 'bg' => 'bg-blue-500', 'shadow' => 'shadow-blue-500/30', 'text' => 'text-blue-700 dark:text-blue-400', 'area' => 'bg-blue-50 border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20'],
-            ['label' => 'Total B. Domain',  'value' => $statsData['total_domain'],  'icon' => 'globe',        'bg' => 'bg-violet-500','shadow' => 'shadow-violet-500/30','text' => 'text-violet-700 dark:text-violet-400','area' => 'bg-violet-50 border-violet-100 dark:bg-violet-500/10 dark:border-violet-500/20'],
-            ['label' => 'Total B. Hosting', 'value' => $statsData['total_hosting'], 'icon' => 'server',       'bg' => 'bg-amber-500', 'shadow' => 'shadow-amber-500/30', 'text' => 'text-amber-700 dark:text-amber-400', 'area' => 'bg-amber-50 border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20'],
-            ['label' => 'Total Margin',     'value' => $statsData['total_margin'],  'icon' => 'trending-up',  'bg' => 'bg-emerald-500','shadow' => 'shadow-emerald-500/30','text' => 'text-emerald-700 dark:text-emerald-400','area' => 'bg-emerald-50 border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20'],
-        ];
+    $finCards = [
+    ['label' => 'Total Pendapatan', 'value' => $statsData['total_revenue'], 'icon' => 'dollar-sign', 'bg' => 'bg-blue-500', 'shadow' => 'shadow-blue-500/30', 'text' => 'text-blue-700 dark:text-blue-400', 'area' => 'bg-blue-50 border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20'],
+    ['label' => 'Total B. Domain', 'value' => $statsData['total_domain'], 'icon' => 'globe', 'bg' => 'bg-violet-500','shadow' => 'shadow-violet-500/30','text' => 'text-violet-700 dark:text-violet-400','area' => 'bg-violet-50 border-violet-100 dark:bg-violet-500/10 dark:border-violet-500/20'],
+    ['label' => 'Total B. Hosting', 'value' => $statsData['total_hosting'], 'icon' => 'server', 'bg' => 'bg-amber-500', 'shadow' => 'shadow-amber-500/30', 'text' => 'text-amber-700 dark:text-amber-400', 'area' => 'bg-amber-50 border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20'],
+    ['label' => 'Total Margin', 'value' => $statsData['total_margin'], 'icon' => 'trending-up', 'bg' => 'bg-emerald-500','shadow' => 'shadow-emerald-500/30','text' => 'text-emerald-700 dark:text-emerald-400','area' => 'bg-emerald-50 border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20'],
+    ];
     @endphp
     @foreach($finCards as $card)
     <div class="p-4 md:p-5 rounded-xl border shadow-sm {{ $card['area'] }}">
@@ -44,9 +56,9 @@
             Status Pembayaran
         </h3>
         @php
-            $totalPay = $statsData['lunas'] + $statsData['belum'];
-            $lunasPct = $totalPay > 0 ? round($statsData['lunas'] / $totalPay * 100) : 0;
-            $belumPct = 100 - $lunasPct;
+        $totalPay = $statsData['lunas'] + $statsData['belum'];
+        $lunasPct = $totalPay > 0 ? round($statsData['lunas'] / $totalPay * 100) : 0;
+        $belumPct = 100 - $lunasPct;
         @endphp
         <div class="space-y-4">
             {{-- Lunas --}}
@@ -95,66 +107,86 @@
 
 @push('scripts')
 <script>
-window.WHSection   = 'finansial';
-window.WHDropdowns = @json($dropdowns->map(fn($d) => $d->options));
+    window.WHSection = 'finansial';
+    window.WHDropdowns = @json($dropdowns -> map(fn($d) => $d -> options));
 
-// Margin chart
-(function() {
-    const isDark    = document.documentElement.classList.contains('dark');
-    const gridColor = isDark ? 'rgba(51,65,85,0.8)' : 'rgba(226,232,240,0.8)';
-    const textColor = isDark ? '#94a3b8' : '#64748b';
-    const margins   = @json($statsData['margins']);
+    // Margin chart
+    (function() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const gridColor = isDark ? 'rgba(51,65,85,0.8)' : 'rgba(226,232,240,0.8)';
+        const textColor = isDark ? '#94a3b8' : '#64748b';
+        const margins = @json($statsData['margins']);
 
-    // Hitung batas atas dinamis: ceil ke kelipatan 1 juta terdekat
-    const maxMargin  = Math.max(...margins.map(m => m.margin), 0);
-    const JT         = 1_000_000;
-    const axisMax    = maxMargin <= 0 ? JT : Math.ceil(maxMargin / JT) * JT;
+        // Hitung batas atas dinamis: ceil ke kelipatan 1 juta terdekat
+        const maxMargin = Math.max(...margins.map(m => m.margin), 0);
+        const JT = 1_000_000;
+        const axisMax = maxMargin <= 0 ? JT : Math.ceil(maxMargin / JT) * JT;
 
-    // Format label sumbu X: "Rp X juta"
-    const fmtJuta = (v) => {
-        if (v === 0) return 'Rp 0';
-        const juta = v / JT;
-        // Tampilkan 1 desimal hanya bila bukan bilangan bulat
-        const label = Number.isInteger(juta) ? juta : juta.toFixed(1).replace('.', ',');
-        return 'Rp ' + label + ' juta';
-    };
+        // Format label sumbu X: "Rp X juta"
+        const fmtJuta = (v) => {
+            if (v === 0) return 'Rp 0';
+            const juta = v / JT;
+            // Tampilkan 1 desimal hanya bila bukan bilangan bulat
+            const label = Number.isInteger(juta) ? juta : juta.toFixed(1).replace('.', ',');
+            return 'Rp ' + label + ' juta';
+        };
 
-    new Chart(document.getElementById('marginChart'), {
-        type: 'bar',
-        data: {
-            labels: margins.map(m => m.website),
-            datasets: [{
-                label: 'Margin',
-                data: margins.map(m => m.margin),
-                backgroundColor: margins.map(m =>
-                    m.margin >= 0 ? 'rgba(16,185,129,0.75)' : 'rgba(239,68,68,0.75)'
-                ),
-                borderRadius: 5,
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: { callbacks: { label: ctx => 'Rp ' + new Intl.NumberFormat('id-ID').format(ctx.raw) } }
+        new Chart(document.getElementById('marginChart'), {
+            type: 'bar',
+            data: {
+                labels: margins.map(m => m.website),
+                datasets: [{
+                    label: 'Margin',
+                    data: margins.map(m => m.margin),
+                    backgroundColor: margins.map(m =>
+                        m.margin >= 0 ? 'rgba(16,185,129,0.75)' : 'rgba(239,68,68,0.75)'
+                    ),
+                    borderRadius: 5,
+                }]
             },
-            scales: {
-                x: {
-                    min: 0,
-                    max: axisMax,
-                    ticks: {
-                        color: textColor,
-                        font: { size: 10 },
-                        callback: v => fmtJuta(v),
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
                     },
-                    grid: { color: gridColor }
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => 'Rp ' + new Intl.NumberFormat('id-ID').format(ctx.raw)
+                        }
+                    }
                 },
-                y: { ticks: { color: textColor, font: { size: 11 } }, grid: { display: false } },
+                scales: {
+                    x: {
+                        min: 0,
+                        max: axisMax,
+                        ticks: {
+                            color: textColor,
+                            font: {
+                                size: 10
+                            },
+                            callback: v => fmtJuta(v),
+                        },
+                        grid: {
+                            color: gridColor
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: textColor,
+                            font: {
+                                size: 11
+                            }
+                        },
+                        grid: {
+                            display: false
+                        }
+                    },
+                }
             }
-        }
-    });
-})();
+        });
+    })();
 </script>
 @endpush
