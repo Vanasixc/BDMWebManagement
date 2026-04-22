@@ -34,12 +34,10 @@ class AuthController extends Controller
         // Cari user berdasarkan name (username) karena field login menggunakan name
         $user = \App\Models\User::where('name', $request->username)->first();
 
-        if (!$user) {
-            return back()->withErrors(['username' => 'Username tidak ditemukan di sistem!'])->withInput();
-        }
-
-        if (!\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
-            return back()->withErrors(['password' => 'Password yang Anda masukkan salah!'])->withInput();
+        if (!$user || !\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+            return back()
+                ->withErrors(['username' => 'Username atau password yang Anda masukkan salah!'])
+                ->withInput(['username' => $request->username]);
         }
 
         Auth::login($user, $request->boolean('remember'));

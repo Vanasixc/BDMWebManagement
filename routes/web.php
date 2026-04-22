@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Route;
 // =============================================
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:login')
+        ->name('login.post');
 });
 
 // =============================================
@@ -31,7 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/domain',   [WebsiteController::class, 'index'])->defaults('section', 'domain')->name('domain');
     Route::get('/hosting',  [WebsiteController::class, 'index'])->defaults('section', 'hosting')->name('hosting');
     Route::get('/akses',    [WebsiteController::class, 'index'])->defaults('section', 'akses')->name('akses');
-    Route::get('/finansial',[WebsiteController::class, 'index'])->defaults('section', 'finansial')->name('finansial');
+    Route::get('/finansial', [WebsiteController::class, 'index'])->defaults('section', 'finansial')->name('finansial');
     Route::get('/reminder', [WebsiteController::class, 'index'])->defaults('section', 'reminder')->name('reminder');
 
     // CRUD Websites (AJAX-friendly JSON untuk show)
