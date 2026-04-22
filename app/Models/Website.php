@@ -8,21 +8,47 @@ class Website extends Model
 {
     protected $fillable = [
         // Master
-        'client', 'pic', 'website', 'url', 'type', 'technology', 'status',
-        'internal_pic', 'service_package', 'created_year', 'note', 'phone', 'email',
+        'client',
+        'pic',
+        'website',
+        'url',
+        'type',
+        'technology',
+        'status',
+        'internal_pic',
+        'service_package',
+        'created_year',
+        'note',
+        'phone',
+        'email',
 
         // Domain
-        'domain_provider', 'domain_email', 'domain_reg_date', 'domain_exp_date', 'domain_price',
+        'domain_provider',
+        'domain_email',
+        'domain_reg_date',
+        'domain_exp_date',
+        'domain_price',
 
         // Hosting
-        'hosting_type', 'hosting_provider', 'storage', 'ip_server', 'location',
-        'hosting_email', 'hosting_exp_date', 'hosting_price',
+        'hosting_type',
+        'hosting_provider',
+        'storage',
+        'ip_server',
+        'location',
+        'hosting_email',
+        'hosting_exp_date',
+        'hosting_price',
 
         // Access
-        'admin_url', 'extra_access', 'password_loc',
+        'admin_url',
+        'extra_access',
+        'password_loc',
 
         // Financial
-        'sell_price', 'pay_system', 'pay_status', 'invoice_date',
+        'sell_price',
+        'pay_system',
+        'pay_status',
+        'invoice_date',
     ];
 
     protected $casts = [
@@ -43,7 +69,11 @@ class Website extends Model
     public function getDaysRemainingAttribute(): int
     {
         if (!$this->hosting_exp_date) return 0;
-        return (int) now()->diffInDays($this->hosting_exp_date, false);
+
+        return (int) now()->startOfDay()->diffInDays(
+            $this->hosting_exp_date->startOfDay(),
+            false
+        );
     }
 
     /**
@@ -73,6 +103,6 @@ class Website extends Model
     public function scopeSearch($query, string $keyword)
     {
         return $query->where('client', 'like', "%{$keyword}%")
-                     ->orWhere('website', 'like', "%{$keyword}%");
+            ->orWhere('website', 'like', "%{$keyword}%");
     }
 }
