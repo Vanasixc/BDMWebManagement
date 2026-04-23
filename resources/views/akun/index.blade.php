@@ -151,7 +151,6 @@
                                    focus:ring-2 focus:ring-blue-500">
                             <option value="user">user</option>
                             <option value="admin">admin</option>
-                            <option value="superAdmin">superAdmin</option>
                         </select>
                     </div>
                     <div class="space-y-1">

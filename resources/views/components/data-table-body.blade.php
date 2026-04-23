@@ -50,7 +50,14 @@
             @elseif (!empty($col['suffix']))
             {{ $website->{$col['key']} }}{{ $col['suffix'] }}
             @else
+            @if ($col['key'] === 'admin_url' && !empty($website->admin_url))
+            <a href="{{ $website->admin_url }}" target="_blank" rel="noopener noreferrer"
+                class="text-blue-500 hover:text-blue-700 hover:underline transition truncate max-w-[200px] block">
+                {{ $website->admin_url }}
+            </a>
+            @else
             {{ $website->{$col['key']} ?? '-' }}
+            @endif
             @endif
         </td>
         @endforeach
