@@ -3,26 +3,26 @@
  * Handles: dark mode, sidebar toggle/resize, modal CRUD, delete confirm, Chart.js init
  */
 
-import './bootstrap';
+import "./bootstrap";
 
 // =============================================
 // DARK MODE
 // =============================================
 window.toggleDark = function () {
-    const isDark = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('darkMode', isDark ? '1' : '0');
-    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+    const isDark = document.documentElement.classList.toggle("dark");
+    localStorage.setItem("darkMode", isDark ? "1" : "0");
+    document.documentElement.style.colorScheme = isDark ? "dark" : "light";
 };
 
 // Apply on load — harus sebelum render untuk hindari flash
 (function () {
-    const isDark = localStorage.getItem('darkMode') === '1';
+    const isDark = localStorage.getItem("darkMode") === "1";
     if (isDark) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.style.colorScheme = 'dark';
+        document.documentElement.classList.add("dark");
+        document.documentElement.style.colorScheme = "dark";
     } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.style.colorScheme = 'light';
+        document.documentElement.classList.remove("dark");
+        document.documentElement.style.colorScheme = "light";
     }
 })();
 
@@ -42,10 +42,10 @@ window.closeSidebar = function () {
 };
 
 function applySidebarState() {
-    const sidebar   = document.getElementById('sidebar');
-    const overlay   = document.getElementById('sidebar-overlay');
-    const iconOpen  = document.getElementById('hamburger-icon-open');
-    const iconClose = document.getElementById('hamburger-icon-close');
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebar-overlay");
+    const iconOpen = document.getElementById("hamburger-icon-open");
+    const iconClose = document.getElementById("hamburger-icon-close");
 
     if (!sidebar) return;
 
@@ -54,86 +54,88 @@ function applySidebarState() {
     if (isMobile) {
         // Gunakan classList — hindari konflik dengan Tailwind v4 native CSS translate property
         if (sidebarOpen) {
-            sidebar.classList.add('sidebar-open');
+            sidebar.classList.add("sidebar-open");
         } else {
-            sidebar.classList.remove('sidebar-open');
+            sidebar.classList.remove("sidebar-open");
         }
 
         // Overlay: gunakan style langsung agar tidak konflik dengan Tailwind
         if (overlay) {
-            overlay.style.display       = sidebarOpen ? 'block' : 'none';
-            overlay.style.pointerEvents = sidebarOpen ? 'auto' : 'none';
+            overlay.style.display = sidebarOpen ? "block" : "none";
+            overlay.style.pointerEvents = sidebarOpen ? "auto" : "none";
         }
     } else {
         // Desktop: kontrol via width
-        sidebar.classList.remove('sidebar-open'); // bersihkan class mobile
-        sidebar.style.width    = sidebarOpen ? (currentSidebarWidth + 'px') : '0px';
-        sidebar.style.overflow = sidebarOpen ? '' : 'hidden';
+        sidebar.classList.remove("sidebar-open"); // bersihkan class mobile
+        sidebar.style.width = sidebarOpen ? currentSidebarWidth + "px" : "0px";
+        sidebar.style.overflow = sidebarOpen ? "" : "hidden";
         if (overlay) {
-            overlay.style.display       = 'none';
-            overlay.style.pointerEvents = 'none';
+            overlay.style.display = "none";
+            overlay.style.pointerEvents = "none";
         }
     }
 
-    if (iconOpen)  iconOpen.style.display  = sidebarOpen ? 'none' : 'block';
-    if (iconClose) iconClose.style.display = sidebarOpen ? 'block' : 'none';
+    if (iconOpen) iconOpen.style.display = sidebarOpen ? "none" : "block";
+    if (iconClose) iconClose.style.display = sidebarOpen ? "block" : "none";
 }
 
 // =============================================
 // SIDEBAR — RESIZABLE (desktop only)
 // =============================================
-let currentSidebarWidth = parseInt(localStorage.getItem('sidebarWidth') || '256');
+let currentSidebarWidth = parseInt(
+    localStorage.getItem("sidebarWidth") || "256",
+);
 let isResizing = false;
 let startX = 0;
 let startWidth = 0;
 
-document.addEventListener('DOMContentLoaded', () => {
-    const sidebar  = document.getElementById('sidebar');
-    const resizer  = document.getElementById('sidebar-resizer');
+document.addEventListener("DOMContentLoaded", () => {
+    const sidebar = document.getElementById("sidebar");
+    const resizer = document.getElementById("sidebar-resizer");
 
     if (sidebar && window.innerWidth >= 768) {
-        sidebar.style.width = currentSidebarWidth + 'px';
+        sidebar.style.width = currentSidebarWidth + "px";
     }
 
     if (resizer) {
-        resizer.addEventListener('mousedown', (e) => {
+        resizer.addEventListener("mousedown", (e) => {
             isResizing = true;
             startX = e.clientX;
             startWidth = parseInt(sidebar.style.width || currentSidebarWidth);
-            resizer.classList.add('is-resizing');
-            document.body.style.userSelect = 'none';
+            resizer.classList.add("is-resizing");
+            document.body.style.userSelect = "none";
         });
     }
 
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener("mousemove", (e) => {
         if (!isResizing || window.innerWidth < 768) return;
-        const sidebar = document.getElementById('sidebar');
+        const sidebar = document.getElementById("sidebar");
         let newWidth = startWidth + (e.clientX - startX);
         newWidth = Math.max(200, Math.min(480, newWidth));
-        sidebar.style.width = newWidth + 'px';
+        sidebar.style.width = newWidth + "px";
         currentSidebarWidth = newWidth;
     });
 
-    document.addEventListener('mouseup', () => {
+    document.addEventListener("mouseup", () => {
         if (isResizing) {
             isResizing = false;
-            const resizer = document.getElementById('sidebar-resizer');
-            if (resizer) resizer.classList.remove('is-resizing');
-            document.body.style.userSelect = '';
-            localStorage.setItem('sidebarWidth', currentSidebarWidth);
+            const resizer = document.getElementById("sidebar-resizer");
+            if (resizer) resizer.classList.remove("is-resizing");
+            document.body.style.userSelect = "";
+            localStorage.setItem("sidebarWidth", currentSidebarWidth);
         }
     });
 
     // Responsive: if resized to mobile, reset sidebar
-    window.addEventListener('resize', () => {
-        const sidebar = document.getElementById('sidebar');
+    window.addEventListener("resize", () => {
+        const sidebar = document.getElementById("sidebar");
         if (!sidebar) return;
         if (window.innerWidth < 768) {
-            sidebar.style.width = '256px';
+            sidebar.style.width = "256px";
             sidebarOpen = false;
             applySidebarState();
         } else {
-            sidebar.style.width = currentSidebarWidth + 'px';
+            sidebar.style.width = currentSidebarWidth + "px";
             sidebarOpen = true;
             applySidebarState();
         }
@@ -144,11 +146,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Auto-dismiss flash messages setelah 4 detik
     setTimeout(function () {
-        ['flash-success', 'flash-error'].forEach(function (id) {
+        ["flash-success", "flash-error"].forEach(function (id) {
             const el = document.getElementById(id);
             if (el) {
-                el.style.transition = 'opacity 0.5s';
-                el.style.opacity   = '0';
+                el.style.transition = "opacity 0.5s";
+                el.style.opacity = "0";
                 setTimeout(() => el.remove(), 500);
             }
         });
@@ -161,29 +163,32 @@ document.addEventListener('DOMContentLoaded', () => {
 window.confirmDelete = function (e, form) {
     e.preventDefault();
 
-    const isDark = document.documentElement.classList.contains('dark');
+    const isDark = document.documentElement.classList.contains("dark");
 
     Swal.fire({
-        title: 'Hapus Data?',
-        text: 'Data yang dihapus tidak bisa dikembalikan!',
-        icon: 'warning',
+        title: "Hapus Data?",
+        text: "Data yang dihapus tidak bisa dikembalikan!",
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: '#EF4444',
-        cancelButtonColor: '#475569',
-        confirmButtonText: '<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> Ya, Hapus!',
-        cancelButtonText: 'Batal',
-        background: isDark ? '#1e293b' : '#ffffff',
-        color: isDark ? '#f1f5f9' : '#0f172a',
+        confirmButtonColor: "#EF4444",
+        cancelButtonColor: "#475569",
+        confirmButtonText:
+            '<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> Ya, Hapus!',
+        cancelButtonText: "Batal",
+        background: isDark ? "#1e293b" : "#ffffff",
+        color: isDark ? "#f1f5f9" : "#0f172a",
         customClass: {
-            popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
-            title: 'font-bold text-base',
-            htmlContainer: 'text-sm',
-            confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
-            cancelButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+            popup:
+                "rounded-2xl shadow-2xl border " +
+                (isDark ? "border-slate-700" : "border-gray-100"),
+            title: "font-bold text-base",
+            htmlContainer: "text-sm",
+            confirmButton: "rounded-xl font-bold text-sm px-5 py-2.5",
+            cancelButton: "rounded-xl font-bold text-sm px-5 py-2.5",
         },
         buttonsStyling: true,
         reverseButtons: true,
-    }).then(result => {
+    }).then((result) => {
         if (result.isConfirmed) form.submit();
     });
 
@@ -193,29 +198,31 @@ window.confirmDelete = function (e, form) {
 window.confirmClear = function (e, form) {
     e.preventDefault();
 
-    const isDark = document.documentElement.classList.contains('dark');
+    const isDark = document.documentElement.classList.contains("dark");
 
     Swal.fire({
-        title: 'Reset Data?',
-        text: 'Data yang direset tidak bisa dikembalikan!',
-        icon: 'warning',
+        title: "Reset Data?",
+        text: "Data yang direset tidak bisa dikembalikan!",
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: '#EF4444',
-        cancelButtonColor: '#475569',
-        confirmButtonText: 'Ya, Reset!',
-        cancelButtonText: 'Batal',
-        background: isDark ? '#1e293b' : '#ffffff',
-        color: isDark ? '#f1f5f9' : '#0f172a',
+        confirmButtonColor: "#EF4444",
+        cancelButtonColor: "#475569",
+        confirmButtonText: "Ya, Reset!",
+        cancelButtonText: "Batal",
+        background: isDark ? "#1e293b" : "#ffffff",
+        color: isDark ? "#f1f5f9" : "#0f172a",
         customClass: {
-            popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
-            title: 'font-bold text-base',
-            htmlContainer: 'text-sm',
-            confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
-            cancelButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+            popup:
+                "rounded-2xl shadow-2xl border " +
+                (isDark ? "border-slate-700" : "border-gray-100"),
+            title: "font-bold text-base",
+            htmlContainer: "text-sm",
+            confirmButton: "rounded-xl font-bold text-sm px-5 py-2.5",
+            cancelButton: "rounded-xl font-bold text-sm px-5 py-2.5",
         },
         buttonsStyling: true,
         reverseButtons: true,
-    }).then(result => {
+    }).then((result) => {
         if (result.isConfirmed) form.submit();
     });
 
@@ -225,171 +232,179 @@ window.confirmClear = function (e, form) {
 // =============================================
 // MODAL — CRUD
 // =============================================
-let currentModalMode = 'view'; // 'view' | 'edit' | 'add' | 'editTable'
+let currentModalMode = "view"; // 'view' | 'edit' | 'add' | 'editTable'
 let currentWebsiteId = null;
-const CSRF = document.querySelector('meta[name="csrf-token"]')?.content || '';
+const CSRF = document.querySelector('meta[name="csrf-token"]')?.content || "";
 
 window.openModal = function () {
-    document.getElementById('modal-overlay').classList.add('active');
-    document.body.style.overflow = 'hidden'; // Cegah body scroll saat modal terbuka
+    document.getElementById("modal-overlay").classList.add("active");
+    document.body.style.overflow = "hidden"; // Cegah body scroll saat modal terbuka
 };
 
 window.closeModal = function () {
-    document.getElementById('modal-overlay').classList.remove('active');
-    document.body.style.overflow = '';
+    document.getElementById("modal-overlay").classList.remove("active");
+    document.body.style.overflow = "";
 };
 
 window.closeModalOnOverlay = function (e) {
-    if (e.target === document.getElementById('modal-overlay')) closeModal();
+    if (e.target === document.getElementById("modal-overlay")) closeModal();
 };
 
 window.openModalView = function (id) {
-    currentModalMode = 'view';
+    currentModalMode = "view";
     currentWebsiteId = id;
-    document.getElementById('modal-title').textContent = 'Detail Data Website';
-    document.getElementById('modal-save-btn').style.display = 'none';
+    document.getElementById("modal-title").textContent = "Detail Data Website";
+    document.getElementById("modal-save-btn").style.display = "none";
     fetchAndRenderForm(id, true);
 };
 
 window.openModalEdit = function (id) {
-    currentModalMode = 'edit';
+    currentModalMode = "edit";
     currentWebsiteId = id;
-    document.getElementById('modal-title').textContent = 'Edit Data Website';
-    document.getElementById('modal-save-btn').style.display = '';
+    document.getElementById("modal-title").textContent = "Edit Data Website";
+    document.getElementById("modal-save-btn").style.display = "";
     fetchAndRenderForm(id, false);
 };
 
 window.openModalAdd = function () {
-    currentModalMode = 'add';
+    currentModalMode = "add";
     currentWebsiteId = null;
-    document.getElementById('modal-title').textContent = 'Tambah Data Website Baru';
-    document.getElementById('modal-save-btn').style.display = '';
+    document.getElementById("modal-title").textContent =
+        "Tambah Data Website Baru";
+    document.getElementById("modal-save-btn").style.display = "";
     renderForm(null, false);
     openModal();
 };
 
 window.openModalEditTable = function () {
-    currentModalMode = 'editTable';
-    document.getElementById('modal-title').textContent = 'Pengaturan Opsi Dropdown';
-    document.getElementById('modal-save-btn').style.display = 'none';
+    currentModalMode = "editTable";
+    document.getElementById("modal-title").textContent =
+        "Pengaturan Opsi Dropdown";
+    document.getElementById("modal-save-btn").style.display = "none";
     renderEditTableForm();
     openModal();
 };
 
 window.submitModalForm = function () {
-    const form = document.getElementById('modal-dynamic-form');
+    const form = document.getElementById("modal-dynamic-form");
     if (!form) return;
 
-    const isDark = document.documentElement.classList.contains('dark');
-    const isAdd  = currentModalMode === 'add';
+    const isDark = document.documentElement.classList.contains("dark");
+    const isAdd = currentModalMode === "add";
     const formData = new FormData(form);
 
     // Untuk PUT method (edit), FormData sudah include _method=PUT via hidden field
     fetch(form.action, {
-        method: 'POST',   // Laravel method-spoofing lewat _method field
+        method: "POST", // Laravel method-spoofing lewat _method field
         headers: {
-            'Accept': 'application/json',
-            'X-CSRF-TOKEN': CSRF,
+            Accept: "application/json",
+            "X-CSRF-TOKEN": CSRF,
         },
         body: formData,
     })
-    .then(async r => {
-        // Jika redirect (success) atau JSON
-        if (r.redirected || r.ok) {
-            closeModal();
-            Swal.fire({
-                icon: 'success',
-                title: isAdd ? 'Data Ditambahkan!' : 'Data Diperbarui!',
-                text: isAdd
-                    ? 'Data website baru berhasil ditambahkan.'
-                    : 'Perubahan data website berhasil disimpan.',
-                timer: 1800,
-                showConfirmButton: false,
-                background: isDark ? '#1e293b' : '#ffffff',
-                color: isDark ? '#f1f5f9' : '#0f172a',
-                customClass: {
-                    popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
-                },
-            }).then(() => location.reload());
-        } else {
-            // Error (mis. validasi 422)
-            let errMsg = 'Terjadi kesalahan. Periksa kembali data yang diisi.';
-            try {
-                const json = await r.json();
-                if (json.errors) {
-                    errMsg = Object.values(json.errors).flat().join('<br>');
-                } else if (json.message) {
-                    errMsg = json.message;
-                }
-            } catch (_) {}
+        .then(async (r) => {
+            // Jika redirect (success) atau JSON
+            if (r.redirected || r.ok) {
+                closeModal();
+                Swal.fire({
+                    icon: "success",
+                    title: isAdd ? "Data Ditambahkan!" : "Data Diperbarui!",
+                    text: isAdd
+                        ? "Data website baru berhasil ditambahkan."
+                        : "Perubahan data website berhasil disimpan.",
+                    timer: 1800,
+                    showConfirmButton: false,
+                    background: isDark ? "#1e293b" : "#ffffff",
+                    color: isDark ? "#f1f5f9" : "#0f172a",
+                    customClass: {
+                        popup:
+                            "rounded-2xl shadow-2xl border " +
+                            (isDark ? "border-slate-700" : "border-gray-100"),
+                    },
+                }).then(() => location.reload());
+            } else {
+                // Error (mis. validasi 422)
+                let errMsg =
+                    "Terjadi kesalahan. Periksa kembali data yang diisi.";
+                try {
+                    const json = await r.json();
+                    if (json.errors) {
+                        errMsg = Object.values(json.errors).flat().join("<br>");
+                    } else if (json.message) {
+                        errMsg = json.message;
+                    }
+                } catch (_) {}
 
+                Swal.fire({
+                    icon: "error",
+                    title: isAdd ? "Gagal Menambahkan!" : "Gagal Menyimpan!",
+                    html: errMsg,
+                    confirmButtonColor: "#3B82F6",
+                    confirmButtonText: "Tutup",
+                    background: isDark ? "#1e293b" : "#ffffff",
+                    color: isDark ? "#f1f5f9" : "#0f172a",
+                    customClass: {
+                        popup:
+                            "rounded-2xl shadow-2xl border " +
+                            (isDark ? "border-slate-700" : "border-gray-100"),
+                        confirmButton:
+                            "rounded-xl font-bold text-sm px-5 py-2.5",
+                    },
+                    didOpen: () => {
+                        const sc = document.querySelector(".swal2-container");
+                        if (sc) sc.style.zIndex = "99999";
+                    },
+                });
+            }
+        })
+        .catch(() => {
             Swal.fire({
-                icon: 'error',
-                title: isAdd ? 'Gagal Menambahkan!' : 'Gagal Menyimpan!',
-                html: errMsg,
-                confirmButtonColor: '#3B82F6',
-                confirmButtonText: 'Tutup',
-                background: isDark ? '#1e293b' : '#ffffff',
-                color: isDark ? '#f1f5f9' : '#0f172a',
-                customClass: {
-                    popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
-                    confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
-                },
-                didOpen: () => {
-                    const sc = document.querySelector('.swal2-container');
-                    if (sc) sc.style.zIndex = '99999';
-                }
+                icon: "error",
+                title: "Koneksi Gagal",
+                text: "Tidak dapat terhubung ke server. Periksa koneksi internet kamu.",
+                confirmButtonColor: "#3B82F6",
+                background: isDark ? "#1e293b" : "#ffffff",
+                color: isDark ? "#f1f5f9" : "#0f172a",
             });
-        }
-    })
-    .catch(() => {
-        Swal.fire({
-            icon: 'error',
-            title: 'Koneksi Gagal',
-            text: 'Tidak dapat terhubung ke server. Periksa koneksi internet kamu.',
-            confirmButtonColor: '#3B82F6',
-            background: isDark ? '#1e293b' : '#ffffff',
-            color: isDark ? '#f1f5f9' : '#0f172a',
         });
-    });
 };
 
 // Fetch website data via AJAX then render form
 function fetchAndRenderForm(id, readonly) {
     fetch(`/websites/${id}`, {
-        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
+        headers: { Accept: "application/json", "X-CSRF-TOKEN": CSRF },
     })
-        .then(r => r.json())
-        .then(data => {
+        .then((r) => r.json())
+        .then((data) => {
             renderForm(data, readonly);
             openModal();
         })
-        .catch(() => alert('Gagal memuat data.'));
+        .catch(() => alert("Gagal memuat data."));
 }
 
 // =============================================
 // FORM BUILDER — renders form inside modal body
 // =============================================
 function renderForm(data, readonly) {
-    const section = window.WHSection || 'master';
+    const section = window.WHSection || "master";
     const dd = window.WHDropdowns || {};
     const isEdit = data && data.id;
-    const action = isEdit ? `/websites/${data.id}` : '/websites';
-    const method = isEdit ? 'PUT' : 'POST';
-
+    const action = isEdit ? `/websites/${data.id}` : "/websites";
+    const method = isEdit ? "PUT" : "POST";
+    
     let html = `<form id="modal-dynamic-form" method="POST" action="${action}">
         <input type="hidden" name="_token" value="${CSRF}"/>
-        ${isEdit ? '<input type="hidden" name="_method" value="PUT"/>' : ''}
+        ${isEdit ? '<input type="hidden" name="_method" value="PUT"/>' : ""}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
 
     const v = data || {};
 
-    function inp(label, name, value, type = 'text') {
-        const val = (value !== null && value !== undefined) ? value : '';
-        const ro = readonly ? 'disabled' : '';
+    function inp(label, name, value, type = "text") {
+        const val = value !== null && value !== undefined ? value : "";
+        const ro = readonly ? "disabled" : "";
         return `<div class="space-y-1">
             <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${label}</label>
-            <input type="${type}" name="${name}" value="${String(val).replace(/"/g,'&quot;')}" ${ro}
+            <input type="${type}" name="${name}" value="${String(val).replace(/"/g, "&quot;")}" ${ro}
                 class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
                        bg-white border-gray-300 text-slate-900
                        dark:bg-slate-700 dark:border-slate-600 dark:text-white
@@ -398,26 +413,32 @@ function renderForm(data, readonly) {
         </div>`;
     }
 
+
     function sel(label, name, value, options) {
-        const ro = readonly ? 'disabled' : '';
-        const opts = options.map(o => `<option ${o === value ? 'selected' : ''}>${o}</option>`).join('');
+        const ro = readonly ? "disabled" : "";
+        const opts = options
+            .map(
+                (o) =>
+                    `<option value="${o}" ${o === value ? "selected" : ""}>${o}</option>`,
+            )
+            .join("");
         return `<div class="space-y-1">
-            <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${label}</label>
-            <select name="${name}" ${ro}
-                class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
-                       bg-white border-gray-300 text-slate-900
-                       dark:bg-slate-700 dark:border-slate-600 dark:text-white
-                       disabled:bg-slate-50 dark:disabled:bg-slate-800
-                       focus:ring-2 focus:ring-blue-500">
-                ${opts}
-            </select>
-        </div>`;
+        <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${label}</label>
+        <select name="${name}" ${ro}
+            class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
+                   bg-white border-gray-300 text-slate-900
+                   dark:bg-slate-700 dark:border-slate-600 dark:text-white
+                   disabled:bg-slate-50 dark:disabled:bg-slate-800
+                   focus:ring-2 focus:ring-blue-500">
+            ${opts}
+        </select>
+    </div>`;
     }
 
     function textarea(label, name, value, span = false) {
-        const ro = readonly ? 'disabled' : '';
-        const colSpan = span ? 'col-span-1 md:col-span-2' : '';
-        const val = (value !== null && value !== undefined) ? value : '';
+        const ro = readonly ? "disabled" : "";
+        const colSpan = span ? "col-span-1 md:col-span-2" : "";
+        const val = value !== null && value !== undefined ? value : "";
         return `<div class="space-y-1 ${colSpan}">
             <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${label}</label>
             <textarea name="${name}" rows="3" ${ro}
@@ -431,87 +452,180 @@ function renderForm(data, readonly) {
 
     // Build fields based on section
     switch (section) {
-        case 'master': {
-            const types = dd['type'] || ['Profile', 'Blog', 'Berita'];
-            const techs = dd['technology'] || ['WordPress', 'Laravel'];
-            const statuses = dd['status'] || ['Active', 'InActive', 'Suspend'];
-            const pics = dd['internalPic'] || ['Iqbal'];
-            html += inp('Nama Client', 'client', v.client);
-            html += inp('PIC', 'pic', v.pic);
-            html += inp('Nama Website', 'website', v.website);
-            html += inp('URL Website', 'url', v.url);
-            html += sel('Jenis Website', 'type', v.type, types);
-            html += sel('CMS/Teknologi', 'technology', v.technology, techs);
-            html += sel('Status', 'status', v.status, statuses);
-            html += sel('PIC Internal', 'internal_pic', v.internal_pic, pics);
-            html += inp('Service Package', 'service_package', v.service_package);
-            html += inp('Tahun Pembuatan', 'created_year', v.created_year ? v.created_year.substring(0,10) : '', 'date');
-            html += inp('Telepon', 'phone', v.phone);
-            html += inp('Email', 'email', v.email, 'email');
+        case "master": {
+            const types = dd["type"] || ["Profile", "Blog", "Berita"];
+            const techs = dd["technology"] || ["WordPress", "Laravel"];
+            const statuses = dd["status"] || ["Active", "InActive", "Suspend"];
+            const pics = dd["internalPic"] || ["Iqbal"];
+
+            if (v.status === "Aktif") v.status = "Active";
+
+            html += inp("Nama Client", "client", v.client);
+            html += inp("PIC", "pic", v.pic);
+            html += inp("Nama Website", "website", v.website);
+            html += inp("URL Website", "url", v.url);
+            html += sel("Jenis Website", "type", v.type, types);
+            html += sel("CMS/Teknologi", "technology", v.technology, techs);
+            html += sel("Status", "status", v.status, statuses);
+            html += sel("PIC Internal", "internal_pic", v.internal_pic, pics);
+            html += inp(
+                "Service Package",
+                "service_package",
+                v.service_package,
+            );
+            html += inp(
+                "Tahun Pembuatan",
+                "created_year",
+                v.created_year ? v.created_year.substring(0, 10) : "",
+                "date",
+            );
+            html += inp("Telepon", "phone", v.phone);
+            html += inp("Email", "email", v.email, "email");
             html = html + `</div>`;
             html += `<div class="grid grid-cols-1 gap-4 mt-4">`;
-            html += textarea('Catatan', 'note', v.note, true);
+            html += textarea("Catatan", "note", v.note, true);
             break;
         }
-        case 'domain': {
-            html += inp('Domain URL', 'url', v.url);
-            html += inp('Provider Domain', 'domain_provider', v.domain_provider);
-            html += inp('Email Akun Domain', 'domain_email', v.domain_email, 'email');
-            html += inp('Harga Domain / Tahun', 'domain_price', v.domain_price, 'number');
-            html += inp('Tanggal Registrasi', 'domain_reg_date', v.domain_reg_date ? v.domain_reg_date.substring(0,10) : '', 'date');
-            html += inp('Tanggal Expired', 'domain_exp_date', v.domain_exp_date ? v.domain_exp_date.substring(0,10) : '', 'date');
+        case "domain": {
+            html += inp("Domain URL", "url", v.url);
+            html += inp(
+                "Provider Domain",
+                "domain_provider",
+                v.domain_provider,
+            );
+            html += inp(
+                "Email Akun Domain",
+                "domain_email",
+                v.domain_email,
+                "email",
+            );
+            html += inp(
+                "Harga Domain / Tahun",
+                "domain_price",
+                v.domain_price,
+                "number",
+            );
+            html += inp(
+                "Tanggal Registrasi",
+                "domain_reg_date",
+                v.domain_reg_date ? v.domain_reg_date.substring(0, 10) : "",
+                "date",
+            );
+            html += inp(
+                "Tanggal Expired",
+                "domain_exp_date",
+                v.domain_exp_date ? v.domain_exp_date.substring(0, 10) : "",
+                "date",
+            );
             break;
         }
-        case 'hosting': {
-            const hTypes = dd['hostingType'] || ['Dedicated Server', 'Shared', 'Redirect'];
-            html += sel('Jenis Hosting', 'hosting_type', v.hosting_type, hTypes);
-            html += inp('Provider Hosting', 'hosting_provider', v.hosting_provider);
-            html += inp('Kapasitas Storage (GB)', 'storage', v.storage, 'number');
-            html += inp('IP Server', 'ip_server', v.ip_server);
-            html += inp('Lokasi Server', 'location', v.location);
-            html += inp('Email Hosting', 'hosting_email', v.hosting_email, 'email');
-            html += inp('Harga Hosting / Tahun', 'hosting_price', v.hosting_price, 'number');
-            html += inp('Tanggal Expired', 'hosting_exp_date', v.hosting_exp_date ? v.hosting_exp_date.substring(0,10) : '', 'date');
+        case "hosting": {
+            const hTypes = dd["hostingType"] || [
+                "Dedicated Server",
+                "Shared",
+                "Redirect",
+            ];
+            html += sel(
+                "Jenis Hosting",
+                "hosting_type",
+                v.hosting_type,
+                hTypes,
+            );
+            html += inp(
+                "Provider Hosting",
+                "hosting_provider",
+                v.hosting_provider,
+            );
+            html += inp(
+                "Kapasitas Storage (GB)",
+                "storage",
+                v.storage,
+                "number",
+            );
+            html += inp("IP Server", "ip_server", v.ip_server);
+            html += inp("Lokasi Server", "location", v.location);
+            html += inp(
+                "Email Hosting",
+                "hosting_email",
+                v.hosting_email,
+                "email",
+            );
+            html += inp(
+                "Harga Hosting / Tahun",
+                "hosting_price",
+                v.hosting_price,
+                "number",
+            );
+            html += inp(
+                "Tanggal Expired",
+                "hosting_exp_date",
+                v.hosting_exp_date ? v.hosting_exp_date.substring(0, 10) : "",
+                "date",
+            );
             break;
         }
-        case 'akses': {
-            html += inp('URL Admin', 'admin_url', v.admin_url);
-            html += inp('Akses Tambahan', 'extra_access', v.extra_access);
-            html += inp('Lokasi Simpan Password', 'password_loc', v.password_loc);
+        case "akses": {
+            html += inp("URL Admin", "admin_url", v.admin_url);
+            html += inp("Akses Tambahan", "extra_access", v.extra_access);
+            html += inp(
+                "Lokasi Simpan Password",
+                "password_loc",
+                v.password_loc,
+            );
             html = html + `</div><div class="grid grid-cols-1 gap-4 mt-4">`;
-            html += textarea('Catatan Akses', 'note', v.note, true);
+            html += textarea("Catatan Akses", "note", v.note, true);
             break;
         }
-        case 'finansial': {
-            const paySystems = dd['paySystem'] || ['Tahunan', 'Bulanan'];
-            const payStatuses = dd['payStatus'] || ['Lunas', 'Belum'];
-            html += inp('Harga Jual / Tahun', 'sell_price', v.sell_price, 'number');
-            html += sel('Sistem Pembayaran', 'pay_system', v.pay_system, paySystems);
-            html += sel('Status Pembayaran', 'pay_status', v.pay_status, payStatuses);
-            html += inp('Tanggal Invoice', 'invoice_date', v.invoice_date ? v.invoice_date.substring(0,10) : '', 'date');
+        case "finansial": {
+            const paySystems = dd["paySystem"] || ["Tahunan", "Bulanan"];
+            const payStatuses = dd["payStatus"] || ["Lunas", "Belum"];
+            html += inp(
+                "Harga Jual / Tahun",
+                "sell_price",
+                v.sell_price,
+                "number",
+            );
+            html += sel(
+                "Sistem Pembayaran",
+                "pay_system",
+                v.pay_system,
+                paySystems,
+            );
+            html += sel(
+                "Status Pembayaran",
+                "pay_status",
+                v.pay_status,
+                payStatuses,
+            );
+            html += inp(
+                "Tanggal Invoice",
+                "invoice_date",
+                v.invoice_date ? v.invoice_date.substring(0, 10) : "",
+                "date",
+            );
             break;
         }
-        case 'reminder': {
-            html += inp('Website', 'website', v.website);
+        case "reminder": {
+            html += inp("Website", "website", v.website);
             html = html + `</div><div class="grid grid-cols-1 gap-4 mt-4">`;
-            html += textarea('Catatan Reminder', 'note', v.note, true);
+            html += textarea("Catatan Reminder", "note", v.note, true);
             break;
         }
     }
 
     html += `</div></form>`;
-    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById("modal-body").innerHTML = html;
 }
 
 // =============================================
 // EDIT TABLE — Dropdown Config Manager
 // =============================================
 function renderEditTableForm() {
-    const section = window.WHSection || 'master';
+    const section = window.WHSection || "master";
     const dd = window.WHDropdowns || {};
 
     if (Object.keys(dd).length === 0) {
-        document.getElementById('modal-body').innerHTML =
+        document.getElementById("modal-body").innerHTML =
             `<p class="text-sm text-slate-400 dark:text-slate-500">Tidak ada konfigurasi dropdown untuk halaman ini.</p>`;
         return;
     }
@@ -522,25 +636,34 @@ function renderEditTableForm() {
 
     // We iterate based on dropdown keys available
     const labelMap = {
-        type: 'Jenis Website', technology: 'CMS/Teknologi', status: 'Status', internalPic: 'PIC Internal',
-        hostingType: 'Jenis Hosting', paySystem: 'Sistem Pembayaran', payStatus: 'Status Pembayaran',
-        reminderStatus: 'Status Reminder',
+        type: "Jenis Website",
+        technology: "CMS/Teknologi",
+        status: "Status",
+        internalPic: "PIC Internal",
+        hostingType: "Jenis Hosting",
+        paySystem: "Sistem Pembayaran",
+        payStatus: "Status Pembayaran",
+        reminderStatus: "Status Reminder",
     };
 
     for (const [key, opts] of Object.entries(dd)) {
         html += `<div class="p-4 border rounded-xl mb-4 border-gray-200 dark:border-slate-700 bg-gray-50/60 dark:bg-slate-900/50">
             <h4 class="font-bold text-sm mb-3 text-slate-800 dark:text-slate-200">${labelMap[key] || key}</h4>
             <div class="flex flex-wrap gap-2 mb-3" id="opts-${key}">
-                ${opts.map(opt => `
+                ${opts
+                    .map(
+                        (opt) => `
                     <span class="px-3 py-1 rounded-full text-xs border flex items-center gap-2
                                 border-gray-300 bg-white text-slate-700
                                 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300">
                         ${opt}
                         <button type="button"
-                            onclick="removeDropdownOption('${section}','${key}','${opt.replace(/'/g,"\\\'")}')"
+                            onclick="removeDropdownOption('${section}','${key}','${opt.replace(/'/g, "\\\'")}')"
                             class="text-rose-500 hover:text-rose-700 transition font-bold leading-none">×</button>
                     </span>
-                `).join('')}
+                `,
+                    )
+                    .join("")}
             </div>
             <button
                 type="button"
@@ -551,93 +674,114 @@ function renderEditTableForm() {
         </div>`;
     }
 
-    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById("modal-body").innerHTML = html;
 }
 
 window.addDropdownOption = function (page, key) {
-    const isDark = document.documentElement.classList.contains('dark');
+    const isDark = document.documentElement.classList.contains("dark");
     Swal.fire({
-        title: 'Tambah Opsi Dropdown',
-        input: 'text',
-        inputLabel: 'Masukkan opsi baru',
-        inputPlaceholder: 'Contoh: WordPress, Laravel...',
+        title: "Tambah Opsi Dropdown",
+        input: "text",
+        inputLabel: "Masukkan opsi baru",
+        inputPlaceholder: "Contoh: WordPress, Laravel...",
         showCancelButton: true,
-        confirmButtonText: 'Tambahkan',
-        cancelButtonText: 'Batal',
-        confirmButtonColor: '#3B82F6',
-        cancelButtonColor: '#475569',
-        background: isDark ? '#1e293b' : '#ffffff',
-        color: isDark ? '#f1f5f9' : '#0f172a',
+        confirmButtonText: "Tambahkan",
+        cancelButtonText: "Batal",
+        confirmButtonColor: "#3B82F6",
+        cancelButtonColor: "#475569",
+        background: isDark ? "#1e293b" : "#ffffff",
+        color: isDark ? "#f1f5f9" : "#0f172a",
         customClass: {
-            popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
-            confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
-            cancelButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
-            input: 'rounded-lg border text-sm px-3 py-2 w-full mt-1 ' + (isDark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-white border-gray-300 text-slate-900'),
+            popup:
+                "rounded-2xl shadow-2xl border " +
+                (isDark ? "border-slate-700" : "border-gray-100"),
+            confirmButton: "rounded-xl font-bold text-sm px-5 py-2.5",
+            cancelButton: "rounded-xl font-bold text-sm px-5 py-2.5",
+            input:
+                "rounded-lg border text-sm px-3 py-2 w-full mt-1 " +
+                (isDark
+                    ? "bg-slate-700 border-slate-600 text-white"
+                    : "bg-white border-gray-300 text-slate-900"),
         },
         inputValidator: (value) => {
-            if (!value || value.trim() === '') return 'Opsi tidak boleh kosong!';
+            if (!value || value.trim() === "")
+                return "Opsi tidak boleh kosong!";
         },
         reverseButtons: true,
         // Pastikan SweetAlert tampil di atas modal (z-index: 9999)
         didOpen: () => {
-            const swalContainer = document.querySelector('.swal2-container');
-            if (swalContainer) swalContainer.style.zIndex = '99999';
+            const swalContainer = document.querySelector(".swal2-container");
+            if (swalContainer) swalContainer.style.zIndex = "99999";
         },
-    }).then(result => {
+    }).then((result) => {
         if (!result.isConfirmed || !result.value) return;
 
-        fetch('/dropdown/add', {
-            method: 'POST',
+        fetch("/dropdown/add", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': CSRF
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "X-CSRF-TOKEN": CSRF,
             },
-            body: JSON.stringify({ page, key, option: result.value.trim() })
+            body: JSON.stringify({ page, key, option: result.value.trim() }),
         })
-        .then(r => r.json().catch(() => ({})))
-        .then(() => location.reload())
-        .catch(() => Swal.fire({ icon: 'error', title: 'Gagal', text: 'Gagal menambahkan opsi.' }));
+            .then((r) => r.json().catch(() => ({})))
+            .then(() => location.reload())
+            .catch(() =>
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: "Gagal menambahkan opsi.",
+                }),
+            );
     });
 };
 
 window.removeDropdownOption = function (page, key, option) {
-    const isDark = document.documentElement.classList.contains('dark');
+    const isDark = document.documentElement.classList.contains("dark");
     Swal.fire({
         title: `Hapus opsi "${option}"?`,
-        text: 'Opsi ini akan dihapus dari daftar pilihan.',
-        icon: 'warning',
+        text: "Opsi ini akan dihapus dari daftar pilihan.",
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: '#EF4444',
-        cancelButtonColor: '#475569',
-        confirmButtonText: 'Ya, Hapus',
-        cancelButtonText: 'Batal',
-        background: isDark ? '#1e293b' : '#ffffff',
-        color: isDark ? '#f1f5f9' : '#0f172a',
+        confirmButtonColor: "#EF4444",
+        cancelButtonColor: "#475569",
+        confirmButtonText: "Ya, Hapus",
+        cancelButtonText: "Batal",
+        background: isDark ? "#1e293b" : "#ffffff",
+        color: isDark ? "#f1f5f9" : "#0f172a",
         customClass: {
-            popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
-            confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
-            cancelButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+            popup:
+                "rounded-2xl shadow-2xl border " +
+                (isDark ? "border-slate-700" : "border-gray-100"),
+            confirmButton: "rounded-xl font-bold text-sm px-5 py-2.5",
+            cancelButton: "rounded-xl font-bold text-sm px-5 py-2.5",
         },
         reverseButtons: true,
         // Pastikan SweetAlert tampil di atas modal (z-index: 9999)
         didOpen: () => {
-            const swalContainer = document.querySelector('.swal2-container');
-            if (swalContainer) swalContainer.style.zIndex = '99999';
+            const swalContainer = document.querySelector(".swal2-container");
+            if (swalContainer) swalContainer.style.zIndex = "99999";
         },
-    }).then(result => {
+    }).then((result) => {
         if (!result.isConfirmed) return;
 
-        fetch('/dropdown/remove', {
-            method: 'POST',
+        fetch("/dropdown/remove", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': CSRF
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "X-CSRF-TOKEN": CSRF,
             },
-            body: JSON.stringify({ page, key, option })
+            body: JSON.stringify({ page, key, option }),
         })
-        .then(() => location.reload())
-        .catch(() => Swal.fire({ icon: 'error', title: 'Gagal', text: 'Gagal menghapus opsi.' }));
+            .then(() => location.reload())
+            .catch(() =>
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: "Gagal menghapus opsi.",
+                }),
+            );
     });
 };

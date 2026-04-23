@@ -1,6 +1,16 @@
 <tbody id="table-tbody" class="divide-y divide-gray-100 dark:divide-slate-700 whitespace-nowrap">
     @forelse ($websites as $idx => $website)
-    <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition">
+    @php
+    $rowClass = 'hover:bg-gray-50 dark:hover:bg-slate-700/50';
+    if ($section !== 'master') {
+    if ($website->isAllEmpty($section)) {
+    $rowClass = 'bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 border-l-4 border-rose-400';
+    } elseif ($website->isIncomplete($section)) {
+    $rowClass = 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 border-l-4 border-amber-400';
+    }
+    }
+    @endphp
+    <tr class="transition {{ $rowClass }}">
         <td class="px-4 py-3 text-slate-500 dark:text-slate-400">{{ $websites->firstItem() + $idx }}</td>
 
         @foreach ($columns as $col)

@@ -113,4 +113,42 @@ class Website extends Model
     {
         return in_array($this->role, ['superAdmin', 'admin']);
     }
+
+    public function isIncomplete(string $section): bool
+    {
+        return match ($section) {
+            'domain'    => empty($this->domain_provider) || empty($this->domain_email) ||
+                empty($this->domain_reg_date) || empty($this->domain_exp_date) ||
+                empty($this->domain_price),
+            'hosting'   => empty($this->hosting_type) || empty($this->hosting_provider) ||
+                empty($this->storage) || empty($this->ip_server) ||
+                empty($this->location) || empty($this->hosting_email) ||
+                empty($this->hosting_exp_date) || empty($this->hosting_price),
+            'akses'     => empty($this->admin_url) || empty($this->extra_access) ||
+                empty($this->password_loc),
+            'finansial' => empty($this->sell_price) || empty($this->pay_status) ||
+                empty($this->pay_system) || empty($this->invoice_date),
+            'reminder'  => empty($this->hosting_exp_date) || empty($this->domain_exp_date),
+            default     => false,
+        };
+    }
+
+    public function isAllEmpty(string $section): bool
+    {
+        return match ($section) {
+            'domain'    => empty($this->domain_provider) && empty($this->domain_email) &&
+                empty($this->domain_reg_date) && empty($this->domain_exp_date) &&
+                empty($this->domain_price),
+            'hosting'   => empty($this->hosting_type) && empty($this->hosting_provider) &&
+                empty($this->storage) && empty($this->ip_server) &&
+                empty($this->location) && empty($this->hosting_email) &&
+                empty($this->hosting_exp_date) && empty($this->hosting_price),
+            'akses'     => empty($this->admin_url) && empty($this->extra_access) &&
+                empty($this->password_loc),
+            'finansial' => empty($this->sell_price) && empty($this->pay_status) &&
+                empty($this->pay_system) && empty($this->invoice_date),
+            'reminder'  => empty($this->hosting_exp_date) && empty($this->domain_exp_date),
+            default     => false,
+        };
+    }
 }
