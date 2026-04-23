@@ -34,6 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/finansial/export', [WebsiteController::class, 'exportFinansial'])->name('finansial.export');
     Route::get('/reminder',  [WebsiteController::class, 'index'])->defaults('section', 'reminder')->name('reminder');
 
+    // AJAX search — semua role bisa akses
+    Route::get('/websites/search', [WebsiteController::class, 'search'])->name('websites.search');
     // Show detail — semua role bisa akses
     Route::get('/websites/{website}', [WebsiteController::class, 'show'])->name('websites.show');
 

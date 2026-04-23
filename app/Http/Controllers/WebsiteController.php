@@ -280,6 +280,42 @@ class WebsiteController extends Controller
         };
     }
 
+    public function search(Request $request)
+    {
+        $search  = $request->get('search', '');
+        $perPage = (int) $request->get('per_page', 10);
+        $perPage = in_array($perPage, [10, 25, 50]) ? $perPage : 10;
+        $section = $request->get('section', 'master');
+
+        $query = Website::query();
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('client', 'like', "%{$search}%")
+                    ->orWhere('website', 'like', "%{$search}%");
+            });
+        }
+
+        $websites  = $query->paginate($perPage)->withQueryString();
+        $columns   = $this->sectionColumns[$section] ?? $this->sectionColumns['master'];
+        $dropdowns = DropdownConfig::forPage($section);
+
+        return response()->json([
+            'html' => view('components.data-table-body', compact(
+                'websites',
+                'columns',
+                'section',
+                'search',
+                'perPage',
+                'dropdowns'
+            ))->render(),
+            'total'    => $websites->total(),
+            'from'     => $websites->firstItem(),
+            'to'       => $websites->lastItem(),
+            'lastPage' => $websites->lastPage(),
+            'links'    => $websites->withQueryString()->links()->toHtml(),
+        ]);
+    }
+
     public function exportFinansial()
     {
         $websites = Website::orderBy('client')->get();
