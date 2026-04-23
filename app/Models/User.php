@@ -32,18 +32,11 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Override: gunakan 'name' sebagai username untuk Auth::attempt.
-     * Ini memungkinkan login menggunakan name alih-alih email.
-     */
     public function getAuthIdentifierName(): string
     {
         return 'name';
     }
 
-    /**
-     * Cek apakah user adalah superAdmin.
-     */
     public function isSuperAdmin(): bool
     {
         return $this->role === 'superAdmin';
@@ -64,9 +57,6 @@ class User extends Authenticatable
         return in_array($this->role, ['superAdmin', 'admin']);
     }
 
-    /**
-     * Nama tampilan — gunakan display_name jika ada, fallback ke name.
-     */
     public function getLabel(): string
     {
         return $this->display_name ?: $this->name;

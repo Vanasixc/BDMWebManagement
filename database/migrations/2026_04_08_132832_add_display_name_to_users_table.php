@@ -9,8 +9,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // display_name = nama indah untuk ditampilkan di UI
-            // name tetap digunakan sebagai USERNAME login
             $table->string('display_name')->nullable()->after('name');
         });
     }

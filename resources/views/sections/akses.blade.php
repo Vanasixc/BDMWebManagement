@@ -5,9 +5,6 @@
 
 @section('content')
 
-{{-- ============================================================
-     VISUALISASI: Kelengkapan Data Akses
-     ============================================================ --}}
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
     @php
         $total = $statsData['total'];

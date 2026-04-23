@@ -1,8 +1,3 @@
-{{--
-    Modal Form Component — Digunakan oleh semua section pages
-    Di-include langsung dari layouts/app.blade.php (bukan dari section views)
-    sehingga selalu berada di root body, tidak terkekang div parent manapun.
---}}
 <div
     id="modal-overlay"
     onclick="closeModalOnOverlay(event)"

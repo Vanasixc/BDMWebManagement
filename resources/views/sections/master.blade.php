@@ -6,9 +6,6 @@
 
 @section('content')
 
-{{-- ============================================================
-     VISUALISASI: Stat Cards + Doughnut Chart Status Website
-     ============================================================ --}}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
 
     {{-- Stat Cards --}}

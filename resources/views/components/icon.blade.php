@@ -1,7 +1,3 @@
-{{-- 
-    Icon Component — menggunakan SVG inline Lucide-style icons
-    Usage: @include('components.icon', ['name' => 'globe', 'class' => 'w-5 h-5'])
---}}
 @php
     $class = $class ?? 'w-5 h-5';
     $stroke = $stroke ?? 'currentColor';

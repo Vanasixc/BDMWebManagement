@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class WebsiteController extends Controller
 {
-    // Konfigurasi kolom tabel per section / halaman
     private array $sectionColumns = [
         'master' => [
             ['key' => 'client',       'label' => 'Nama Client'],
@@ -57,9 +56,6 @@ class WebsiteController extends Controller
         ],
     ];
 
-    /**
-     * List website dengan filter section.
-     */
     public function index(Request $request, string $section = 'master')
     {
         $search    = $request->get('search', '');
@@ -83,9 +79,6 @@ class WebsiteController extends Controller
         return view("sections.{$section}", compact('websites', 'columns', 'section', 'search', 'perPage', 'dropdowns', 'allWebsites', 'statsData'));
     }
 
-    /**
-     * Simpan website baru.
-     */
     public function store(Request $request)
     {
         if (! auth()->user()->canModify()) {
@@ -101,9 +94,6 @@ class WebsiteController extends Controller
         return back()->with('success', 'Data website berhasil ditambahkan!');
     }
 
-    /**
-     * Update website.
-     */
     public function update(Request $request, Website $website)
     {
         if (! auth()->user()->canModify()) {
@@ -119,9 +109,6 @@ class WebsiteController extends Controller
         return back()->with('success', 'Data website berhasil diperbarui!');
     }
 
-    /**
-     * Hapus website.
-     */
     public function destroy(Website $website)
     {
         if (! auth()->user()->canModify()) {
@@ -132,9 +119,6 @@ class WebsiteController extends Controller
         return back()->with('success', 'Data website berhasil dihapus!');
     }
 
-    /**
-     * Clear section columns only, row stays intact.
-     */
     public function clear(Request $request, Website $website)
     {
         /** @var \App\Models\User $user */
@@ -189,17 +173,11 @@ class WebsiteController extends Controller
         return back()->with('success', 'Data section berhasil direset!');
     }
 
-    /**
-     * Ambil data website untuk modal (JSON).
-     */
     public function show(Website $website)
     {
         return response()->json($website);
     }
 
-    /**
-     * Aturan validasi terpusat.
-     */
     private function validationRules(): array
     {
         return [
@@ -239,9 +217,6 @@ class WebsiteController extends Controller
         ];
     }
 
-    /**
-     * Hitung statistik agregat per section untuk visualisasi.
-     */
     private function buildStatsData(string $section, $all): array
     {
         return match ($section) {

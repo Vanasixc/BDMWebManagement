@@ -5,9 +5,6 @@
 
 @section('content')
 
-{{-- ============================================================
-     VISUALISASI: Status Cards + Deadline List
-     ============================================================ --}}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
 
     {{-- Status Cards --}}

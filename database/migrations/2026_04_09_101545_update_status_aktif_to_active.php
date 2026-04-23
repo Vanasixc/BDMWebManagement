@@ -5,9 +5,6 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    /**
-     * Ubah status "Aktif" → "Active" di tabel websites.
-     */
     public function up(): void
     {
         DB::table('websites')
@@ -15,9 +12,6 @@ return new class extends Migration
             ->update(['status' => 'Active']);
     }
 
-    /**
-     * Rollback: kembalikan "Active" → "Aktif".
-     */
     public function down(): void
     {
         DB::table('websites')

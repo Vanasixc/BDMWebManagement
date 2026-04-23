@@ -64,8 +64,7 @@
                     Edit Table
                 </button>
 
-                @if ($section === 'master')
-                {{-- Tombol Tambah hanya di Master Table --}}
+                @if ($section === 'master' && auth()->user()->canModify())
                 <button
                     onclick="openModalAdd()"
                     class="flex-1 sm:flex-none justify-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-700 transition shadow-sm">
@@ -140,7 +139,6 @@
                     <td class="px-4 py-3">
                         <div class="flex justify-center gap-2">
 
-                            {{-- View — semua section --}}
                             <button
                                 onclick="openModalView({{ $website->id }})"
                                 class="p-1.5 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition"
@@ -148,8 +146,9 @@
                                 @include('components.icon', ['name' => 'eye', 'class' => 'w-4 h-4'])
                             </button>
 
+                            @if (auth()->user()->canModify())
+
                             @if ($section !== 'reminder')
-                            {{-- Edit — semua section kecuali Reminder --}}
                             <button
                                 onclick="openModalEdit({{ $website->id }})"
                                 class="p-1.5 bg-amber-500/10 text-amber-500 rounded-lg hover:bg-amber-500/20 transition"
@@ -159,7 +158,6 @@
                             @endif
 
                             @if ($section === 'master')
-                            {{-- Delete — hanya Master --}}
                             <form
                                 method="POST"
                                 action="{{ route('websites.destroy', $website->id) }}"
@@ -175,7 +173,6 @@
                             </form>
 
                             @elseif (in_array($section, ['domain', 'hosting', 'akses', 'finansial']))
-                            {{-- Clear — section selain Master dan Reminder --}}
                             <form
                                 method="POST"
                                 action="{{ route('websites.clear', $website->id) }}"
@@ -191,6 +188,8 @@
                                 </button>
                             </form>
                             @endif
+
+                            @endif {{-- end canModify --}}
 
                         </div>
                     </td>

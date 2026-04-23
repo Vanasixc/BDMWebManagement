@@ -7,9 +7,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    /**
-     * Tampilkan halaman login.
-     */
     public function showLogin()
     {
         if (Auth::check()) {
@@ -18,9 +15,6 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    /**
-     * Proses login.
-     */
     public function login(Request $request)
     {
         $request->validate([
@@ -31,7 +25,6 @@ class AuthController extends Controller
             'password.required' => 'Password wajib diisi.',
         ]);
 
-        // Cari user berdasarkan name (username) karena field login menggunakan name
         $user = \App\Models\User::where('name', $request->username)->first();
 
         if (!$user || !\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
@@ -45,9 +38,6 @@ class AuthController extends Controller
         return redirect()->route('dashboard');
     }
 
-    /**
-     * Logout user.
-     */
     public function logout(Request $request)
     {
         Auth::logout();

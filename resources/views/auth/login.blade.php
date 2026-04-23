@@ -12,7 +12,6 @@
 <body class="min-h-screen flex items-center justify-center p-4 font-sans transition-colors duration-300
              bg-slate-900 dark:bg-slate-950">
 
-    {{-- Dark mode toggle (floating) --}}
     <button
         id="dark-toggle"
         onclick="toggleDark()"
@@ -124,13 +123,11 @@
     </div>
 
     <script>
-        // Dark mode toggle (standalone, sebelum app.js loaded via Vite)
         function toggleDark() {
             document.documentElement.classList.toggle('dark');
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('darkMode', isDark ? '1' : '0');
         }
-        // Apply saved preference
         if (localStorage.getItem('darkMode') === '1') {
             document.documentElement.classList.add('dark');
         }

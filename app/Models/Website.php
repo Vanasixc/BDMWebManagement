@@ -63,9 +63,6 @@ class Website extends Model
         'storage'          => 'integer',
     ];
 
-    /**
-     * Hitung sisa hari hosting.
-     */
     public function getDaysRemainingAttribute(): int
     {
         if (!$this->hosting_exp_date) return 0;
@@ -76,18 +73,12 @@ class Website extends Model
         );
     }
 
-    /**
-     * Hitung margin finansial.
-     */
     public function getMarginAttribute(): int
     {
         $monthlyHosting = $this->hosting_price / 12;
         return (int) ($this->sell_price - ($this->domain_price + $monthlyHosting));
     }
 
-    /**
-     * Status reminder berdasarkan sisa hari hosting.
-     */
     public function getReminderStatusAttribute(): string
     {
         $days = $this->days_remaining;
@@ -97,42 +88,27 @@ class Website extends Model
         return 'Aman';
     }
 
-    /**
-     * Scope: filter by section page (digunakan di semua controller).
-     */
     public function scopeSearch($query, string $keyword)
     {
         return $query->where('client', 'like', "%{$keyword}%")
             ->orWhere('website', 'like', "%{$keyword}%");
     }
 
-    /**
-     * Check if user is superAdmin.
-     */
     public function isSuperAdmin(): bool
     {
         return $this->role === 'superAdmin';
     }
 
-    /**
-     * Check if user is admin.
-     */
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }
 
-    /**
-     * Check if user is regular user (read-only).
-     */
     public function isUser(): bool
     {
         return $this->role === 'user';
     }
 
-    /**
-     * Check if user can modify data (superAdmin or admin).
-     */
     public function canModify(): bool
     {
         return in_array($this->role, ['superAdmin', 'admin']);

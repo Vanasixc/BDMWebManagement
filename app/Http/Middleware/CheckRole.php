@@ -8,10 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
-    /**
-     * Handle an incoming request.
-     * Penggunaan di route: ->middleware('role:superAdmin')
-     */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         if (!auth()->check()) {

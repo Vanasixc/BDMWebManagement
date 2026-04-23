@@ -5,9 +5,6 @@
 
 @section('content')
 
-{{-- ============================================================
-     Header + Export Button
-     ============================================================ --}}
 <div class="flex justify-end mb-4">
     <a
         href="{{ route('finansial.export') }}"
@@ -17,9 +14,6 @@
     </a>
 </div>
 
-{{-- ============================================================
-     VISUALISASI: Summary Cards Finansial
-     ============================================================ --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
     @php
     $finCards = [
@@ -44,9 +38,6 @@
     @endforeach
 </div>
 
-{{-- ============================================================
-     Payment Status Bar + Margin Chart
-     ============================================================ --}}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
 
     {{-- Payment Status --}}

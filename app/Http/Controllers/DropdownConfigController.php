@@ -7,9 +7,6 @@ use Illuminate\Http\Request;
 
 class DropdownConfigController extends Controller
 {
-    /**
-     * Tambah opsi baru ke dropdown config.
-     */
     public function addOption(Request $request)
     {
         $request->validate([
@@ -35,9 +32,6 @@ class DropdownConfigController extends Controller
         return back()->with('success', "Opsi \"{$request->option}\" berhasil ditambahkan.");
     }
 
-    /**
-     * Hapus opsi dari dropdown config.
-     */
     public function removeOption(Request $request)
     {
         $request->validate([

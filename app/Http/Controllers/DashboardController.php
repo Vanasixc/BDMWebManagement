@@ -28,13 +28,17 @@ class DashboardController extends Controller
             return $w->days_remaining < 0;
         })->sortBy('days_remaining')->values();
 
-        // Data revenue hardcoded (bisa dijadikan model tersendiri nantinya)
-        $revenueData = [
-            ['year' => '2021', 'revenue' => 45000000, 'margin' => 15000000],
-            ['year' => '2022', 'revenue' => 62000000, 'margin' => 22000000],
-            ['year' => '2023', 'revenue' => 85000000, 'margin' => 31000000],
-            ['year' => '2024', 'revenue' => 110000000, 'margin' => 42000000],
-        ];
+        $revenueData = $websites
+            ->filter(fn($w) => $w->invoice_date !== null)
+            ->groupBy(fn($w) => $w->invoice_date->format('Y'))
+            ->map(fn($group, $year) => [
+                'year'    => $year,
+                'revenue' => $group->sum('sell_price'),
+                'margin'  => $group->sum(fn($w) => $w->margin),
+            ])
+            ->sortKeys()
+            ->values()
+            ->toArray();
 
         $domainPriceData = $websites->map(fn($w) => [
             'client' => $w->client,
@@ -42,7 +46,12 @@ class DashboardController extends Controller
         ])->values();
 
         return view('dashboard.index', compact(
-            'stats', 'expiring', 'expired', 'revenueData', 'domainPriceData', 'websites'
+            'stats',
+            'expiring',
+            'expired',
+            'revenueData',
+            'domainPriceData',
+            'websites'
         ));
     }
 }

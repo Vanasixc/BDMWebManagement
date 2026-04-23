@@ -5,9 +5,6 @@
 
 @section('content')
 
-{{-- ============================================================
-     VISUALISASI: Expiry Timeline Cards
-     ============================================================ --}}
 @if(count($statsData['expiry_cards']) > 0)
 <div class="p-5 md:p-6 rounded-xl border shadow-sm mb-6 bg-white border-gray-100 dark:bg-slate-800 dark:border-slate-700">
     <h3 class="font-bold text-sm md:text-base mb-4 flex items-center gap-2">

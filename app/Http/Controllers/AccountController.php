@@ -15,11 +15,11 @@ class AccountController extends Controller
     }
 
     public function store(Request $request)
-    {
+    {        
         $request->validate([
             'name'     => 'required|string|max:100|unique:users,name',
             'email'    => 'required|email|unique:users,email',
-            'role'     => 'required|in:admin,superAdmin',
+            'role'     => 'required|in:user,admin,superAdmin',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
@@ -39,7 +39,7 @@ class AccountController extends Controller
         $request->validate([
             'name'  => "required|string|max:100|unique:users,name,{$user->id}",
             'email' => "required|email|unique:users,email,{$user->id}",
-            'role'  => 'required|in:admin,superAdmin',
+            'role'  => 'required|in:user,admin,superAdmin',
         ]);
 
         $data = ['name' => $request->name, 'email' => $request->email, 'role' => $request->role];
