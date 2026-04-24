@@ -52,6 +52,7 @@
 
             <div class="flex gap-2 w-full sm:w-auto items-center">
                 {{-- Edit Table (dropdown config) --}}
+                @if ($section !== 'reminder')
                 <button
                     onclick="openModalEditTable()"
                     class="flex-1 sm:flex-none justify-center px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition border
@@ -60,6 +61,7 @@
                     @include('components.icon', ['name' => 'settings', 'class' => 'w-4 h-4'])
                     Edit Table
                 </button>
+                @endif
 
                 {{-- Extra action buttons injected by individual pages --}}
                 @stack('table-actions')
