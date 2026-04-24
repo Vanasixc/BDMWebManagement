@@ -85,6 +85,7 @@ class WebsiteController extends Controller
             abort(403, 'Anda tidak memiliki akses untuk menambah data.');
         }
 
+        $section = $request->input('section', 'master');
         $validated = $request->validate($this->validationRules($section));
         Website::create($validated);
 

@@ -293,6 +293,8 @@ window.submitModalForm = function () {
     const isAdd = currentModalMode === "add";
     const formData = new FormData(form);
 
+    formData.append('section', window.WHSection || 'master');
+
     // Untuk PUT method (edit), FormData sudah include _method=PUT via hidden field
     fetch(form.action, {
         method: "POST", // Laravel method-spoofing lewat _method field
