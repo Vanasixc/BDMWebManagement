@@ -85,7 +85,7 @@ class WebsiteController extends Controller
             abort(403, 'Anda tidak memiliki akses untuk menambah data.');
         }
 
-        $validated = $request->validate($this->validationRules());
+        $validated = $request->validate($this->validationRules($section));
         Website::create($validated);
 
         if ($request->expectsJson()) {
@@ -96,11 +96,12 @@ class WebsiteController extends Controller
 
     public function update(Request $request, Website $website)
     {
-        if (! auth()->user()->canModify()) {
+        if (!auth()->user()->canModify()) {
             abort(403, 'Anda tidak memiliki akses untuk mengubah data.');
         }
 
-        $validated = $request->validate($this->validationRules());
+        $section = $request->get('section', 'master');
+        $validated = $request->validate($this->validationRules($section));
         $website->update($validated);
 
         if ($request->expectsJson()) {
@@ -178,43 +179,59 @@ class WebsiteController extends Controller
         return response()->json($website);
     }
 
-    private function validationRules(): array
+    private function validationRules(string $section): array
     {
-        return [
-            'client'           => 'required|string|max:100',
-            'pic'              => 'required|string|max:100',
-            'website'          => 'required|string|max:100',
-            'url'              => 'required|string|max:200',
-            'type'             => 'required|string',
-            'technology'       => 'required|string',
-            'status'           => 'required|in:Active,InActive,Suspend',
-            'internal_pic'     => 'required|string',
-            'service_package'  => 'nullable|string',
-            'created_year'     => 'nullable|date',
-            'note'             => 'nullable|string',
-            'phone'            => 'nullable|string|max:20',
-            'email'            => 'nullable|email',
-            'domain_provider'  => 'nullable|string',
-            'domain_email'     => 'nullable|email',
-            'domain_reg_date'  => 'nullable|date',
-            'domain_exp_date'  => 'nullable|date',
-            'domain_price'     => 'nullable|integer|min:0',
-            'hosting_type'     => 'nullable|string',
-            'hosting_provider' => 'nullable|string',
-            'storage'          => 'nullable|integer|min:0',
-            'ip_server'        => 'nullable|string',
-            'location'         => 'nullable|string',
-            'hosting_email'    => 'nullable|email',
-            'hosting_exp_date' => 'nullable|date',
-            'hosting_price'    => 'nullable|integer|min:0',
-            'admin_url'        => 'nullable|string',
-            'extra_access'     => 'nullable|string',
-            'password_loc'     => 'nullable|string',
-            'sell_price'       => 'nullable|integer|min:0',
-            'pay_system'       => 'nullable|in:Tahunan,Bulanan',
-            'pay_status'       => 'nullable|in:Lunas,Belum',
-            'invoice_date'     => 'nullable|date',
-        ];
+        return match ($section) {
+            'master' => [
+                'client'          => 'required|string|max:100',
+                'pic'             => 'required|string|max:100',
+                'website'         => 'required|string|max:100',
+                'url'             => 'required|string|max:200',
+                'type'            => 'required|string',
+                'technology'      => 'required|string',
+                'status'          => 'required|in:Active,InActive,Suspend',
+                'internal_pic'    => 'required|string',
+                'service_package' => 'nullable|string',
+                'created_year'    => 'nullable|date',
+                'note'            => 'nullable|string',
+                'phone'           => 'nullable|string|max:20',
+                'email'           => 'nullable|email',
+            ],
+            'domain' => [
+                'url'              => 'nullable|string|max:200',
+                'domain_provider'  => 'nullable|string',
+                'domain_email'     => 'nullable|email',
+                'domain_reg_date'  => 'nullable|date',
+                'domain_exp_date'  => 'nullable|date',
+                'domain_price'     => 'nullable|integer|min:0',
+            ],
+            'hosting' => [
+                'hosting_type'     => 'nullable|string',
+                'hosting_provider' => 'nullable|string',
+                'storage'          => 'nullable|integer|min:0',
+                'ip_server'        => 'nullable|string',
+                'location'         => 'nullable|string',
+                'hosting_email'    => 'nullable|email',
+                'hosting_exp_date' => 'nullable|date',
+                'hosting_price'    => 'nullable|integer|min:0',
+            ],
+            'akses' => [
+                'admin_url'    => 'nullable|string',
+                'extra_access' => 'nullable|string',
+                'password_loc' => 'nullable|string',
+                'note'         => 'nullable|string',
+            ],
+            'finansial' => [
+                'sell_price'   => 'nullable|integer|min:0',
+                'pay_system'   => 'nullable|in:Tahunan,Bulanan',
+                'pay_status'   => 'nullable|in:Lunas,Belum',
+                'invoice_date' => 'nullable|date',
+            ],
+            'reminder' => [
+                'note' => 'nullable|string',
+            ],
+            default => $this->validationRules($section),
+        };
     }
 
     private function buildStatsData(string $section, $all): array

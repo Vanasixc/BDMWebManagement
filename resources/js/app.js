@@ -391,9 +391,10 @@ function renderForm(data, readonly) {
     const isEdit = data && data.id;
     const action = isEdit ? `/websites/${data.id}` : "/websites";
     const method = isEdit ? "PUT" : "POST";
-    
+
     let html = `<form id="modal-dynamic-form" method="POST" action="${action}">
         <input type="hidden" name="_token" value="${CSRF}"/>
+        <input type="hidden" name="section" value="${section}"/>
         ${isEdit ? '<input type="hidden" name="_method" value="PUT"/>' : ""}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
 
@@ -412,7 +413,6 @@ function renderForm(data, readonly) {
                        focus:ring-2 focus:ring-blue-500"/>
         </div>`;
     }
-
 
     function sel(label, name, value, options) {
         const ro = readonly ? "disabled" : "";
