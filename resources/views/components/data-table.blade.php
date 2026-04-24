@@ -61,6 +61,9 @@
                     Edit Table
                 </button>
 
+                {{-- Extra action buttons injected by individual pages --}}
+                @stack('table-actions')
+
                 @if ($section === 'master' && auth()->user()->canModify())
                 <button
                     onclick="openModalAdd()"

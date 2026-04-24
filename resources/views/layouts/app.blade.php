@@ -108,7 +108,7 @@
                     ['id' => 'reminder',  'label' => 'Reminder',      'route' => 'reminder',  'icon' => 'bell'],
                 ];
                 if (auth()->user()->isSuperAdmin()) {
-                    $menu[] = ['id' => 'akun', 'label' => 'Akun', 'route' => 'akun', 'icon' => 'users'];
+                    $menu[] = ['id' => 'akun', 'label' => 'Manajemen Akun', 'route' => 'akun', 'icon' => 'users'];
                 }
                 $currentRoute = request()->route()->getName();
             @endphp

@@ -4,9 +4,9 @@
     $rowClass = 'hover:bg-gray-50 dark:hover:bg-slate-700/50';
     if ($section !== 'master') {
     if ($website->isAllEmpty($section)) {
-    $rowClass = 'bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 border-l-4 border-rose-400';
+    $rowClass = 'bg-rose-50/80 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20';
     } elseif ($website->isIncomplete($section)) {
-    $rowClass = 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 border-l-4 border-amber-400';
+    $rowClass = 'bg-amber-50/80 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20';
     }
     }
     @endphp
@@ -70,7 +70,7 @@
                     onclick="openModalView({{ $website->id }})"
                     class="p-1.5 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition"
                     title="Lihat Detail">
-                    @include('components.icon', ['name' => 'eye', 'class' => 'w-4 h-4'])
+                    @include('components.icon', ['name' => 'info', 'class' => 'w-4 h-4'])
                 </button>
 
                 @if (auth()->user()->canModify())
@@ -111,7 +111,7 @@
                         type="submit"
                         class="p-1.5 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500/20 transition"
                         title="Reset Data Section">
-                        @include('components.icon', ['name' => 'x-circle', 'class' => 'w-4 h-4'])
+                        @include('components.icon', ['name' => 'trash', 'class' => 'w-4 h-4'])
                     </button>
                 </form>
                 @endif

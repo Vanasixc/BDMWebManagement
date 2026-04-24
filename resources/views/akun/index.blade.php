@@ -112,19 +112,11 @@
             <input type="hidden" name="_user_id" id="account-user-id" value=""/>
 
             <div style="padding: 1.5rem 2rem; overflow-y: auto; flex: 1; min-height: 0;">
-                {{-- Validation Errors --}}
-                @if ($errors->any())
-                <div class="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/20">
-                    <ul class="space-y-1">
-                        @foreach ($errors->all() as $error)
-                        <li class="text-xs text-rose-600 dark:text-rose-400 flex items-start gap-2">
-                            @include('components.icon', ['name' => 'alert-circle', 'class' => 'w-3.5 h-3.5 shrink-0 mt-0.5'])
-                            {{ $error }}
-                        </li>
-                        @endforeach
-                    </ul>
+                {{-- Validation Errors Container (JS-managed) --}}
+                <div id="account-errors-container" class="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/20" style="display: none;">
+                    <ul id="account-errors-list" class="space-y-1"></ul>
                 </div>
-                @endif
+
                 <div class="space-y-4">
                     <div class="space-y-1">
                         <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Nama / Username</label>
@@ -158,19 +150,35 @@
                             Password
                             <span id="pw-hint" class="normal-case font-normal text-slate-400">(kosongkan jika tidak diubah)</span>
                         </label>
-                        <input type="password" name="password" id="account-password" autocomplete="new-password"
-                            class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
-                                   bg-white border-gray-300 text-slate-900
-                                   dark:bg-slate-700 dark:border-slate-600 dark:text-white
-                                   focus:ring-2 focus:ring-blue-500" />
+                        <div class="relative">
+                            <input type="password" name="password" id="account-password" autocomplete="new-password"
+                                class="w-full px-3 py-2 pr-10 border rounded-lg text-sm outline-none transition
+                                       bg-white border-gray-300 text-slate-900
+                                       dark:bg-slate-700 dark:border-slate-600 dark:text-white
+                                       focus:ring-2 focus:ring-blue-500" />
+                            <button type="button" onclick="togglePasswordVisibility('account-password', this)" tabindex="-1"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition rounded"
+                                aria-label="Toggle password visibility">
+                                <span class="eye-icon-show">@include('components.icon', ['name' => 'eye', 'class' => 'w-4 h-4'])</span>
+                                <span class="eye-icon-hide" style="display:none;">@include('components.icon', ['name' => 'eye-off', 'class' => 'w-4 h-4'])</span>
+                            </button>
+                        </div>
                     </div>
                     <div id="pw-confirm-wrap" class="space-y-1">
                         <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Konfirmasi Password</label>
-                        <input type="password" name="password_confirmation" autocomplete="new-password"
-                            class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
-                                   bg-white border-gray-300 text-slate-900
-                                   dark:bg-slate-700 dark:border-slate-600 dark:text-white
-                                   focus:ring-2 focus:ring-blue-500" />
+                        <div class="relative">
+                            <input type="password" name="password_confirmation" id="account-password-confirm" autocomplete="new-password"
+                                class="w-full px-3 py-2 pr-10 border rounded-lg text-sm outline-none transition
+                                       bg-white border-gray-300 text-slate-900
+                                       dark:bg-slate-700 dark:border-slate-600 dark:text-white
+                                       focus:ring-2 focus:ring-blue-500" />
+                            <button type="button" onclick="togglePasswordVisibility('account-password-confirm', this)" tabindex="-1"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition rounded"
+                                aria-label="Toggle password visibility">
+                                <span class="eye-icon-show">@include('components.icon', ['name' => 'eye', 'class' => 'w-4 h-4'])</span>
+                                <span class="eye-icon-hide" style="display:none;">@include('components.icon', ['name' => 'eye-off', 'class' => 'w-4 h-4'])</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -186,27 +194,90 @@
 
 @push('scripts')
 <script>
+    window.togglePasswordVisibility = function(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        const showIcon = btn.querySelector('.eye-icon-show');
+        const hideIcon = btn.querySelector('.eye-icon-hide');
+        if (showIcon) showIcon.style.display = isPassword ? 'none' : '';
+        if (hideIcon) hideIcon.style.display = isPassword ? '' : 'none';
+    };
+
+    /**
+     * ACCOUNT MODAL
+     */
+    function showAccountErrors(errors) {
+        const container = document.getElementById('account-errors-container');
+        const list = document.getElementById('account-errors-list');
+        if (!container || !list) return;
+
+        list.innerHTML = '';
+        const errorMessages = Array.isArray(errors) ? errors : Object.values(errors).flat();
+
+        errorMessages.forEach(function(msg) {
+            const li = document.createElement('li');
+            li.className = 'text-xs text-rose-600 dark:text-rose-400 flex items-start gap-2';
+            li.innerHTML = `<svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 3a9 9 0 110 18A9 9 0 0112 3z"/></svg>${msg}`;
+            list.appendChild(li);
+        });
+
+        container.style.display = '';
+    }
+
+    function clearAccountErrors() {
+        const container = document.getElementById('account-errors-container');
+        const list = document.getElementById('account-errors-list');
+        if (container) container.style.display = 'none';
+        if (list) list.innerHTML = '';
+    }
+
+    function resetPasswordToggleState() {
+        ['account-password', 'account-password-confirm'].forEach(function(id) {
+            const input = document.getElementById(id);
+            if (input) input.type = 'password';
+        });
+        document.querySelectorAll('#account-modal-overlay .eye-icon-show').forEach(function(el) {
+            el.style.display = '';
+        });
+        document.querySelectorAll('#account-modal-overlay .eye-icon-hide').forEach(function(el) {
+            el.style.display = 'none';
+        });
+    }
+
+    /**
+     * OPEN / CLOSE MODAL
+     */
     function openAddAccountModal() {
+        clearAccountErrors();
+        resetPasswordToggleState();
         document.getElementById('account-modal-title').textContent = 'Tambah Akun Baru';
         document.getElementById('account-modal-form').action = '{{ route("akun.store") }}';
         document.getElementById('account-method').value = 'POST';
+        document.getElementById('account-user-id').value = '';
         document.getElementById('account-name').value = '';
         document.getElementById('account-email').value = '';
         document.getElementById('account-role').value = 'admin';
         document.getElementById('account-password').value = '';
+        document.getElementById('account-password-confirm').value = '';
         document.getElementById('pw-hint').style.display = 'none';
         document.getElementById('account-modal-overlay').style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
 
     function openEditAccountModal(user) {
+        clearAccountErrors();
+        resetPasswordToggleState();
         document.getElementById('account-modal-title').textContent = 'Edit Akun';
         document.getElementById('account-modal-form').action = `/akun/${user.id}`;
         document.getElementById('account-method').value = 'PUT';
+        document.getElementById('account-user-id').value = user.id;
         document.getElementById('account-name').value = user.name;
         document.getElementById('account-email').value = user.email;
         document.getElementById('account-role').value = user.role;
         document.getElementById('account-password').value = '';
+        document.getElementById('account-password-confirm').value = '';
         document.getElementById('pw-hint').style.display = '';
         document.getElementById('account-modal-overlay').style.display = 'flex';
         document.body.style.overflow = 'hidden';
@@ -216,32 +287,105 @@
         if (e && e.target !== document.getElementById('account-modal-overlay')) return;
         document.getElementById('account-modal-overlay').style.display = 'none';
         document.body.style.overflow = '';
+        clearAccountErrors();
+        resetPasswordToggleState();
     }
-    @if ($errors->any())
-    document.addEventListener('DOMContentLoaded', function () {
-        @if (old('_method') === 'PUT' && old('_user_id'))
-            document.getElementById('account-modal-title').textContent = 'Edit Akun';
-            document.getElementById('account-modal-form').action = `/akun/{{ old('_user_id') }}`;
-            document.getElementById('account-method').value = 'PUT';
-            document.getElementById('account-user-id').value = '{{ old("_user_id") }}';
-            document.getElementById('account-name').value = '{{ old("name") }}';
-            document.getElementById('account-email').value = '{{ old("email") }}';
-            document.getElementById('account-role').value = '{{ old("role") }}';
-            document.getElementById('pw-hint').style.display = '';
-            document.getElementById('account-modal-overlay').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        @else
-            document.getElementById('account-modal-title').textContent = 'Tambah Akun Baru';
-            document.getElementById('account-modal-form').action = '{{ route("akun.store") }}';
-            document.getElementById('account-method').value = 'POST';
-            document.getElementById('account-name').value = '{{ old("name") }}';
-            document.getElementById('account-email').value = '{{ old("email") }}';
-            document.getElementById('account-role').value = '{{ old("role", "admin") }}';
-            document.getElementById('pw-hint').style.display = 'none';
-            document.getElementById('account-modal-overlay').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        @endif
+
+    /**
+     * FORM SUBMIT VIA AJAX + SWEETALERT2
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('account-modal-form');
+        if (!form) return;
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const formData = new FormData(form);
+            const method = document.getElementById('account-method').value;
+            const isAdd = method === 'POST';
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                },
+                body: formData,
+            })
+            .then(async function(response) {
+                if (response.ok || response.redirected) {
+                    // Sukses — tutup modal dan tampilkan SweetAlert success
+                    document.getElementById('account-modal-overlay').style.display = 'none';
+                    document.body.style.overflow = '';
+                    clearAccountErrors();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: isAdd ? 'Akun Ditambahkan!' : 'Akun Diperbarui!',
+                        text: isAdd
+                            ? 'Akun baru berhasil ditambahkan ke sistem.'
+                            : 'Perubahan data akun berhasil disimpan.',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        background: isDark ? '#1e293b' : '#ffffff',
+                        color: isDark ? '#f1f5f9' : '#0f172a',
+                        customClass: {
+                            popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
+                        },
+                    }).then(function() {
+                        location.reload();
+                    });
+                } else {
+                    // Gagal — tampilkan error di dalam modal
+                    let errorMessages = ['Terjadi kesalahan. Periksa kembali data yang diisi.'];
+                    try {
+                        const json = await response.json();
+                        if (json.errors) {
+                            errorMessages = Object.values(json.errors).flat();
+                        } else if (json.message) {
+                            errorMessages = [json.message];
+                        }
+                    } catch (_) {}
+
+                    showAccountErrors(errorMessages);
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: isAdd ? 'Gagal Menambahkan!' : 'Gagal Menyimpan!',
+                        text: 'Silakan periksa form untuk melihat detail kesalahan.',
+                        confirmButtonColor: '#3B82F6',
+                        confirmButtonText: 'Mengerti',
+                        background: isDark ? '#1e293b' : '#ffffff',
+                        color: isDark ? '#f1f5f9' : '#0f172a',
+                        customClass: {
+                            popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
+                            confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+                        },
+                        didOpen: function() {
+                            const sc = document.querySelector('.swal2-container');
+                            if (sc) sc.style.zIndex = '99999';
+                        },
+                    });
+                }
+            })
+            .catch(function() {
+                const isDark = document.documentElement.classList.contains('dark');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Koneksi Gagal',
+                    text: 'Tidak dapat terhubung ke server. Periksa koneksi internet kamu.',
+                    confirmButtonColor: '#3B82F6',
+                    background: isDark ? '#1e293b' : '#ffffff',
+                    color: isDark ? '#f1f5f9' : '#0f172a',
+                    didOpen: function() {
+                        const sc = document.querySelector('.swal2-container');
+                        if (sc) sc.style.zIndex = '99999';
+                    },
+                });
+            });
+        });
     });
-    @endif
 </script>
 @endpush

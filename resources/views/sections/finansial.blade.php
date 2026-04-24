@@ -5,14 +5,14 @@
 
 @section('content')
 
-<div class="flex justify-end mb-4">
-    <a
-        href="{{ route('finansial.export') }}"
-        class="justify-center bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 hover:bg-emerald-700 transition shadow-sm">
-        @include('components.icon', ['name' => 'download', 'class' => 'w-4 h-4'])
-        Export CSV
-    </a>
-</div>
+@push('table-actions')
+<a
+    href="{{ route('finansial.export') }}"
+    class="flex-1 sm:flex-none justify-center bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-emerald-700 transition shadow-sm">
+    @include('components.icon', ['name' => 'download', 'class' => 'w-4 h-4'])
+    Export CSV
+</a>
+@endpush
 
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
     @php
