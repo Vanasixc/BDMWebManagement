@@ -1,0 +1,48 @@
+================================================================================
+DOKUMENTASI PERUBAHAN DATABASE & SISTEM (BDM Web Management)
+================================================================================
+Update Terakhir: 27 April 2026
+
+Berikut adalah riwayat perubahan dan normalisasi database (Single-Table Database) yang telah diterapkan untuk memastikan aplikasi berjalan stabil di lingkungan production lokal menggunakan MySQL.
+
+1. KONFIGURASI ENVIRONMENT (.env)
+--------------------------------------------------------------------------------
+- Database: `mysql` | Host: `127.0.0.1` | DB: `wh_manager` | User: `wh_user`
+- Password: `password_kuat_kamu`
+- SESSION_DRIVER: `file` (Menghindari Login Loop pada environment lokal).
+
+2. MIGRATION SCHEMA (Tabel Websites)
+--------------------------------------------------------------------------------
+File: database/migrations/2026_04_08_125137_create_websites_table.php
+- Struktur tabel disatukan menjadi tabel tunggal `websites` untuk efisiensi data client.
+- Nama field disesuaikan: `client_type` -> `jenis_klien`.
+- Standardisasi Status: Default status diubah menjadi `'Active'` (sebelumnya 'Aktif').
+- Tipe Data: `created_year` menggunakan tipe `YEAR`, harga menggunakan `BIGINT`.
+
+3. DATABASE SEEDER (WebsiteSeeder.php) - PERUBAHAN BESAR
+--------------------------------------------------------------------------------
+- Master Data: Menambahkan 24 data website lengkap (Data 1 s/d 24) dari master Excel.
+- Penanganan Tanggal: Semua `hosting_exp_date` yang kosong diisi default `'2025-12-31'` agar fungsi format tanggal di Blade tidak error.
+- Perbaikan Logic Insert: Mengubah metode `DB::table('websites')->insert($websites)` menjadi loop `foreach` individu.
+  *Alasan:* Mencegah error SQL "Column count doesn't match value count" akibat perbedaan urutan atau jumlah kolom pada data array yang di-input secara massal.
+- Standardisasi Nilai: Mengubah semua nilai `'Aktif'` menjadi `'Active'` agar konsisten dengan filter status di Dashboard.
+
+4. MODEL & CONTROLLER (WebsiteController.php)
+--------------------------------------------------------------------------------
+- Penyesuaian `$fillable` di Model `Website` mencakup seluruh kolom baru.
+- Penyesuaian `buildStatsData` di Controller untuk mendukung segmentasi harga domain (Ekonomis, Standar, Premium) dan distribusi provider.
+
+5. SISTEM AUTENTIKASI
+--------------------------------------------------------------------------------
+- Login menggunakan username:
+  1. superAdmin / superAdmin
+  2. admin / admin
+- Session stabil menggunakan driver `file`.
+
+================================================================================
+STATUS TERKINI:
+- Sistem sudah bermigrasi penuh ke MySQL (`wh_manager`).
+- 24 Data Master Website telah sukses di-seed ke database.
+- Dashboard menampilkan statistik akurat untuk Status Website, Segmentasi Harga Domain, dan Distribusi Provider.
+- Perintah eksekusi: `php artisan migrate:fresh --seed`
+================================================================================
