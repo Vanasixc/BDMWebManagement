@@ -13,48 +13,56 @@ return new class extends Migration
     {
         Schema::create('websites', function (Blueprint $table) {
             $table->id();
-
-            // == Master Data ==
-            $table->string('client');           // Nama Client
-            $table->string('pic');              // PIC Client
-            $table->string('website');          // Nama Website
-            $table->string('url');              // URL Website
-            $table->string('type');             // Jenis Website
-            $table->string('technology');       // CMS/Teknologi
-            $table->string('status')->default('Aktif'); // Aktif|InActive|Suspend
-            $table->string('internal_pic');     // PIC Internal
-            $table->string('service_package')->nullable();
-            $table->date('created_year')->nullable();
-            $table->text('note')->nullable();
-            $table->string('phone')->nullable();
+            
+            // -- Data Klien --
+            $table->string('client');
+            $table->string('jenis_klien')->nullable();
+            $table->string('pic')->nullable();
+            $table->string('phone', 50)->nullable();
             $table->string('email')->nullable();
-
-            // == Domain ==
+            
+            // -- Data Website Utama --
+            $table->string('website');
+            $table->string('url')->nullable();
+            $table->string('type', 100)->nullable();
+            $table->string('technology', 100)->nullable();
+            $table->string('status', 50)->default('Active');
+            $table->string('internal_pic')->nullable();
+            $table->string('service_package')->nullable();
+            $table->year('created_year')->nullable();
+            $table->text('note')->nullable();
+            
+            // -- Data Domain --
+            $table->string('domain_name')->nullable();
             $table->string('domain_provider')->nullable();
             $table->string('domain_email')->nullable();
             $table->date('domain_reg_date')->nullable();
             $table->date('domain_exp_date')->nullable();
-            $table->bigInteger('domain_price')->default(0);
-
-            // == Hosting ==
-            $table->string('hosting_type')->nullable();
+            $table->integer('domain_duration')->nullable();
+            $table->boolean('is_auto_renew')->default(false);
+            $table->decimal('domain_price', 15, 2)->nullable();
+            
+            // -- Data Hosting --
+            $table->string('hosting_type', 100)->nullable();
+            $table->string('hosting_package')->nullable();
             $table->string('hosting_provider')->nullable();
-            $table->integer('storage')->default(0);
-            $table->string('ip_server')->nullable();
-            $table->string('location')->nullable();
+            $table->string('storage', 100)->nullable();
+            $table->string('ip_server', 100)->nullable();
+            $table->string('location', 100)->nullable();
             $table->string('hosting_email')->nullable();
             $table->date('hosting_exp_date')->nullable();
-            $table->bigInteger('hosting_price')->default(0);
-
-            // == Access ==
+            $table->decimal('hosting_price', 15, 2)->nullable();
+            
+            // -- Data Akses --
             $table->string('admin_url')->nullable();
-            $table->string('extra_access')->nullable();
+            $table->string('admin_username')->nullable();
+            $table->text('extra_access')->nullable();
             $table->string('password_loc')->nullable();
-
-            // == Financial ==
-            $table->bigInteger('sell_price')->default(0);
-            $table->string('pay_system')->default('Tahunan');
-            $table->string('pay_status')->default('Belum');
+            
+            // -- Data Finansial --
+            $table->decimal('sell_price', 15, 2)->nullable();
+            $table->string('pay_system', 50)->nullable();
+            $table->string('pay_status', 50)->nullable();
             $table->date('invoice_date')->nullable();
 
             $table->timestamps();

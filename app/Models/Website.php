@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Website extends Model
 {
     protected $fillable = [
-        // Master
+        // Info Klien
         'client',
+        'jenis_klien', // NOTE: Kolom diganti nama sesuai schema baru
         'pic',
+        'phone',       // NOTE: Ditambahkan nomor telepon klien
+        'email',
+
+        // Info Website
         'website',
         'url',
         'type',
@@ -19,19 +24,21 @@ class Website extends Model
         'service_package',
         'created_year',
         'note',
-        'phone',
-        'email',
 
-        // Domain
+        // Info Domain
+        'domain_name', // NOTE: Ditambahkan untuk membedakan nama domain & URL
         'domain_provider',
         'domain_email',
         'domain_reg_date',
         'domain_exp_date',
+        'domain_duration', // NOTE: Durasi perpanjangan domain dalam tahun
+        'is_auto_renew',   // NOTE: Flag untuk auto renew domain
         'domain_price',
 
-        // Hosting
+        // Info Hosting
         'hosting_type',
         'hosting_provider',
+        'hosting_package', // NOTE: Menyimpan nama paket hosting spesifik
         'storage',
         'ip_server',
         'location',
@@ -39,12 +46,13 @@ class Website extends Model
         'hosting_exp_date',
         'hosting_price',
 
-        // Access
+        // Info Akses
         'admin_url',
+        'admin_username',  // NOTE: Dipisahkan untuk username login akses admin
         'extra_access',
         'password_loc',
 
-        // Financial
+        // Info Finansial
         'sell_price',
         'pay_system',
         'pay_status',
@@ -56,11 +64,12 @@ class Website extends Model
         'domain_exp_date'  => 'date',
         'hosting_exp_date' => 'date',
         'invoice_date'     => 'date',
-        'created_year'     => 'date',
-        'domain_price'     => 'integer',
-        'hosting_price'    => 'integer',
-        'sell_price'       => 'integer',
-        'storage'          => 'integer',
+        'created_year'     => 'integer',
+        'domain_duration'  => 'integer',
+        'is_auto_renew'    => 'boolean',
+        'domain_price'     => 'decimal:2',
+        'hosting_price'    => 'decimal:2',
+        'sell_price'       => 'decimal:2',
     ];
 
     public function getDaysRemainingAttribute(): int
