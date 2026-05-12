@@ -64,7 +64,7 @@ class Website extends Model
         'domain_exp_date'  => 'date',
         'hosting_exp_date' => 'date',
         'invoice_date'     => 'date',
-        'created_year'     => 'integer',
+        'created_year'     => 'string',
         'domain_duration'  => 'integer',
         'is_auto_renew'    => 'boolean',
         'domain_price'     => 'decimal:2',

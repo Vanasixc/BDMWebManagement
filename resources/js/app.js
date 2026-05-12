@@ -478,7 +478,7 @@ function renderForm(data, readonly) {
             html += inp(
                 "Tahun Pembuatan",
                 "created_year",
-                v.created_year ? v.created_year.substring(0, 10) : "",
+                v.created_year ? String(v.created_year).substring(0, 10) : "",
                 "date",
             );
             html += inp("Telepon", "phone", v.phone);
