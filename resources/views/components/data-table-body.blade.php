@@ -3,11 +3,14 @@
     @php
     $rowClass = 'hover:bg-gray-50 dark:hover:bg-slate-700/50';
     if ($section !== 'master') {
-    if ($website->isAllEmpty($section)) {
-    $rowClass = 'bg-rose-50/80 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20';
-    } elseif ($website->isIncomplete($section)) {
-    $rowClass = 'bg-amber-50/80 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20';
-    }
+        if ($website->isAllEmpty($section)) {
+            $rowClass = 'bg-rose-50/80 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20';
+        } elseif ($section === 'finansial' && $website->margin < 0) {
+            // Rugi — highlight merah muda lebih soft agar berbeda dengan isAllEmpty
+            $rowClass = 'bg-rose-50/60 hover:bg-rose-100/80 dark:bg-rose-500/5 dark:hover:bg-rose-500/15 border-l-2 border-l-rose-400';
+        } elseif ($website->isIncomplete($section)) {
+            $rowClass = 'bg-amber-50/80 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20';
+        }
     }
     @endphp
     <tr class="transition {{ $rowClass }}">
@@ -17,6 +20,14 @@
         <td class="px-4 py-3">
             @if (!empty($col['badge']))
             @include('components.status-badge', ['status' => $website->{$col['key']}])
+            @elseif (!empty($col['profit_badge']))
+            @php $margin = $website->margin; @endphp
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
+                {{ $margin >= 0
+                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                   : 'bg-rose-500/10 text-rose-600 dark:text-rose-400' }}">
+                {{ $margin >= 0 ? 'Untung' : 'Rugi' }}
+            </span>
             @elseif (!empty($col['pay_badge']))
             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
                                 {{ $website->{$col['key']} === 'Lunas'
@@ -24,6 +35,15 @@
                                    : 'bg-rose-500/10 text-rose-600 dark:text-rose-400' }}">
                 {{ $website->{$col['key']} }}
             </span>
+            @elseif (!empty($col['domain_days_col']))
+            @if (!$website->domain_exp_date)
+            <span class="text-slate-400">-</span>
+            @else
+            @php $dd = $website->domain_days_remaining; @endphp
+            <span class="font-bold tabular-nums {{ $dd < 0 ? 'text-rose-600 dark:text-rose-400' : ($dd <= 3 ? 'text-rose-500 dark:text-rose-400' : ($dd <= 30 ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')) }}">
+                {{ $dd < 0 ? 'Telat '.abs($dd).'h' : $dd.' hari' }}
+            </span>
+            @endif
             @elseif (!empty($col['reminder_badge']))
             @include('components.reminder-badge', ['status' => $website->reminder_status])
             @elseif (!empty($col['days_col']))
@@ -55,6 +75,11 @@
                 class="text-blue-500 hover:text-blue-700 hover:underline transition truncate max-w-[200px] block">
                 {{ $website->admin_url }}
             </a>
+            @elseif ($col['key'] === 'url' && !empty($website->url))
+            <a href="{{ $website->url }}" target="_blank" rel="noopener noreferrer"
+                class="text-blue-500 hover:text-blue-700 hover:underline transition truncate max-w-[220px] block">
+                {{ $website->url }}
+            </a>
             @else
             {{ $website->{$col['key']} ?? '-' }}
             @endif
@@ -68,7 +93,7 @@
 
                 <button
                     onclick="openModalView({{ $website->id }})"
-                    class="p-1.5 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition"
+                    class="p-1.5 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition cursor-pointer"
                     title="Lihat Detail">
                     @include('components.icon', ['name' => 'info', 'class' => 'w-4 h-4'])
                 </button>
@@ -78,7 +103,7 @@
                 @if ($section !== 'reminder')
                 <button
                     onclick="openModalEdit({{ $website->id }})"
-                    class="p-1.5 bg-amber-500/10 text-amber-500 rounded-lg hover:bg-amber-500/20 transition"
+                    class="p-1.5 bg-amber-500/10 text-amber-500 rounded-lg hover:bg-amber-500/20 transition cursor-pointer"
                     title="Edit Data">
                     @include('components.icon', ['name' => 'edit', 'class' => 'w-4 h-4'])
                 </button>
@@ -93,7 +118,7 @@
                     @csrf @method('DELETE')
                     <button
                         type="submit"
-                        class="p-1.5 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500/20 transition"
+                        class="p-1.5 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500/20 transition cursor-pointer"
                         title="Hapus Permanen">
                         @include('components.icon', ['name' => 'trash', 'class' => 'w-4 h-4'])
                     </button>
@@ -109,7 +134,7 @@
                     <input type="hidden" name="section" value="{{ $section }}">
                     <button
                         type="submit"
-                        class="p-1.5 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500/20 transition"
+                        class="p-1.5 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500/20 transition cursor-pointer"
                         title="Reset Data Section">
                         @include('components.icon', ['name' => 'trash', 'class' => 'w-4 h-4'])
                     </button>

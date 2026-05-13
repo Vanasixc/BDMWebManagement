@@ -142,19 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Initial state
+    // Sidebar state awal
     applySidebarState();
-
-    // Auto-dismiss flash messages setelah 4 detik
-    setTimeout(function () {
-        ["flash-success", "flash-error"].forEach(function (id) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.style.transition = "opacity 0.5s";
-                el.style.opacity = "0";
-                setTimeout(() => el.remove(), 500);
-            }
-        });
-    }, 4000);
 });
 
 // =============================================
@@ -244,6 +233,9 @@ window.openModal = function () {
 window.closeModal = function () {
     document.getElementById("modal-overlay").classList.remove("active");
     document.body.style.overflow = "";
+    // Pastikan tidak ada swal container yang menghalangi interaksi
+    const swalBg = document.querySelector(".swal2-container");
+    if (swalBg) swalBg.style.pointerEvents = "";
 };
 
 window.closeModalOnOverlay = function (e) {
@@ -293,6 +285,15 @@ window.submitModalForm = function () {
     const isAdd = currentModalMode === "add";
     const formData = new FormData(form);
 
+<<<<<<< Updated upstream
+=======
+    formData.append('section', window.WHSection || 'master');
+
+    // Validasi HTML5 (required, pattern, dll.) sebelum kirim ke server
+    // reportValidity() menampilkan tooltip error native browser jika ada field tidak valid
+    if (!form.reportValidity()) return;
+
+>>>>>>> Stashed changes
     // Untuk PUT method (edit), FormData sudah include _method=PUT via hidden field
     fetch(form.action, {
         method: "POST", // Laravel method-spoofing lewat _method field
@@ -391,20 +392,33 @@ function renderForm(data, readonly) {
     const isEdit = data && data.id;
     const action = isEdit ? `/websites/${data.id}` : "/websites";
     const method = isEdit ? "PUT" : "POST";
+<<<<<<< Updated upstream
     
+=======
+
+    // Legenda required hanya untuk section master dan saat bukan readonly
+    const reqLegend = (section === 'master' && !readonly)
+        ? `<p class="text-[10px] text-slate-400 dark:text-slate-500 mb-1 col-span-full"><span class="text-rose-500 font-bold">*</span> Wajib diisi</p>`
+        : '';
+
+>>>>>>> Stashed changes
     let html = `<form id="modal-dynamic-form" method="POST" action="${action}">
         <input type="hidden" name="_token" value="${CSRF}"/>
         ${isEdit ? '<input type="hidden" name="_method" value="PUT"/>' : ""}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${reqLegend}`;
 
     const v = data || {};
 
-    function inp(label, name, value, type = "text") {
+    function inp(label, name, value, type = "text", { pattern = "", placeholder = "", required = false } = {}) {
         const val = value !== null && value !== undefined ? value : "";
         const ro = readonly ? "disabled" : "";
+        const patAttr  = pattern     ? `pattern="${pattern}" title="Format tidak valid"` : "";
+        const phAttr   = placeholder ? `placeholder="${placeholder}"` : "";
+        const reqAttr  = required    ? `required` : "";
+        const reqStar  = required    ? `<span class="text-rose-500 ml-0.5">*</span>` : "";
         return `<div class="space-y-1">
-            <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${label}</label>
-            <input type="${type}" name="${name}" value="${String(val).replace(/"/g, "&quot;")}" ${ro}
+            <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${label}${reqStar}</label>
+            <input type="${type}" name="${name}" value="${String(val).replace(/"/g, "&quot;")}" ${ro} ${patAttr} ${phAttr} ${reqAttr}
                 class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
                        bg-white border-gray-300 text-slate-900
                        dark:bg-slate-700 dark:border-slate-600 dark:text-white
@@ -413,9 +427,15 @@ function renderForm(data, readonly) {
         </div>`;
     }
 
+<<<<<<< Updated upstream
 
     function sel(label, name, value, options) {
+=======
+    function sel(label, name, value, options, { required = false } = {}) {
+>>>>>>> Stashed changes
         const ro = readonly ? "disabled" : "";
+        const reqAttr = required ? `required` : "";
+        const reqStar = required ? `<span class="text-rose-500 ml-0.5">*</span>` : "";
         const opts = options
             .map(
                 (o) =>
@@ -423,9 +443,9 @@ function renderForm(data, readonly) {
             )
             .join("");
         return `<div class="space-y-1">
-        <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${label}</label>
-        <select name="${name}" ${ro}
-            class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
+        <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${label}${reqStar}</label>
+        <select name="${name}" ${ro} ${reqAttr}
+            class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition cursor-pointer
                    bg-white border-gray-300 text-slate-900
                    dark:bg-slate-700 dark:border-slate-600 dark:text-white
                    disabled:bg-slate-50 dark:disabled:bg-slate-800
@@ -455,54 +475,49 @@ function renderForm(data, readonly) {
         case "master": {
             const types = dd["type"] || ["Profile", "Blog", "Berita"];
             const techs = dd["technology"] || ["WordPress", "Laravel"];
-            const statuses = dd["status"] || ["Active", "InActive", "Suspend"];
+            // Normalisasi: ganti 'Aktif' -> 'Active', urut agar Active selalu pertama
+            const rawStatuses = dd["status"] || ["Active", "InActive", "Suspend"];
+            const statuses = [
+                ...rawStatuses.map(s => s === 'Aktif' ? 'Active' : s)
+                    .filter(s => s === 'Active'),
+                ...rawStatuses.map(s => s === 'Aktif' ? 'Active' : s)
+                    .filter(s => s !== 'Active'),
+            ];
             const pics = dd["internalPic"] || ["Iqbal"];
 
-            if (v.status === "Aktif") v.status = "Active";
+            // Normalisasi value status (edit mode)
+            if (!v.status || v.status === "Aktif") v.status = "Active";
 
-            html += inp("Nama Client", "client", v.client);
-            html += inp("PIC", "pic", v.pic);
-            html += inp("Nama Website", "website", v.website);
-            html += inp("URL Website", "url", v.url);
-            html += sel("Jenis Website", "type", v.type, types);
-            html += sel("CMS/Teknologi", "technology", v.technology, techs);
-            html += sel("Status", "status", v.status, statuses);
-            html += sel("PIC Internal", "internal_pic", v.internal_pic, pics);
-            html += inp(
-                "Service Package",
-                "service_package",
-                v.service_package,
-            );
+            html += inp("Nama Client", "client", v.client, "text", { placeholder: "Contoh: PT. Banjar Digital Media", required: true });
+            html += inp("PIC", "pic", v.pic, "text", { placeholder: "Nama penanggung jawab client", required: true });
+            html += inp("Nama Website", "website", v.website, "text", { placeholder: "Contoh: Banjar Digital Media", required: true });
+            html += inp("URL Website", "url", v.url, "text", { placeholder: "https://example.com", required: true });
+            html += sel("Jenis Website", "type", v.type, types, { required: true });
+            html += sel("CMS/Teknologi", "technology", v.technology, techs, { required: true });
+            html += sel("Status", "status", v.status, statuses, { required: true });
+            html += sel("PIC Internal", "internal_pic", v.internal_pic, pics, { required: true });
+            html += inp("Service Package", "service_package", v.service_package, "text", { placeholder: "Contoh: Basic, Premium, dll." });
             html += inp(
                 "Tahun Pembuatan",
                 "created_year",
                 v.created_year ? v.created_year.substring(0, 10) : "",
                 "date",
             );
-            html += inp("Telepon", "phone", v.phone);
-            html += inp("Email", "email", v.email, "email");
+            html += inp("No. WhatsApp", "phone", v.phone, "text", { placeholder: "Contoh: 08123456789", required: true });
+            html += inp("Email", "email", v.email, "email", { placeholder: "email@client.com" });
             html = html + `</div>`;
             html += `<div class="grid grid-cols-1 gap-4 mt-4">`;
             html += textarea("Catatan", "note", v.note, true);
             break;
         }
         case "domain": {
-            html += inp("Domain URL", "url", v.url);
-            html += inp(
-                "Provider Domain",
-                "domain_provider",
-                v.domain_provider,
-            );
-            html += inp(
-                "Email Akun Domain",
-                "domain_email",
-                v.domain_email,
-                "email",
-            );
+            html += inp("Domain URL", "url", v.url, "text", { placeholder: "https://namadomain.com" });
+            html += inp("Provider Domain", "domain_provider", v.domain_provider, "text", { placeholder: "Contoh: Domainesia, Niagahoster" });
+            html += inp("Email Akun Domain", "domain_email", v.domain_email, "email", { placeholder: "email@provider.com" });
             html += inp(
                 "Harga Domain / Tahun",
                 "domain_price",
-                v.domain_price,
+                v.domain_price ? parseInt(v.domain_price) : "",
                 "number",
             );
             html += inp(
@@ -531,29 +546,23 @@ function renderForm(data, readonly) {
                 v.hosting_type,
                 hTypes,
             );
-            html += inp(
-                "Provider Hosting",
-                "hosting_provider",
-                v.hosting_provider,
-            );
+            html += inp("Provider Hosting", "hosting_provider", v.hosting_provider, "text", { placeholder: "Contoh: OVHcloud, Niagahoster" });
             html += inp(
                 "Kapasitas Storage (GB)",
                 "storage",
                 v.storage,
                 "number",
             );
-            html += inp("IP Server", "ip_server", v.ip_server);
-            html += inp("Lokasi Server", "location", v.location);
-            html += inp(
-                "Email Hosting",
-                "hosting_email",
-                v.hosting_email,
-                "email",
-            );
+            html += inp("IP Server", "ip_server", v.ip_server, "text", {
+                pattern: "^(\\d{1,3}\\.){3}\\d{1,3}$",
+                placeholder: "Contoh: 192.168.1.1",
+            });
+            html += inp("Lokasi Server", "location", v.location, "text", { placeholder: "Contoh: Singapore, Jakarta" });
+            html += inp("Email Hosting", "hosting_email", v.hosting_email, "email", { placeholder: "email@provider.com" });
             html += inp(
                 "Harga Hosting / Tahun",
                 "hosting_price",
-                v.hosting_price,
+                v.hosting_price ? parseInt(v.hosting_price) : "",
                 "number",
             );
             html += inp(
@@ -565,13 +574,9 @@ function renderForm(data, readonly) {
             break;
         }
         case "akses": {
-            html += inp("URL Admin", "admin_url", v.admin_url);
-            html += inp("Akses Tambahan", "extra_access", v.extra_access);
-            html += inp(
-                "Lokasi Simpan Password",
-                "password_loc",
-                v.password_loc,
-            );
+            html += inp("URL Admin", "admin_url", v.admin_url, "text", { placeholder: "https://namadomain.com/wp-admin" });
+            html += inp("Akses Tambahan", "extra_access", v.extra_access, "text", { placeholder: "Contoh: cPanel, FTP, SSH" });
+            html += inp("Lokasi Simpan Password", "password_loc", v.password_loc, "text", { placeholder: "Contoh: Google Drive, Notion" });
             html = html + `</div><div class="grid grid-cols-1 gap-4 mt-4">`;
             html += textarea("Catatan Akses", "note", v.note, true);
             break;
@@ -582,7 +587,7 @@ function renderForm(data, readonly) {
             html += inp(
                 "Harga Jual / Tahun",
                 "sell_price",
-                v.sell_price,
+                v.sell_price ? parseInt(v.sell_price) : "",
                 "number",
             );
             html += sel(
@@ -606,7 +611,7 @@ function renderForm(data, readonly) {
             break;
         }
         case "reminder": {
-            html += inp("Website", "website", v.website);
+            html += inp("Website", "website", v.website, "text", { placeholder: "Nama website" });
             html = html + `</div><div class="grid grid-cols-1 gap-4 mt-4">`;
             html += textarea("Catatan Reminder", "note", v.note, true);
             break;

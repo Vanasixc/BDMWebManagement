@@ -133,8 +133,12 @@
                 @csrf
                 <button
                     type="submit"
+<<<<<<< Updated upstream
                     class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/20 transition text-sm font-medium"
                 >
+=======
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/20 transition text-sm font-medium cursor-pointer">
+>>>>>>> Stashed changes
                     <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                     </svg>
@@ -228,21 +232,28 @@
                     <p class="text-xs text-slate-500 dark:text-slate-400">@yield('page_subtitle', 'Kelola infrastruktur website Anda.')</p>
                 </div>
 
-                {{-- Flash Messages --}}
+                {{-- Flash Messages via SweetAlert2 (di-fire via script setelah CDN load) --}}
                 @if (session('success'))
+<<<<<<< Updated upstream
                 <div id="flash-success"
                      class="mb-5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-sm p-4 rounded-xl flex items-center gap-2 animate-fade-in-up">
                     <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     <span>{{ session('success') }}</span>
                 </div>
+=======
+                <script>window.__flashSuccess = @json(session('success'));</script>
+>>>>>>> Stashed changes
                 @endif
-
                 @if (session('error'))
+<<<<<<< Updated upstream
                 <div id="flash-error"
                      class="mb-5 bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-400 text-sm p-4 rounded-xl flex items-center gap-2 animate-fade-in-up">
                     <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 3a9 9 0 110 18A9 9 0 0112 3z"/></svg>
                     <span>{{ session('error') }}</span>
                 </div>
+=======
+                <script>window.__flashError = @json(session('error'));</script>
+>>>>>>> Stashed changes
                 @endif
 
                 {{-- Main content slot --}}
@@ -259,6 +270,37 @@
     {{-- SweetAlert2 CDN --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"/>
+
+    {{-- Flash via SweetAlert2 — dijalankan setelah CDN load --}}
+    <script>
+    (function () {
+        function showFlash() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const base = {
+                timer: 2500,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                toast: false,
+                background: isDark ? '#1e293b' : '#ffffff',
+                color: isDark ? '#f1f5f9' : '#0f172a',
+                customClass: {
+                    popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
+                },
+            };
+            if (window.__flashSuccess) {
+                Swal.fire(Object.assign({}, base, { icon: 'success', title: 'Berhasil!', text: window.__flashSuccess }));
+            } else if (window.__flashError) {
+                Swal.fire(Object.assign({}, base, { icon: 'error', title: 'Terjadi Kesalahan!', text: window.__flashError, timer: 4000 }));
+            }
+        }
+        // Tunggu hingga DOM siap
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', showFlash);
+        } else {
+            showFlash();
+        }
+    })();
+    </script>
 
     {{-- Chart.js CDN --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>

@@ -56,17 +56,25 @@ class Website extends Model
         'domain_exp_date'  => 'date',
         'hosting_exp_date' => 'date',
         'invoice_date'     => 'date',
+<<<<<<< Updated upstream
         'created_year'     => 'date',
         'domain_price'     => 'integer',
         'hosting_price'    => 'integer',
         'sell_price'       => 'integer',
         'storage'          => 'integer',
+=======
+        'created_year'     => 'string',
+        'domain_duration'  => 'integer',
+        'is_auto_renew'    => 'boolean',
+        'domain_price'     => 'integer',
+        'hosting_price'    => 'integer',
+        'sell_price'       => 'integer',
+>>>>>>> Stashed changes
     ];
 
     public function getDaysRemainingAttribute(): int
     {
         if (!$this->hosting_exp_date) return 0;
-
         return (int) now()->startOfDay()->diffInDays(
             $this->hosting_exp_date->startOfDay(),
             false
@@ -75,8 +83,23 @@ class Website extends Model
 
     public function getMarginAttribute(): int
     {
-        $monthlyHosting = $this->hosting_price / 12;
-        return (int) ($this->sell_price - ($this->domain_price + $monthlyHosting));
+        // Margin = Harga Jual/Thn - (Biaya Domain/Thn + Biaya Hosting/Thn)
+        // Semua dalam basis tahunan
+        return (int) ($this->sell_price - ($this->domain_price + $this->hosting_price));
+    }
+
+    public function getProfitStatusAttribute(): string
+    {
+        return $this->margin >= 0 ? 'Untung' : 'Rugi';
+    }
+
+    public function getDomainDaysRemainingAttribute(): int
+    {
+        if (!$this->domain_exp_date) return 0;
+        return (int) now()->startOfDay()->diffInDays(
+            $this->domain_exp_date->startOfDay(),
+            false
+        );
     }
 
     public function getReminderStatusAttribute(): string
