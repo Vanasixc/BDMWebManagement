@@ -1,7 +1,3 @@
-{{--
-    Status Badge Component
-    Usage: @include('components.status-badge', ['status' => $website->status])
---}}
 @php
     $colors = [
         'Active'   => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',

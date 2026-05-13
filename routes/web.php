@@ -7,9 +7,6 @@ use App\Http\Controllers\DropdownConfigController;
 use App\Http\Controllers\WebsiteController;
 use Illuminate\Support\Facades\Route;
 
-// =============================================
-// GUEST Routes (belum login)
-// =============================================
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])
@@ -17,15 +14,11 @@ Route::middleware('guest')->group(function () {
         ->name('login.post');
 });
 
-// =============================================
-// AUTHENTICATED Routes
-// =============================================
 Route::middleware('auth')->group(function () {
 
     Route::get('/', fn() => redirect()->route('dashboard'));
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Section pages — semua role bisa akses (view)
     Route::get('/master',    [WebsiteController::class, 'index'])->defaults('section', 'master')->name('master');
     Route::get('/domain',    [WebsiteController::class, 'index'])->defaults('section', 'domain')->name('domain');
     Route::get('/hosting',   [WebsiteController::class, 'index'])->defaults('section', 'hosting')->name('hosting');
@@ -34,12 +27,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/finansial/export', [WebsiteController::class, 'exportFinansial'])->name('finansial.export');
     Route::get('/reminder',  [WebsiteController::class, 'index'])->defaults('section', 'reminder')->name('reminder');
 
-    // AJAX search — semua role bisa akses
     Route::get('/websites/search', [WebsiteController::class, 'search'])->name('websites.search');
-    // Show detail — semua role bisa akses
     Route::get('/websites/{website}', [WebsiteController::class, 'show'])->name('websites.show');
 
-    // CRUD — hanya superAdmin dan admin
     Route::middleware('role:superAdmin,admin')->group(function () {
         Route::post('/websites',              [WebsiteController::class, 'store'])->name('websites.store');
         Route::put('/websites/{website}',     [WebsiteController::class, 'update'])->name('websites.update');
@@ -50,7 +40,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/dropdown/remove', [DropdownConfigController::class, 'removeOption'])->name('dropdown.remove');
     });
 
-    // Akun — hanya superAdmin
     Route::middleware('role:superAdmin')->group(function () {
         Route::get('/akun',           [AccountController::class, 'index'])->name('akun');
         Route::post('/akun',          [AccountController::class, 'store'])->name('akun.store');

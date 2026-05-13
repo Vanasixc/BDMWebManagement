@@ -1,42 +1,25 @@
-{{--
-    Data Table Component — reusable di semua section page
-    Variables expected:
-      $websites  — paginated collection
-      $columns   — array of column config
-      $section   — current section name (string)
-      $search    — current search query
-      $perPage   — current per_page value
-      $dropdowns — DropdownConfig collection keyed by 'key'
---}}
 <div class="rounded-xl shadow-sm border overflow-hidden bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700">
 
-    {{-- Table Controls --}}
     <div class="p-4 border-b border-gray-100 dark:border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 
-        {{-- Per page selector --}}
         <div class="flex items-center gap-2">
             <span class="text-sm text-slate-500 dark:text-slate-400">Show</span>
-            <form method="GET">
-                <input type="hidden" name="search" value="{{ $search }}" />
-                <select
-                    name="per_page"
-                    onchange="this.form.submit()"
-                    class="border rounded-lg px-2 py-1.5 text-sm outline-none transition
-                           bg-white border-gray-300 text-slate-900
-                           dark:bg-slate-700 dark:border-slate-600 dark:text-white
-                           focus:ring-2 focus:ring-blue-500">
-                    @foreach ([10, 25, 50] as $n)
-                    <option value="{{ $n }}" {{ $perPage == $n ? 'selected' : '' }}>{{ $n }}</option>
-                    @endforeach
-                </select>
-            </form>
+            <select
+                id="per-page-select"
+                class="border rounded-lg px-2 py-1.5 text-sm outline-none transition cursor-pointer
+                       bg-white border-gray-300 text-slate-900
+                       dark:bg-slate-700 dark:border-slate-600 dark:text-white
+                       focus:ring-2 focus:ring-blue-500">
+                @foreach ([10, 25, 50] as $n)
+                <option value="{{ $n }}" {{ $perPage == $n ? 'selected' : '' }}>{{ $n }}</option>
+                @endforeach
+            </select>
             <span class="text-sm text-slate-500 dark:text-slate-400">entries</span>
         </div>
 
-        {{-- Search + Actions --}}
+
         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
 
-            {{-- Search Box --}}
             <div class="relative flex-1 w-full sm:w-auto">
                 @include('components.icon', ['name' => 'search', 'class' => 'w-4 h-4 absolute left-3 top-2.5 text-gray-400 pointer-events-none'])
                 <input
@@ -51,11 +34,10 @@
             </div>
 
             <div class="flex gap-2 w-full sm:w-auto items-center">
-                {{-- Edit Table (dropdown config) --}}
                 @if ($section !== 'reminder')
                 <button
                     onclick="openModalEditTable()"
-                    class="flex-1 sm:flex-none justify-center px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition border
+                    class="flex-1 sm:flex-none justify-center px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition border cursor-pointer
                            border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200
                            dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600">
                     @include('components.icon', ['name' => 'settings', 'class' => 'w-4 h-4'])
@@ -63,13 +45,12 @@
                 </button>
                 @endif
 
-                {{-- Extra action buttons injected by individual pages --}}
                 @stack('table-actions')
 
                 @if ($section === 'master' && auth()->user()->canModify())
                 <button
                     onclick="openModalAdd()"
-                    class="flex-1 sm:flex-none justify-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-700 transition shadow-sm">
+                    class="flex-1 sm:flex-none justify-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-700 transition shadow-sm cursor-pointer">
                     @include('components.icon', ['name' => 'plus', 'class' => 'w-4 h-4'])
                     Tambah
                 </button>
@@ -85,7 +66,33 @@
                 <tr>
                     <th class="px-4 py-3">No</th>
                     @foreach ($columns as $col)
+                    @php
+                        // Kolom tidak bisa di-sort jika: computed DAN tidak ada flag sortable,
+                        // atau reminder_badge, atau Domain URL di section domain
+                        $noSort = (!empty($col['computed']) && empty($col['sortable']))
+                               || !empty($col['reminder_badge'])
+                               || ($col['key'] === 'url' && $section === 'domain');
+                        $dbKey    = $col['key'];
+                        $isActive = $sortBy === $dbKey;
+                        $nextDir  = ($isActive && $sortDir === 'asc') ? 'desc' : 'asc';
+                        $sortIcon = $isActive
+                            ? ($sortDir === 'asc' ? '↑' : '↓')
+                            : '↕';
+                    @endphp
+                    @if ($noSort)
                     <th class="px-4 py-3">{{ $col['label'] }}</th>
+                    @else
+                    <th class="px-4 py-3">
+                        <button
+                            type="button"
+                            data-sort="{{ $dbKey }}"
+                            data-dir="{{ $nextDir }}"
+                            class="sort-btn inline-flex items-center gap-1 hover:text-blue-500 dark:hover:text-blue-400 transition group cursor-pointer {{ $isActive ? 'text-blue-600 dark:text-blue-400' : '' }}">
+                            {{ $col['label'] }}
+                            <span class="text-[10px] {{ $isActive ? 'opacity-100' : 'opacity-30 group-hover:opacity-70' }}">{{ $sortIcon }}</span>
+                        </button>
+                    </th>
+                    @endif
                     @endforeach
                     <th class="px-4 py-3 text-center">Action</th>
                 </tr>
@@ -131,30 +138,99 @@ if (!window.WHSection) {
     window.WHSection = '{{ $section }}';
 }
 (function () {
-    const input   = document.getElementById('search-input');
-    const section = window.WHSection ?? 'master';
+    const input    = document.getElementById('search-input');
+    const section  = window.WHSection ?? 'master';
     let debounce;
+    let currentSortBy  = '{{ $sortBy }}';
+    let currentSortDir = '{{ $sortDir }}';
+    let currentPerPage = {{ $perPage }};
+
+    function fetchTable({ search, perPage, sortBy, sortDir, page } = {}) {
+        search   = search   ?? input.value;
+        perPage  = perPage  ?? currentPerPage;
+        sortBy   = sortBy   ?? currentSortBy;
+        sortDir  = sortDir  ?? currentSortDir;
+        page     = page     ?? 1;
+        currentPerPage = perPage;
+
+        const params = new URLSearchParams({
+            search, per_page: perPage, section, page,
+            sort_by: sortBy, sort_dir: sortDir,
+        });
+
+        fetch(`/websites/search?${params}`)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('table-tbody').innerHTML = data.html;
+
+                const paginLinks = document.getElementById('pagination-links');
+                if (paginLinks) paginLinks.innerHTML = data.links ?? '';
+                const info = document.getElementById('pagination-info');
+                if (info) {
+                    info.textContent = data.from && data.to
+                        ? `Menampilkan ${data.from} – ${data.to} dari ${data.total} entri`
+                        : '';
+                }
+
+                if (data.sortBy  !== undefined) currentSortBy  = data.sortBy;
+                if (data.sortDir !== undefined) currentSortDir = data.sortDir;
+
+                document.querySelectorAll('.sort-btn').forEach(btn => {
+                    const key = btn.dataset.sort;
+                    const isActive = key === currentSortBy;
+                    const icon = btn.querySelector('span');
+                    btn.classList.toggle('text-blue-600', isActive);
+                    btn.classList.toggle('dark:text-blue-400', isActive);
+                    if (icon) {
+                        icon.textContent = isActive
+                            ? (currentSortDir === 'asc' ? '↑' : '↓')
+                            : '↕';
+                        icon.classList.toggle('opacity-100', isActive);
+                        icon.classList.toggle('opacity-30',  !isActive);
+                    }
+                    btn.dataset.dir = isActive
+                        ? (currentSortDir === 'asc' ? 'desc' : 'asc')
+                        : 'asc';
+                });
+
+                bindPaginationLinks();
+            });
+    }
+
+    function bindPaginationLinks() {
+        document.querySelectorAll('#pagination-links a').forEach(a => {
+            a.addEventListener('click', function (e) {
+                e.preventDefault();
+                const url  = new URL(this.href);
+                const page = url.searchParams.get('page') ?? 1;
+                fetchTable({ page });
+            });
+        });
+    }
 
     input.addEventListener('input', function () {
         clearTimeout(debounce);
-        debounce = setTimeout(() => {
-            const search  = input.value;
-            const perPage = {{ $perPage }};
-
-            fetch(`/websites/search?search=${encodeURIComponent(search)}&per_page=${perPage}&section=${section}`)
-                .then(r => r.json())
-                .then(data => {
-                    document.getElementById('table-tbody').innerHTML = data.html;
-                    document.getElementById('pagination-links').innerHTML = data.links ?? '';
-                    const info = document.getElementById('pagination-info');
-                    if (info) {
-                        info.textContent = data.from && data.to
-                            ? `Menampilkan ${data.from} – ${data.to} dari ${data.total} entri`
-                            : '';
-                    }
-                });
-        }, 350);
+        debounce = setTimeout(() => fetchTable({ page: 1 }), 350);
     });
+
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const sortBy  = this.dataset.sort;
+            const sortDir = this.dataset.dir;
+            currentSortBy  = sortBy;
+            currentSortDir = sortDir;
+            fetchTable({ sortBy, sortDir, page: 1 });
+        });
+    });
+
+    bindPaginationLinks();
+
+    const perPageSel = document.getElementById('per-page-select');
+    if (perPageSel) {
+        perPageSel.addEventListener('change', function () {
+            fetchTable({ perPage: parseInt(this.value), page: 1 });
+        });
+    }
 })();
 </script>
 @endpush

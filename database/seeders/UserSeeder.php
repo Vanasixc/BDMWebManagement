@@ -10,7 +10,6 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Username 'superAdmin' — sesuai dengan source code React asli
         User::create([
             'name'         => 'superAdmin',
             'display_name' => 'Super Admin',
@@ -20,7 +19,6 @@ class UserSeeder extends Seeder
             'avatar'       => 'https://ui-avatars.com/api/?name=Super+Admin&background=3B82F6&color=fff',
         ]);
 
-        // Username 'admin' — sesuai dengan source code React asli
         User::create([
             'name'         => 'admin',
             'display_name' => 'Iqbal',

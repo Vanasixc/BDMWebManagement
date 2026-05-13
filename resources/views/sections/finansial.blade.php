@@ -40,7 +40,6 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
 
-    {{-- Payment Status --}}
     <div class="p-5 rounded-xl border shadow-sm bg-white border-gray-100 dark:bg-slate-800 dark:border-slate-700">
         <h3 class="font-bold text-sm mb-4 flex items-center gap-2">
             @include('components.icon', ['name' => 'credit-card', 'class' => 'w-4 h-4 text-slate-400'])
@@ -52,7 +51,6 @@
         $belumPct = 100 - $lunasPct;
         @endphp
         <div class="space-y-4">
-            {{-- Lunas --}}
             <div>
                 <div class="flex justify-between items-center mb-1.5">
                     <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Lunas</span>
@@ -62,7 +60,6 @@
                     <div class="h-full bg-emerald-500 rounded-full transition-all duration-700" style="width: {{ $lunasPct }}%"></div>
                 </div>
             </div>
-            {{-- Belum --}}
             <div>
                 <div class="flex justify-between items-center mb-1.5">
                     <span class="text-sm font-semibold text-rose-600 dark:text-rose-400">Belum Lunas</span>
@@ -73,7 +70,6 @@
                 </div>
             </div>
 
-            {{-- Summary pill --}}
             <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
                 <span class="text-xs text-slate-500">Total client</span>
                 <span class="font-bold tabular-nums">{{ $totalPay }}</span>
@@ -81,7 +77,6 @@
         </div>
     </div>
 
-    {{-- Margin per Website Chart --}}
     <div class="lg:col-span-2 p-5 rounded-xl border shadow-sm bg-white border-gray-100 dark:bg-slate-800 dark:border-slate-700">
         <h3 class="font-bold text-sm mb-4 flex items-center gap-2">
             @include('components.icon', ['name' => 'bar-chart-2', 'class' => 'w-4 h-4 text-slate-400'])
@@ -101,23 +96,19 @@
     window.WHSection = 'finansial';
     window.WHDropdowns = @json($dropdowns -> map(fn($d) => $d -> options));
 
-    // Margin chart
     (function() {
         const isDark = document.documentElement.classList.contains('dark');
         const gridColor = isDark ? 'rgba(51,65,85,0.8)' : 'rgba(226,232,240,0.8)';
         const textColor = isDark ? '#94a3b8' : '#64748b';
         const margins = @json($statsData['margins']);
 
-        // Hitung batas atas dinamis: ceil ke kelipatan 1 juta terdekat
         const maxMargin = Math.max(...margins.map(m => m.margin), 0);
         const JT = 1_000_000;
         const axisMax = maxMargin <= 0 ? JT : Math.ceil(maxMargin / JT) * JT;
 
-        // Format label sumbu X: "Rp X juta"
         const fmtJuta = (v) => {
             if (v === 0) return 'Rp 0';
             const juta = v / JT;
-            // Tampilkan 1 desimal hanya bila bukan bilangan bulat
             const label = Number.isInteger(juta) ? juta : juta.toFixed(1).replace('.', ',');
             return 'Rp ' + label + ' juta';
         };

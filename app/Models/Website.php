@@ -7,56 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 class Website extends Model
 {
     protected $fillable = [
-        // Info Klien
-        'client',
-        'jenis_klien', // NOTE: Kolom diganti nama sesuai schema baru
-        'pic',
-        'phone',       // NOTE: Ditambahkan nomor telepon klien
-        'email',
+        // Klien
+        'client', 'jenis_klien', 'pic', 'phone', 'email',
 
-        // Info Website
-        'website',
-        'url',
-        'type',
-        'technology',
-        'status',
-        'internal_pic',
-        'service_package',
-        'created_year',
-        'note',
+        // Website
+        'website', 'url', 'type', 'technology', 'status',
+        'internal_pic', 'service_package', 'created_year', 'note',
 
-        // Info Domain
-        'domain_name', // NOTE: Ditambahkan untuk membedakan nama domain & URL
-        'domain_provider',
-        'domain_email',
-        'domain_reg_date',
-        'domain_exp_date',
-        'domain_duration', // NOTE: Durasi perpanjangan domain dalam tahun
-        'is_auto_renew',   // NOTE: Flag untuk auto renew domain
-        'domain_price',
+        // Domain
+        'domain_name', 'domain_provider', 'domain_email',
+        'domain_reg_date', 'domain_exp_date', 'domain_duration',
+        'is_auto_renew', 'domain_price',
 
-        // Info Hosting
-        'hosting_type',
-        'hosting_provider',
-        'hosting_package', // NOTE: Menyimpan nama paket hosting spesifik
-        'storage',
-        'ip_server',
-        'location',
-        'hosting_email',
-        'hosting_exp_date',
-        'hosting_price',
+        // Hosting
+        'hosting_type', 'hosting_provider', 'hosting_package',
+        'storage', 'ip_server', 'location', 'hosting_email',
+        'hosting_exp_date', 'hosting_price',
 
-        // Info Akses
-        'admin_url',
-        'admin_username',  // NOTE: Dipisahkan untuk username login akses admin
-        'extra_access',
-        'password_loc',
+        // Akses
+        'admin_url', 'admin_username', 'extra_access', 'password_loc',
 
-        // Info Finansial
-        'sell_price',
-        'pay_system',
-        'pay_status',
-        'invoice_date',
+        // Finansial
+        'sell_price', 'pay_system', 'pay_status', 'invoice_date',
     ];
 
     protected $casts = [
@@ -67,15 +39,14 @@ class Website extends Model
         'created_year'     => 'string',
         'domain_duration'  => 'integer',
         'is_auto_renew'    => 'boolean',
-        'domain_price'     => 'decimal:2',
-        'hosting_price'    => 'decimal:2',
-        'sell_price'       => 'decimal:2',
+        'domain_price'     => 'integer',
+        'hosting_price'    => 'integer',
+        'sell_price'       => 'integer',
     ];
 
     public function getDaysRemainingAttribute(): int
     {
         if (!$this->hosting_exp_date) return 0;
-
         return (int) now()->startOfDay()->diffInDays(
             $this->hosting_exp_date->startOfDay(),
             false
@@ -84,8 +55,22 @@ class Website extends Model
 
     public function getMarginAttribute(): int
     {
-        $monthlyHosting = $this->hosting_price / 12;
-        return (int) ($this->sell_price - ($this->domain_price + $monthlyHosting));
+        // sell_price - (domain_price + hosting_price)
+        return (int) ($this->sell_price - ($this->domain_price + $this->hosting_price));
+    }
+
+    public function getProfitStatusAttribute(): string
+    {
+        return $this->margin >= 0 ? 'Untung' : 'Rugi';
+    }
+
+    public function getDomainDaysRemainingAttribute(): int
+    {
+        if (!$this->domain_exp_date) return 0;
+        return (int) now()->startOfDay()->diffInDays(
+            $this->domain_exp_date->startOfDay(),
+            false
+        );
     }
 
     public function getReminderStatusAttribute(): string

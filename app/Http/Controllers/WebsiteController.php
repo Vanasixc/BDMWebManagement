@@ -40,27 +40,30 @@ class WebsiteController extends Controller
             ['key' => 'note',         'label' => 'Catatan'],
         ],
         'finansial' => [
-            ['key' => 'client',       'label' => 'Client'],
-            ['key' => 'sell_price',   'label' => 'Harga Jual',  'currency' => true],
-            ['key' => 'domain_price', 'label' => 'B. Domain',   'currency' => true],
-            ['key' => 'hosting_price', 'label' => 'B. Hosting',  'currency' => true],
-            ['key' => 'margin',       'label' => 'Margin',      'currency' => true, 'computed' => true, 'highlight' => 'emerald'],
-            ['key' => 'pay_status',   'label' => 'Status',      'pay_badge' => true],
+            ['key' => 'client',        'label' => 'Client'],
+            ['key' => 'sell_price',    'label' => 'Harga Jual',   'currency' => true],
+            ['key' => 'domain_price',  'label' => 'B. Domain',    'currency' => true],
+            ['key' => 'hosting_price', 'label' => 'B. Hosting',   'currency' => true],
+            ['key' => 'margin',        'label' => 'Margin',       'currency' => true, 'computed' => true, 'sortable' => true, 'highlight' => 'emerald'],
+            ['key' => 'profit_status', 'label' => 'Status',       'profit_badge' => true, 'computed' => true],
         ],
         'reminder' => [
-            ['key' => 'website',          'label' => 'Website'],
-            ['key' => 'domain_exp_date',  'label' => 'Exp Domain',  'date' => true],
-            ['key' => 'hosting_exp_date', 'label' => 'Exp Hosting', 'date' => true],
-            ['key' => 'days_remaining',   'label' => 'Sisa Hari',   'computed' => true, 'days_col' => true],
-            ['key' => 'reminder_status',  'label' => 'Status',      'reminder_badge' => true, 'computed' => true],
+            ['key' => 'website',              'label' => 'Website'],
+            ['key' => 'domain_exp_date',      'label' => 'Exp Domain',        'date' => true],
+            ['key' => 'hosting_exp_date',     'label' => 'Exp Hosting',       'date' => true],
+            ['key' => 'domain_days_remaining','label' => 'Sisa Hari Domain',  'computed' => true, 'sortable' => true, 'domain_days_col' => true],
+            ['key' => 'days_remaining',       'label' => 'Sisa Hari Hosting', 'computed' => true, 'sortable' => true, 'days_col' => true],
+            ['key' => 'reminder_status',      'label' => 'Status',            'reminder_badge' => true, 'computed' => true],
         ],
     ];
 
     public function index(Request $request, string $section = 'master')
     {
-        $search    = $request->get('search', '');
-        $perPage   = (int) $request->get('per_page', 10);
-        $perPage   = in_array($perPage, [10, 25, 50]) ? $perPage : 10;
+        $search  = $request->get('search', '');
+        $perPage = (int) $request->get('per_page', 10);
+        $perPage = in_array($perPage, [10, 25, 50]) ? $perPage : 10;
+        $sortBy  = $request->get('sort_by') ?? '';
+        $sortDir = ($request->get('sort_dir') ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
         $query = Website::query();
         if ($search) {
@@ -69,6 +72,7 @@ class WebsiteController extends Controller
                     ->orWhere('website', 'like', "%{$search}%");
             });
         }
+        $this->applySorting($query, $sortBy, $sortDir);
 
         $websites    = $query->paginate($perPage)->withQueryString();
         $columns     = $this->sectionColumns[$section] ?? $this->sectionColumns['master'];
@@ -76,7 +80,29 @@ class WebsiteController extends Controller
         $allWebsites = Website::all();
         $statsData   = $this->buildStatsData($section, $allWebsites);
 
-        return view("sections.{$section}", compact('websites', 'columns', 'section', 'search', 'perPage', 'dropdowns', 'allWebsites', 'statsData'));
+        return view("sections.{$section}", compact('websites', 'columns', 'section', 'search', 'perPage', 'dropdowns', 'allWebsites', 'statsData', 'sortBy', 'sortDir'));
+    }
+
+    private function applySorting($query, ?string $sortBy, ?string $sortDir): void
+    {
+        $sortBy = $sortBy ?? '';
+        $dir    = ($sortDir ?? 'asc') === 'desc' ? 'desc' : 'asc';
+
+        $directCols = [
+            'client','website','url','status','type','technology','internal_pic',
+            'domain_provider','domain_reg_date','domain_exp_date','domain_price',
+            'hosting_type','hosting_provider','storage','location','hosting_exp_date','hosting_price',
+            'admin_url','extra_access','password_loc','note',
+            'sell_price','pay_status','invoice_date','pic','phone','email',
+        ];
+
+        match (true) {
+            $sortBy === 'margin'               => $query->orderByRaw("(COALESCE(sell_price,0) - COALESCE(domain_price,0) - COALESCE(hosting_price,0)) {$dir}"),
+            $sortBy === 'days_remaining'        => $query->orderBy('hosting_exp_date', $dir),
+            $sortBy === 'domain_days_remaining' => $query->orderBy('domain_exp_date', $dir),
+            in_array($sortBy, $directCols)     => $query->orderBy($sortBy, $dir),
+            default                            => $query->orderBy('id', 'asc'),
+        };
     }
 
     public function store(Request $request)
@@ -123,7 +149,6 @@ class WebsiteController extends Controller
 
     public function clear(Request $request, Website $website)
     {
-        /** @var \App\Models\User $user */
         $user = auth()->user();
 
         if ($user->isUser()) {
@@ -195,7 +220,7 @@ class WebsiteController extends Controller
                 'service_package' => 'nullable|string',
                 'created_year'    => 'nullable|date',
                 'note'            => 'nullable|string',
-                'phone'           => 'nullable|string|max:20',
+                'phone'           => 'required|string|max:20',
                 'email'           => 'nullable|email',
             ],
             'domain' => [
@@ -204,17 +229,19 @@ class WebsiteController extends Controller
                 'domain_email'     => 'nullable|email',
                 'domain_reg_date'  => 'nullable|date',
                 'domain_exp_date'  => 'nullable|date',
-                'domain_price'     => 'nullable|integer|min:0',
+                'domain_price'     => 'nullable|numeric|min:0',
+                'domain_duration'  => 'nullable|integer|min:1',
+                'is_auto_renew'    => 'nullable|boolean',
             ],
             'hosting' => [
                 'hosting_type'     => 'nullable|string',
                 'hosting_provider' => 'nullable|string',
-                'storage'          => 'nullable|integer|min:0',
-                'ip_server'        => 'nullable|string',
+                'storage'          => 'nullable|numeric|min:0',
+                'ip_server'        => ['nullable', 'regex:/^(\d{1,3}\.){3}\d{1,3}$/'],
                 'location'         => 'nullable|string',
                 'hosting_email'    => 'nullable|email',
                 'hosting_exp_date' => 'nullable|date',
-                'hosting_price'    => 'nullable|integer|min:0',
+                'hosting_price'    => 'nullable|numeric|min:0',
             ],
             'akses' => [
                 'admin_url'    => 'nullable|string',
@@ -223,7 +250,7 @@ class WebsiteController extends Controller
                 'note'         => 'nullable|string',
             ],
             'finansial' => [
-                'sell_price'   => 'nullable|integer|min:0',
+                'sell_price'   => 'nullable|numeric|min:0',
                 'pay_system'   => 'nullable|in:Tahunan,Bulanan',
                 'pay_status'   => 'nullable|in:Lunas,Belum',
                 'invoice_date' => 'nullable|date',
@@ -304,6 +331,8 @@ class WebsiteController extends Controller
         $perPage = (int) $request->get('per_page', 10);
         $perPage = in_array($perPage, [10, 25, 50]) ? $perPage : 10;
         $section = $request->get('section', 'master');
+        $sortBy  = $request->get('sort_by') ?? '';
+        $sortDir = ($request->get('sort_dir') ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
         $query = Website::query();
         if ($search) {
@@ -312,6 +341,7 @@ class WebsiteController extends Controller
                     ->orWhere('website', 'like', "%{$search}%");
             });
         }
+        $this->applySorting($query, $sortBy, $sortDir);
 
         $websites  = $query->paginate($perPage)->withQueryString();
         $columns   = $this->sectionColumns[$section] ?? $this->sectionColumns['master'];
@@ -331,6 +361,8 @@ class WebsiteController extends Controller
             'to'       => $websites->lastItem(),
             'lastPage' => $websites->lastPage(),
             'links'    => $websites->withQueryString()->links()->toHtml(),
+            'sortBy'   => $sortBy,
+            'sortDir'  => $sortDir,
         ]);
     }
 
@@ -351,7 +383,7 @@ class WebsiteController extends Controller
         $callback = function () use ($websites) {
             $handle = fopen('php://output', 'w');
 
-            // BOM for Excel UTF-8 compatibility
+            // BOM for Excel UTF-8
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             // Header row
@@ -362,7 +394,6 @@ class WebsiteController extends Controller
                 'URL',
                 'Harga Domain (Rp)',
                 'Harga Hosting (Rp)',
-                'Harga Hosting/Bulan (Rp)',
                 'Harga Jual (Rp)',
                 'Margin (Rp)',
                 'Sistem Bayar',
@@ -370,10 +401,8 @@ class WebsiteController extends Controller
                 'Tanggal Invoice',
             ]);
 
-            // Data rows
             foreach ($websites as $index => $w) {
-                $hostingPerBulan = round($w->hosting_price / 12);
-                $margin          = $w->sell_price - ($w->domain_price + $hostingPerBulan);
+                $margin = $w->margin;
 
                 fputcsv($handle, [
                     $index + 1,
@@ -382,7 +411,6 @@ class WebsiteController extends Controller
                     $w->url,
                     $w->domain_price,
                     $w->hosting_price,
-                    $hostingPerBulan,
                     $w->sell_price,
                     $margin,
                     $w->pay_system,

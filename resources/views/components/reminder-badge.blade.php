@@ -1,7 +1,3 @@
-{{--
-    Reminder Badge Component
-    Usage: @include('components.reminder-badge', ['status' => $website->reminder_status])
---}}
 @php
     $colors = [
         'Aman'    => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',

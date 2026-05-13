@@ -27,9 +27,6 @@
              bg-slate-50 text-slate-900
              dark:bg-slate-900 dark:text-slate-100">
 
-    {{-- ============================================
-         LOADING SCREEN
-         ============================================ --}}
     <div id="page-loader"
         style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;
                 align-items:center;justify-content:center;gap:20px;
@@ -37,7 +34,6 @@
                 transition:opacity 0.35s ease, visibility 0.35s ease;">
 
         <div style="position:relative;width:72px;height:72px;">
-            {{-- Spinner ring --}}
             <svg style="position:absolute;inset:0;width:72px;height:72px;animation:loader-spin 1s linear infinite;"
                 viewBox="0 0 72 72" fill="none">
                 <circle cx="36" cy="36" r="32" stroke="#e2e8f0" stroke-width="5" />
@@ -49,7 +45,6 @@
                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                 style="position:absolute;inset:10px;width:52px;height:52px;
                         border-radius:10px;object-fit:contain;" />
-            {{-- Fallback jika favicon.png belum ada --}}
             <div style="display:none;position:absolute;inset:10px;width:52px;height:52px;
                         border-radius:10px;background:#3b82f6;
                         align-items:center;justify-content:center;">
@@ -76,17 +71,13 @@
         }
     </style>
 
-    {{-- ============================================
-         MOBILE OVERLAY
-         ============================================ --}}
+
     <div
         id="sidebar-overlay"
         onclick="closeSidebar()"
         style="display:none; position:fixed; inset:0; z-index:35; background:rgba(0,0,0,0.6); pointer-events:none;"></div>
 
-    {{-- ============================================
-         SIDEBAR
-         ============================================ --}}
+
     <aside
         id="sidebar"
         style="width: 256px;"
@@ -94,14 +85,12 @@
                bg-white border-r border-slate-200 text-slate-700
                dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300
                transition-colors duration-300">
-        {{-- Logo --}}
         <div class="p-5 flex justify-center items-center gap-3 min-w-[200px]">
             <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white shrink-0">
                 <i><img src="logo_BDM.svg" alt="BDM"></i>
             </div>
         </div>
 
-        {{-- Nav Menu --}}
         <nav class="flex-1 px-3 space-y-1 mt-2 overflow-y-auto min-w-[200px]">
             @php
             $menu = [
@@ -132,13 +121,12 @@
             @endforeach
         </nav>
 
-        {{-- User info + Logout --}}
         <div class="p-3 border-t border-slate-200 dark:border-slate-800 min-w-[200px]">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button
                     type="submit"
-                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/20 transition text-sm font-medium">
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/20 transition text-sm font-medium cursor-pointer">
                     <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
@@ -147,23 +135,17 @@
             </form>
         </div>
 
-        {{-- Resizer handle (desktop only) --}}
         <div
             id="sidebar-resizer"
             class="hidden md:block absolute right-0 top-0 bottom-0 transition"></div>
     </aside>
 
-    {{-- ============================================
-         MAIN CONTENT
-         ============================================ --}}
     <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
 
-        {{-- Header --}}
         <header class="h-16 md:h-20 shrink-0 border-b flex items-center justify-between px-4 md:px-6 z-10 transition-colors
                        bg-white border-gray-100
                        dark:bg-slate-800 dark:border-slate-700">
 
-            {{-- Hamburger --}}
             <div class="flex items-center gap-4">
                 <button
                     onclick="toggleSidebar()"
@@ -178,16 +160,13 @@
                     </svg>
                 </button>
 
-                {{-- Page title (hidden on mobile) --}}
                 <div class="hidden sm:block">
                     <h1 class="text-base md:text-lg font-bold">@yield('page_title', 'Dashboard')</h1>
                     <p class="text-[10px] md:text-xs text-slate-500 dark:text-slate-400">@yield('page_subtitle', 'Kelola infrastruktur website Anda.')</p>
                 </div>
             </div>
 
-            {{-- Right side: dark mode + user --}}
             <div class="flex items-center gap-3 md:gap-5">
-                {{-- Dark Mode Toggle --}}
                 <button
                     onclick="toggleDark()"
                     class="p-2 rounded-full transition
@@ -202,7 +181,6 @@
                     </svg>
                 </button>
 
-                {{-- User info --}}
                 <div class="flex items-center gap-3 border-l pl-3 md:pl-5 border-gray-200 dark:border-slate-700">
                     <div class="text-right hidden sm:block">
                         <p class="text-xs md:text-sm font-bold leading-none mb-0.5">{{ auth()->user()->getLabel() }}</p>
@@ -218,35 +196,19 @@
             </div>
         </header>
 
-        {{-- Page content area --}}
         <div class="flex-1 overflow-y-auto w-full">
             <div class="p-4 md:p-8 max-w-[1600px] mx-auto w-full animate-fade-in-up">
 
-                {{-- Mobile page title --}}
                 <div class="mb-5 md:mb-7 sm:hidden">
                     <h1 class="text-xl font-bold">@yield('page_title', 'Dashboard')</h1>
                     <p class="text-xs text-slate-500 dark:text-slate-400">@yield('page_subtitle', 'Kelola infrastruktur website Anda.')</p>
                 </div>
 
-                {{-- Flash Messages --}}
                 @if (session('success'))
-                <div id="flash-success"
-                    class="mb-5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-sm p-4 rounded-xl flex items-center gap-2 animate-fade-in-up">
-                    <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>{{ session('success') }}</span>
-                </div>
+                <script>window.__flashSuccess = @json(session('success'));</script>
                 @endif
-
                 @if (session('error'))
-                <div id="flash-error"
-                    class="mb-5 bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-400 text-sm p-4 rounded-xl flex items-center gap-2 animate-fade-in-up">
-                    <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 3a9 9 0 110 18A9 9 0 0112 3z" />
-                    </svg>
-                    <span>{{ session('error') }}</span>
-                </div>
+                <script>window.__flashError = @json(session('error'));</script>
                 @endif
 
                 {{-- Main content slot --}}
@@ -255,14 +217,39 @@
         </div>
     </main>
 
-    {{-- ============================================
-         MODAL GLOBAL
-         ============================================ --}}
     @include('components.modal-form')
 
-    {{-- SweetAlert2 CDN --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+
+    <script>
+    (function () {
+        function showFlash() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const base = {
+                timer: 2500,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                toast: false,
+                background: isDark ? '#1e293b' : '#ffffff',
+                color: isDark ? '#f1f5f9' : '#0f172a',
+                customClass: {
+                    popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
+                },
+            };
+            if (window.__flashSuccess) {
+                Swal.fire(Object.assign({}, base, { icon: 'success', title: 'Berhasil!', text: window.__flashSuccess }));
+            } else if (window.__flashError) {
+                Swal.fire(Object.assign({}, base, { icon: 'error', title: 'Terjadi Kesalahan!', text: window.__flashError, timer: 4000 }));
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', showFlash);
+        } else {
+            showFlash();
+        }
+    })();
+    </script>
 
     {{-- Chart.js CDN --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>

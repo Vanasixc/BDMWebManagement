@@ -25,7 +25,6 @@
             } else {
                 $color = ['card' => 'border-emerald-200 bg-emerald-50 dark:bg-emerald-500/10 dark:border-emerald-500/30', 'badge' => 'bg-emerald-500 text-white', 'bar' => 'bg-emerald-500', 'text' => 'text-emerald-700 dark:text-emerald-400'];
             }
-            // Progress bar: 365 hari = penuh, kurang = mengurang
             $barPct = $days <= 0 ? 0 : min(100, round($days / 365 * 100));
         @endphp
         <div class="p-4 rounded-xl border {{ $color['card'] }} flex flex-col gap-2">

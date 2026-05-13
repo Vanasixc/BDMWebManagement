@@ -7,10 +7,8 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
 
-    {{-- Status Cards --}}
     <div class="flex flex-col gap-4">
         <div class="grid grid-cols-3 gap-3">
-            {{-- Aman --}}
             <div class="p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 text-center
                         bg-emerald-50 border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20">
                 <div class="w-9 h-9 rounded-xl bg-emerald-500 shadow-lg shadow-emerald-500/30 flex items-center justify-center mb-1">
@@ -20,7 +18,6 @@
                 <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-500">Aman</p>
                 <p class="text-[9px] text-slate-400">> 30 hari</p>
             </div>
-            {{-- Siaga --}}
             <div class="p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 text-center
                         bg-amber-50 border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20">
                 <div class="w-9 h-9 rounded-xl bg-amber-500 shadow-lg shadow-amber-500/30 flex items-center justify-center mb-1">
@@ -30,7 +27,6 @@
                 <p class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-500">Siaga</p>
                 <p class="text-[9px] text-slate-400">3–30 hari</p>
             </div>
-            {{-- Darurat --}}
             <div class="p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 text-center
                         bg-rose-50 border-rose-100 dark:bg-rose-500/10 dark:border-rose-500/20">
                 <div class="w-9 h-9 rounded-xl bg-rose-500 shadow-lg shadow-rose-500/30 flex items-center justify-center mb-1">
@@ -41,7 +37,6 @@
                 <p class="text-[9px] text-slate-400">< 3 hari / exp</p>
             </div>
         </div>
-        {{-- Legend --}}
         <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-600 text-xs text-slate-500 dark:text-slate-400 space-y-1">
             <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>Aman: sisa hosting &gt; 30 hari</div>
             <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>Siaga: sisa hosting 3–30 hari</div>
@@ -49,7 +44,6 @@
         </div>
     </div>
 
-    {{-- Deadline List --}}
     <div class="lg:col-span-2 p-5 rounded-xl border shadow-sm bg-white border-gray-100 dark:bg-slate-800 dark:border-slate-700">
         <h3 class="font-bold text-sm md:text-base mb-4 flex items-center gap-2">
             @include('components.icon', ['name' => 'calendar', 'class' => 'w-4 h-4 text-slate-400'])

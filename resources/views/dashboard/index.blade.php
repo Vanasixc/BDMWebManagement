@@ -6,9 +6,7 @@
 @section('meta_description', 'Dashboard WH Manager — pantau status website, expiry, dan performa finansial.')
 
 @section('content')
-{{-- ============================================
-     STAT CARDS
-     ============================================ --}}
+
 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 stagger-children">
     {{-- Aktif --}}
     <div class="p-5 md:p-6 rounded-xl shadow-sm border flex items-center justify-between
@@ -47,9 +45,6 @@
     </div>
 </div>
 
-{{-- ============================================
-     EXPIRING & EXPIRED TABLES
-     ============================================ --}}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
 
     {{-- Akan Expired --}}
@@ -86,7 +81,6 @@
         </div>
     </div>
 
-    {{-- Sudah Expired --}}
     <div class="p-5 md:p-6 rounded-xl shadow-sm border bg-white border-gray-100 dark:bg-slate-800 dark:border-slate-700">
         <h3 class="font-bold text-sm md:text-base mb-4 flex items-center gap-2 text-rose-600 dark:text-rose-400">
             @include('components.icon', ['name' => 'alert-triangle', 'class' => 'w-5 h-5'])
@@ -121,9 +115,7 @@
     </div>
 </div>
 
-{{-- ============================================
-     CHARTS
-     ============================================ --}}
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
     {{-- Revenue Bar Chart --}}
@@ -152,20 +144,34 @@ const isDark = document.documentElement.classList.contains('dark');
 const gridColor = isDark ? 'rgba(51,65,85,0.8)' : 'rgba(226,232,240,0.8)';
 const textColor = isDark ? '#94a3b8' : '#64748b';
 
+const revenueData = @json($revenueData);
+
+const allVals = revenueData.flatMap(d => [d.revenue ?? 0, d.margin ?? 0]);
+const maxVal  = Math.max(...allVals, 0);
+const JT = 1_000_000;
+const axisMax = maxVal <= 0 ? JT : Math.ceil(maxVal / JT) * JT;
+
+const fmtJuta = (v) => {
+    if (v === 0) return 'Rp 0';
+    const juta = v / JT;
+    const label = Number.isInteger(juta) ? juta : parseFloat(juta.toFixed(1));
+    return 'Rp ' + label + ' jt';
+};
+
 new Chart(revenueCtx, {
     type: 'bar',
     data: {
-        labels: {!! json_encode(collect($revenueData)->pluck('year')) !!},
+        labels: revenueData.length > 0 ? revenueData.map(d => d.year) : ['Belum ada data'],
         datasets: [
             {
                 label: 'Total Revenue',
-                data: {!! json_encode(collect($revenueData)->pluck('revenue')) !!},
+                data: revenueData.length > 0 ? revenueData.map(d => d.revenue ?? 0) : [0],
                 backgroundColor: 'rgba(59,130,246,0.85)',
                 borderRadius: 6,
             },
             {
                 label: 'Total Margin',
-                data: {!! json_encode(collect($revenueData)->pluck('margin')) !!},
+                data: revenueData.length > 0 ? revenueData.map(d => d.margin ?? 0) : [0],
                 backgroundColor: 'rgba(16,185,129,0.85)',
                 borderRadius: 6,
             },
@@ -178,13 +184,22 @@ new Chart(revenueCtx, {
             legend: { labels: { color: textColor, font: { size: 12 } } },
             tooltip: {
                 callbacks: {
-                    label: ctx => 'Rp ' + new Intl.NumberFormat('id-ID').format(ctx.raw),
+                    label: ctx => 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(ctx.raw)),
                 }
             }
         },
         scales: {
             x: { ticks: { color: textColor, font: { size: 12 } }, grid: { color: gridColor } },
-            y: { ticks: { color: textColor, font: { size: 11 }, callback: v => 'Rp ' + (v/1e6) + 'jt' }, grid: { color: gridColor } },
+            y: {
+                min: 0,
+                max: axisMax,
+                ticks: {
+                    color: textColor,
+                    font: { size: 11 },
+                    callback: v => fmtJuta(v),
+                },
+                grid: { color: gridColor }
+            },
         }
     }
 });
