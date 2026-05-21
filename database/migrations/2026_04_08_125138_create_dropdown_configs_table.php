@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('page');    // master | hosting | finansial | reminder
             $table->string('key');     // type | technology | status | hostingType | dll
-            $table->string('label');   // Label tampilan form
-            $table->json('options');   // Array opsi dalam JSON
+            $table->string('label');
+            $table->json('options');
             $table->timestamps();
         });
     }

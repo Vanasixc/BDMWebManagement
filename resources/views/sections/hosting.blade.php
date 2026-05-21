@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Hosting')
 @section('page_title', 'Hosting')
-@section('page_subtitle', 'Kelola data hosting & server seluruh website client.')
+@section('page_subtitle', 'Kelola data hosting & server website client')
 
 @section('content')
 

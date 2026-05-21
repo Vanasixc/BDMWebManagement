@@ -1,15 +1,15 @@
-<div class="rounded-xl shadow-sm border overflow-hidden bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700">
+<div class="rounded-md shadow-sm border overflow-hidden bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
 
-    <div class="p-4 border-b border-gray-100 dark:border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 
         <div class="flex items-center gap-2">
             <span class="text-sm text-slate-500 dark:text-slate-400">Show</span>
             <select
                 id="per-page-select"
-                class="border rounded-lg px-2 py-1.5 text-sm outline-none transition cursor-pointer
-                       bg-white border-gray-300 text-slate-900
-                       dark:bg-slate-700 dark:border-slate-600 dark:text-white
-                       focus:ring-2 focus:ring-blue-500">
+                class="border rounded px-2 py-1 text-sm outline-none transition cursor-pointer
+                       bg-white border-gray-300 text-gray-700
+                       dark:bg-gray-700 dark:border-gray-600 dark:text-white
+                       focus:ring-2 focus:ring-purple-500">
                 @foreach ([10, 25, 50] as $n)
                 <option value="{{ $n }}" {{ $perPage == $n ? 'selected' : '' }}>{{ $n }}</option>
                 @endforeach
@@ -27,19 +27,19 @@
                     id="search-input"
                     value="{{ $search }}"
                     placeholder="Cari client atau website..."
-                    class="pl-9 pr-4 py-2 border rounded-lg text-sm w-full outline-none transition
-               bg-white border-gray-300 text-slate-900
-               dark:bg-slate-700 dark:border-slate-600 dark:text-white
-               focus:ring-2 focus:ring-blue-500" />
+                    class="pl-9 pr-4 py-2 border rounded text-sm w-full outline-none transition
+               bg-white border-gray-300 text-gray-800
+               dark:bg-gray-700 dark:border-gray-600 dark:text-white
+               focus:ring-2 focus:ring-purple-500" />
             </div>
 
             <div class="flex gap-2 w-full sm:w-auto items-center">
                 @if ($section !== 'reminder')
                 <button
                     onclick="openModalEditTable()"
-                    class="flex-1 sm:flex-none justify-center px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition border cursor-pointer
-                           border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200
-                           dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600">
+                    class="flex-1 sm:flex-none justify-center px-3 py-2 rounded text-sm flex items-center gap-2 transition border cursor-pointer
+                           border-gray-300 bg-white text-gray-700 hover:bg-gray-50
+                           dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                     @include('components.icon', ['name' => 'settings', 'class' => 'w-4 h-4'])
                     Edit Table
                 </button>
@@ -50,7 +50,7 @@
                 @if ($section === 'master' && auth()->user()->canModify())
                 <button
                     onclick="openModalAdd()"
-                    class="flex-1 sm:flex-none justify-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-700 transition shadow-sm cursor-pointer">
+                    class="flex-1 sm:flex-none justify-center bg-blue-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2 hover:bg-blue-700 transition cursor-pointer">
                     @include('components.icon', ['name' => 'plus', 'class' => 'w-4 h-4'])
                     Tambah
                 </button>
@@ -61,8 +61,8 @@
 
     {{-- Table --}}
     <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left text-slate-800 dark:text-slate-200">
-            <thead class="uppercase text-xs font-semibold whitespace-nowrap bg-gray-50 text-gray-600 dark:bg-slate-700 dark:text-slate-300">
+        <table class="w-full text-sm text-left text-gray-800 dark:text-gray-200">
+            <thead class="uppercase text-xs font-semibold whitespace-nowrap bg-gray-50 text-gray-500 border-b border-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600">
                 <tr>
                     <th class="px-4 py-3">No</th>
                     @foreach ($columns as $col)
@@ -102,34 +102,46 @@
     </div>
 
     {{-- Pagination --}}
-    @if ($websites->hasPages())
-    <div class="p-4 border-t border-gray-100 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500 dark:text-slate-400">
+    <div id="pagination-section"
+         class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500 dark:text-gray-400"
+         @if (!$websites->hasPages()) style="display:none" @endif>
         <div id="pagination-info">
-            Menampilkan {{ $websites->firstItem() }} – {{ $websites->lastItem() }} dari {{ $websites->total() }} entri
+            @if ($websites->hasPages())
+            Menampilkan {{ $websites->firstItem() }} &ndash; {{ $websites->lastItem() }} dari {{ $websites->total() }} entri
+            @endif
         </div>
         <div id="pagination-links" class="flex items-center gap-1">
+            @if ($websites->hasPages())
+
+            {{-- Prev --}}
             @if ($websites->onFirstPage())
-            <span class="px-3 py-1.5 rounded border border-gray-200 dark:border-slate-600 text-slate-300 dark:text-slate-600 cursor-not-allowed">‹</span>
+            <span class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-300 dark:text-gray-600 cursor-not-allowed">&lsaquo;</span>
             @else
-            <a href="{{ $websites->previousPageUrl() }}" class="px-3 py-1.5 rounded border border-gray-200 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-700 transition">‹</a>
+            <button type="button" data-page="{{ $websites->currentPage() - 1 }}"
+                    class="page-btn px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">&lsaquo;</button>
             @endif
 
-            @foreach ($websites->getUrlRange(max(1, $websites->currentPage()-2), min($websites->lastPage(), $websites->currentPage()+2)) as $page => $url)
+            {{-- Halaman ± 2 --}}
+            @foreach (range(max(1, $websites->currentPage()-2), min($websites->lastPage(), $websites->currentPage()+2)) as $page)
             @if ($page == $websites->currentPage())
-            <span class="px-3 py-1.5 rounded bg-blue-600 text-white border border-blue-600">{{ $page }}</span>
+            <span class="px-3 py-1 rounded bg-blue-600 text-white border border-blue-600">{{ $page }}</span>
             @else
-            <a href="{{ $url }}" class="px-3 py-1.5 rounded border border-gray-200 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-700 transition">{{ $page }}</a>
+            <button type="button" data-page="{{ $page }}"
+                    class="page-btn px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">{{ $page }}</button>
             @endif
             @endforeach
 
+            {{-- Next --}}
             @if ($websites->hasMorePages())
-            <a href="{{ $websites->nextPageUrl() }}" class="px-3 py-1.5 rounded border border-gray-200 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-700 transition">›</a>
+            <button type="button" data-page="{{ $websites->currentPage() + 1 }}"
+                    class="page-btn px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">&rsaquo;</button>
             @else
-            <span class="px-3 py-1.5 rounded border border-gray-200 dark:border-slate-600 text-slate-300 dark:text-slate-600 cursor-not-allowed">›</span>
+            <span class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-300 dark:text-gray-600 cursor-not-allowed">&rsaquo;</span>
+            @endif
+
             @endif
         </div>
     </div>
-    @endif
 </div>
 
 @push('scripts')
@@ -144,6 +156,72 @@ if (!window.WHSection) {
     let currentSortBy  = '{{ $sortBy }}';
     let currentSortDir = '{{ $sortDir }}';
     let currentPerPage = {{ $perPage }};
+
+    // Rebuild pagination
+    function buildPagination(data) {
+        const { from, to, total, currentPage, lastPage } = data;
+
+        // Update info text
+        const info = document.getElementById('pagination-info');
+        if (info) {
+            info.textContent = from && to
+                ? `Menampilkan ${from} \u2013 ${to} dari ${total} entri`
+                : '';
+        }
+
+        const paginLinks = document.getElementById('pagination-links');
+        if (!paginLinks) return;
+
+        // Hide section pagination 
+        const paginSection = document.getElementById('pagination-section');
+        if (paginSection) {
+            paginSection.style.display = lastPage <= 1 ? 'none' : '';
+        }
+
+        if (lastPage <= 1) return;
+
+        const cls = {
+            inactive: 'px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer',
+            active:   'px-3 py-1 rounded bg-blue-600 text-white border border-blue-600',
+            disabled: 'px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-300 dark:text-gray-600 cursor-not-allowed',
+        };
+
+        let html = '';
+
+        // prev
+        if (currentPage <= 1) {
+            html += `<span class="${cls.disabled}">&lsaquo;</span>`;
+        } else {
+            html += `<button type="button" data-page="${currentPage - 1}" class="page-btn ${cls.inactive}">&lsaquo;</button>`;
+        }
+
+        // Range halaman
+        const rangeStart = Math.max(1, currentPage - 2);
+        const rangeEnd   = Math.min(lastPage, currentPage + 2);
+        for (let p = rangeStart; p <= rangeEnd; p++) {
+            if (p === currentPage) {
+                html += `<span class="${cls.active}">${p}</span>`;
+            } else {
+                html += `<button type="button" data-page="${p}" class="page-btn ${cls.inactive}">${p}</button>`;
+            }
+        }
+
+        // next
+        if (currentPage >= lastPage) {
+            html += `<span class="${cls.disabled}">&rsaquo;</span>`;
+        } else {
+            html += `<button type="button" data-page="${currentPage + 1}" class="page-btn ${cls.inactive}">&rsaquo;</button>`;
+        }
+
+        paginLinks.innerHTML = html;
+
+        // Bind tombol halaman
+        paginLinks.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                fetchTable({ page: parseInt(this.dataset.page) });
+            });
+        });
+    }
 
     function fetchTable({ search, perPage, sortBy, sortDir, page } = {}) {
         search   = search   ?? input.value;
@@ -163,14 +241,7 @@ if (!window.WHSection) {
             .then(data => {
                 document.getElementById('table-tbody').innerHTML = data.html;
 
-                const paginLinks = document.getElementById('pagination-links');
-                if (paginLinks) paginLinks.innerHTML = data.links ?? '';
-                const info = document.getElementById('pagination-info');
-                if (info) {
-                    info.textContent = data.from && data.to
-                        ? `Menampilkan ${data.from} – ${data.to} dari ${data.total} entri`
-                        : '';
-                }
+                buildPagination(data);
 
                 if (data.sortBy  !== undefined) currentSortBy  = data.sortBy;
                 if (data.sortDir !== undefined) currentSortDir = data.sortDir;
@@ -192,20 +263,7 @@ if (!window.WHSection) {
                         ? (currentSortDir === 'asc' ? 'desc' : 'asc')
                         : 'asc';
                 });
-
-                bindPaginationLinks();
             });
-    }
-
-    function bindPaginationLinks() {
-        document.querySelectorAll('#pagination-links a').forEach(a => {
-            a.addEventListener('click', function (e) {
-                e.preventDefault();
-                const url  = new URL(this.href);
-                const page = url.searchParams.get('page') ?? 1;
-                fetchTable({ page });
-            });
-        });
     }
 
     input.addEventListener('input', function () {
@@ -223,7 +281,11 @@ if (!window.WHSection) {
         });
     });
 
-    bindPaginationLinks();
+    document.querySelectorAll('#pagination-links .page-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            fetchTable({ page: parseInt(this.dataset.page) });
+        });
+    });
 
     const perPageSel = document.getElementById('per-page-select');
     if (perPageSel) {

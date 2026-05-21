@@ -24,8 +24,8 @@
 </head>
 
 <body class="h-screen overflow-hidden flex font-sans transition-colors duration-300
-             bg-slate-50 text-slate-900
-             dark:bg-slate-900 dark:text-slate-100">
+             bg-gray-100 text-slate-900
+             dark:bg-gray-900 dark:text-slate-100">
 
     <div id="page-loader"
         style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;
@@ -82,14 +82,14 @@
         id="sidebar"
         style="width: 256px;"
         class="fixed md:relative z-40 h-full flex flex-col shrink-0
-               bg-white border-r border-slate-200 text-slate-700
-               dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300
+               bg-white border-r border-gray-200 text-gray-700
+               dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300
                transition-colors duration-300">
-        <div class="p-5 flex justify-center items-center gap-3 min-w-[200px]">
+        <a href="{{ route('dashboard') }}" class="p-5 flex justify-center items-center gap-3 min-w-[200px] hover:opacity-80 transition-opacity" title="Ke Dashboard">
             <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white shrink-0">
                 <i><img src="logo_BDM.svg" alt="BDM"></i>
             </div>
-        </div>
+        </a>
 
         <nav class="flex-1 px-3 space-y-1 mt-2 overflow-y-auto min-w-[200px]">
             @php
@@ -111,22 +111,22 @@
             @foreach ($menu as $item)
             <a
                 href="{{ route($item['route']) }}"
-                class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition group text-sm font-medium
+                class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition group text-sm font-medium
                        {{ $currentRoute === $item['id']
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                          : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white' }}">
+                          ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
+                          : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white' }}">
                 @include('components.icon', ['name' => $item['icon'], 'class' => 'w-5 h-5 shrink-0'])
                 <span class="truncate">{{ $item['label'] }}</span>
             </a>
             @endforeach
         </nav>
 
-        <div class="p-3 border-t border-slate-200 dark:border-slate-800 min-w-[200px]">
+        <div class="p-3 border-t border-gray-200 dark:border-gray-700 min-w-[200px]">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button
                     type="submit"
-                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/20 transition text-sm font-medium cursor-pointer">
+                    class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600 dark:text-red-400 dark:hover:bg-red-600/20 dark:hover:text-red-300 transition text-sm font-medium cursor-pointer">
                     <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
@@ -142,9 +142,9 @@
 
     <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
 
-        <header class="h-16 md:h-20 shrink-0 border-b flex items-center justify-between px-4 md:px-6 z-10 transition-colors
-                       bg-white border-gray-100
-                       dark:bg-slate-800 dark:border-slate-700">
+        <header class="h-14 md:h-16 shrink-0 border-b flex items-center justify-between px-4 md:px-6 z-10 transition-colors
+                       bg-white border-gray-200
+                       dark:bg-gray-800 dark:border-gray-700">
 
             <div class="flex items-center gap-4">
                 <button
@@ -169,29 +169,29 @@
             <div class="flex items-center gap-3 md:gap-5">
                 <button
                     onclick="toggleDark()"
-                    class="p-2 rounded-full transition
-                           bg-slate-100 text-slate-600 hover:bg-slate-200
-                           dark:bg-slate-700 dark:text-amber-400 dark:hover:bg-slate-600"
+                    class="p-1.5 rounded transition
+                           bg-gray-100 text-gray-600 hover:bg-gray-200
+                           dark:bg-gray-700 dark:text-yellow-400 dark:hover:bg-gray-600"
                     aria-label="Toggle dark mode">
-                    <svg class="w-4 h-4 md:w-5 md:h-5 dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
-                    <svg class="w-4 h-4 md:w-5 md:h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-9h-1M4.34 12h-1m15.07-6.07-.707.707M6.34 17.66l-.707.707m12.02 0-.707-.707M6.34 6.34l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z" />
                     </svg>
                 </button>
 
-                <div class="flex items-center gap-3 border-l pl-3 md:pl-5 border-gray-200 dark:border-slate-700">
+                <div class="flex items-center gap-3 border-l pl-3 md:pl-5 border-gray-200 dark:border-gray-700">
                     <div class="text-right hidden sm:block">
-                        <p class="text-xs md:text-sm font-bold leading-none mb-0.5">{{ auth()->user()->getLabel() }}</p>
-                        <p class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider leading-none text-slate-500 dark:text-slate-400">
+                        <p class="text-xs md:text-sm font-semibold leading-none mb-0.5">{{ auth()->user()->getLabel() }}</p>
+                        <p class="text-[9px] md:text-[10px] font-medium uppercase tracking-wider leading-none text-gray-500 dark:text-gray-400">
                             {{ auth()->user()->role }}
                         </p>
                     </div>
                     <img
                         src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name) }}"
                         alt="{{ auth()->user()->name }}"
-                        class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-blue-500 p-0.5 object-cover" />
+                        class="w-8 h-8 md:w-9 md:h-9 rounded-full border-2 border-purple-500 object-cover" />
                 </div>
             </div>
         </header>

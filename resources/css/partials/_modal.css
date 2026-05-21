@@ -22,8 +22,8 @@
     width: 100%;
     max-width: 52rem;
     max-height: calc(100dvh - 2rem);
-    border-radius: 1rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     background: #ffffff;
     display: flex;
     flex-direction: column;
@@ -31,22 +31,22 @@
     animation: scaleIn 0.22s ease-out both;
 }
 html.dark #modal-box {
-    background: #1e293b;
+    background: #1f2937;
     color: #f1f5f9;
 }
 
 .modal-hdr {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
-    background: #f8fafc;
+    background: #f9fafb;
 }
 html.dark .modal-hdr {
-    border-color: #334155;
-    background: #0f172a;
+    border-color: #374151;
+    background: #111827;
 }
 .modal-hdr h3 {
     font-size: 1rem;
@@ -83,17 +83,17 @@ html.dark .modal-hdr {
 
 .modal-ftr {
     padding: 1rem 1.5rem;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid #e5e7eb;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 0.75rem;
     flex-shrink: 0;
-    background: #f8fafc;
+    background: #f9fafb;
 }
 html.dark .modal-ftr {
-    border-color: #334155;
-    background: #0f172a;
+    border-color: #374151;
+    background: #111827;
 }
 
 
@@ -114,17 +114,16 @@ html.dark .modal-btn-cancel:hover { background: #334155; }
 
 .modal-btn-save {
     padding: 0.6rem 1.5rem;
-    border-radius: 0.5rem;
+    border-radius: 0.375rem;
     border: none;
-    background: #3b82f6;
+    background: #2563eb;
     color: #ffffff;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 0.8125rem;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
     transition: background 0.15s;
 }
-.modal-btn-save:hover { background: #2563eb; }
+.modal-btn-save:hover { background: #1d4ed8; }
 
 
 html.dark #account-modal-overlay > div {

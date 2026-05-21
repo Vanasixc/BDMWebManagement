@@ -2,7 +2,7 @@
 
 @section('title', 'Dashboard')
 @section('page_title', 'Dashboard')
-@section('page_subtitle', 'Ringkasan data infrastruktur website Anda.')
+@section('page_subtitle', 'Rekapitulasi Webiste Client')
 @section('meta_description', 'Dashboard WH Manager — pantau status website, expiry, dan performa finansial.')
 
 @section('content')

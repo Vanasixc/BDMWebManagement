@@ -272,12 +272,8 @@ class WebsiteController extends Controller
                 'total'    => $all->count(),
             ],
             'domain' => [
-                'tier_low'    => $all->filter(fn($w) => ($w->domain_price ?? 0) < 100000)->count(),
-                'tier_mid'    => $all->filter(fn($w) => ($w->domain_price ?? 0) >= 100000 && ($w->domain_price ?? 0) <= 200000)->count(),
-                'tier_high'   => $all->filter(fn($w) => ($w->domain_price ?? 0) > 200000)->count(),
-                'providers'   => $all->whereNotNull('domain_provider')->groupBy('domain_provider')
+                'providers' => $all->whereNotNull('domain_provider')->groupBy('domain_provider')
                     ->map->count()->sortDesc()->take(6)->toArray(),
-                'avg_price'   => (int) $all->whereNotNull('domain_price')->avg('domain_price'),
             ],
             'hosting' => [
                 'expiry_cards' => $all->whereNotNull('hosting_exp_date')
@@ -356,13 +352,13 @@ class WebsiteController extends Controller
                 'perPage',
                 'dropdowns'
             ))->render(),
-            'total'    => $websites->total(),
-            'from'     => $websites->firstItem(),
-            'to'       => $websites->lastItem(),
-            'lastPage' => $websites->lastPage(),
-            'links'    => $websites->withQueryString()->links()->toHtml(),
-            'sortBy'   => $sortBy,
-            'sortDir'  => $sortDir,
+            'total'       => $websites->total(),
+            'from'        => $websites->firstItem(),
+            'to'          => $websites->lastItem(),
+            'currentPage' => $websites->currentPage(),
+            'lastPage'    => $websites->lastPage(),
+            'sortBy'      => $sortBy,
+            'sortDir'     => $sortDir,
         ]);
     }
 

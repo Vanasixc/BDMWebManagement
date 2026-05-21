@@ -45,7 +45,7 @@ class DashboardController extends Controller
             'price'  => $w->domain_price,
         ])->values();
 
-        return view('dashboard.index', compact(
+        return view('sections.dashboard', compact(
             'stats',
             'expiring',
             'expired',

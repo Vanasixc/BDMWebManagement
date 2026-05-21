@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Finansial')
 @section('page_title', 'Finansial')
-@section('page_subtitle', 'Kelola data keuangan, margin, dan status pembayaran.')
+@section('page_subtitle', 'Kelola data keuangan perusahaan')
 
 @section('content')
 

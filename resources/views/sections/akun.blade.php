@@ -2,7 +2,7 @@
 
 @section('title', 'Manajemen Akun')
 @section('page_title', 'Manajemen Akun')
-@section('page_subtitle', 'Kelola akun pengguna yang terdaftar di sistem.')
+@section('page_subtitle', 'Kelola akun akses ke domain ini')
 
 @section('content')
 <div class="rounded-xl shadow-sm border bg-white border-gray-100 dark:bg-slate-800 dark:border-slate-700">

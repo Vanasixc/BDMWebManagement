@@ -11,7 +11,7 @@ class AccountController extends Controller
     public function index()
     {
         $users = User::all();
-        return view('akun.index', compact('users'));
+        return view('sections.akun', compact('users'));
     }
 
     public function store(Request $request)

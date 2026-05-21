@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Akses')
 @section('page_title', 'Akses')
-@section('page_subtitle', 'Kelola data akses admin & password seluruh website.')
+@section('page_subtitle', 'Kelola data akses admin & password webiste client')
 
 @section('content')
 

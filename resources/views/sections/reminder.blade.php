@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Reminder')
 @section('page_title', 'Reminder')
-@section('page_subtitle', 'Pantau status expired domain & hosting seluruh website.')
+@section('page_subtitle', 'Pantau status expired domain & hosting website client')
 
 @section('content')
 

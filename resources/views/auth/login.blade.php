@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="{{ session('dark_mode') ? 'dark' : '' }}">
+<html lang="id" class="">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,10 +7,18 @@
     <meta name="description" content="Masuk ke WebHouse Manager untuk mengelola infrastruktur website klien Anda." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    {{-- Dark mode: jalankan sebelum CSS untuk hindari flash --}}
+    <script>
+        (function() {
+            var dark = localStorage.getItem('darkMode') === '1';
+            document.documentElement.classList.toggle('dark', dark);
+            document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        })();
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 font-sans transition-colors duration-300
-             bg-slate-900 dark:bg-slate-950">
+             bg-gray-100 dark:bg-slate-950">
 
     <button
         id="dark-toggle"
@@ -24,8 +32,8 @@
     </button>
 
     {{-- Login Card --}}
-    <div class="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transition-colors duration-300
-                bg-white dark:bg-slate-800 animate-fade-in-up">
+    <div class="w-full max-w-md rounded-md shadow-lg overflow-hidden transition-colors duration-300
+                bg-white dark:bg-gray-800 animate-fade-in-up">
         <div class="p-6 md:p-10">
 
             {{-- Logo --}}
@@ -38,7 +46,7 @@
             <h1 class="text-xl md:text-2xl font-bold text-center text-gray-800 dark:text-white">
                 Banjar Digital Media <br> Web Management
             </h1>
-            <p class="text-center mt-1 mb-7 text-xs md:text-sm text-gray-500 dark:text-slate-400">
+            <p class="text-center mt-1 mb-7 text-xs md:text-sm text-gray-400 dark:text-gray-400">
                 Silahkan login untuk mengelola website client
             </p>
 
@@ -78,9 +86,9 @@
                             required
                             autocomplete="username"
                             placeholder="Masukkan username"
-                            class="w-full pl-10 pr-4 py-2.5 md:py-3 border rounded-xl text-sm md:text-base outline-none transition
+                            class="w-full pl-10 pr-4 py-2.5 border rounded text-sm outline-none transition
                                    border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                   dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:placeholder-slate-400
+                                   dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400
                                    @error('username') border-red-500 dark:border-red-500 @enderror"
                         />
                     </div>
@@ -102,9 +110,9 @@
                             required
                             autocomplete="current-password"
                             placeholder="Masukkan password"
-                            class="w-full pl-10 pr-4 py-2.5 md:py-3 border rounded-xl text-sm md:text-base outline-none transition
+                            class="w-full pl-10 pr-4 py-2.5 border rounded text-sm outline-none transition
                                    border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                   dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:placeholder-slate-400
+                                   dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400
                                    @error('password') border-red-500 dark:border-red-500 @enderror"
                         />
                     </div>
@@ -112,9 +120,8 @@
 
                 <button
                     type="submit"
-                    class="w-full bg-blue-600 text-white py-2.5 md:py-3 rounded-xl text-sm md:text-base font-bold
-                           hover:bg-blue-700 transition-all duration-200 transform active:scale-[0.98]
-                           shadow-lg shadow-blue-500/30 mt-2"
+                    class="w-full bg-blue-600 text-white py-2.5 rounded text-sm font-semibold
+                           hover:bg-blue-700 transition-colors duration-200 mt-2 cursor-pointer"
                 >
                     MASUK
                 </button>
@@ -127,9 +134,7 @@
             document.documentElement.classList.toggle('dark');
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('darkMode', isDark ? '1' : '0');
-        }
-        if (localStorage.getItem('darkMode') === '1') {
-            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
         }
     </script>
 </body>
