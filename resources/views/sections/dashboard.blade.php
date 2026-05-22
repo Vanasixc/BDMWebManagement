@@ -47,11 +47,12 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
 
-    {{-- Akan Expired --}}
+    {{-- Hosting: Akan Expired --}}
     <div class="p-5 md:p-6 rounded-xl shadow-sm border bg-white border-gray-100 dark:bg-slate-800 dark:border-slate-700">
         <h3 class="font-bold text-sm md:text-base mb-4 flex items-center gap-2 text-amber-600 dark:text-amber-400">
-            @include('components.icon', ['name' => 'clock', 'class' => 'w-5 h-5'])
-            Akan Expired (30 Hari)
+            @include('components.icon', ['name' => 'server', 'class' => 'w-5 h-5'])
+            Hosting Akan Expired
+            <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">≤ 30 Hari</span>
         </h3>
         <div class="overflow-x-auto">
             <table class="w-full text-xs md:text-sm text-left">
@@ -81,10 +82,12 @@
         </div>
     </div>
 
+    {{-- Hosting: Sudah Expired --}}
     <div class="p-5 md:p-6 rounded-xl shadow-sm border bg-white border-gray-100 dark:bg-slate-800 dark:border-slate-700">
         <h3 class="font-bold text-sm md:text-base mb-4 flex items-center gap-2 text-rose-600 dark:text-rose-400">
-            @include('components.icon', ['name' => 'alert-triangle', 'class' => 'w-5 h-5'])
-            Sudah Expired (Telat Bayar)
+            @include('components.icon', ['name' => 'server', 'class' => 'w-5 h-5'])
+            Hosting Sudah Expired
+            <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">Telat Bayar</span>
         </h3>
         <div class="overflow-x-auto">
             <table class="w-full text-xs md:text-sm text-left">
@@ -103,6 +106,80 @@
                             {{ $item->hosting_exp_date->format('d/m/Y') }}
                         </td>
                         <td class="py-2 text-right font-bold tabular-nums">{{ abs($item->days_remaining) }} Hari</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="3" class="py-6 text-center text-slate-400 dark:text-slate-500">Tidak ada data</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{{-- Domain Expired Section --}}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+
+    {{-- Domain: Akan Expired --}}
+    <div class="p-5 md:p-6 rounded-xl shadow-sm border bg-white border-gray-100 dark:bg-slate-800 dark:border-slate-700">
+        <h3 class="font-bold text-sm md:text-base mb-4 flex items-center gap-2 text-amber-600 dark:text-amber-400">
+            @include('components.icon', ['name' => 'globe', 'class' => 'w-5 h-5'])
+            Domain Akan Expired
+            <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">≤ 30 Hari</span>
+        </h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs md:text-sm text-left">
+                <thead>
+                    <tr class="border-b border-gray-100 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+                        <th class="py-2">Client</th>
+                        <th class="py-2">Tgl Expired</th>
+                        <th class="py-2 text-right">Sisa Hari</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($expiringDomain as $item)
+                    <tr class="border-b last:border-0 border-gray-100 dark:border-slate-700">
+                        <td class="py-2 font-medium">{{ $item->client }}</td>
+                        <td class="py-2 text-amber-600 dark:text-amber-400 font-semibold">
+                            {{ $item->domain_exp_date->format('d/m/Y') }}
+                        </td>
+                        <td class="py-2 text-right font-bold tabular-nums">{{ $item->domain_days_remaining }} Hari</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="3" class="py-6 text-center text-slate-400 dark:text-slate-500">Tidak ada data</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {{-- Domain: Sudah Expired --}}
+    <div class="p-5 md:p-6 rounded-xl shadow-sm border bg-white border-gray-100 dark:bg-slate-800 dark:border-slate-700">
+        <h3 class="font-bold text-sm md:text-base mb-4 flex items-center gap-2 text-rose-600 dark:text-rose-400">
+            @include('components.icon', ['name' => 'globe', 'class' => 'w-5 h-5'])
+            Domain Sudah Expired
+            <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">Telat Bayar</span>
+        </h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs md:text-sm text-left">
+                <thead>
+                    <tr class="border-b border-gray-100 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+                        <th class="py-2">Client</th>
+                        <th class="py-2">Tgl Expired</th>
+                        <th class="py-2 text-right">Terlewat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($expiredDomain as $item)
+                    <tr class="border-b last:border-0 border-gray-100 dark:border-slate-700">
+                        <td class="py-2 font-medium">{{ $item->client }}</td>
+                        <td class="py-2 text-rose-600 dark:text-rose-400 font-semibold">
+                            {{ $item->domain_exp_date->format('d/m/Y') }}
+                        </td>
+                        <td class="py-2 text-right font-bold tabular-nums">{{ abs($item->domain_days_remaining) }} Hari</td>
                     </tr>
                     @empty
                     <tr>

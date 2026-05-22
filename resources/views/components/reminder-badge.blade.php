@@ -5,8 +5,15 @@
         'Kritis'  => 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
         'Expired' => 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
     ];
+    $labels = [
+        'Aman'    => 'Aman',
+        'Segera'  => 'Siaga',
+        'Kritis'  => 'Darurat',
+        'Expired' => 'Darurat',
+    ];
     $color = $colors[$status] ?? 'bg-slate-500/10 text-slate-600';
+    $label = $labels[$status] ?? $status;
 @endphp
 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $color }}">
-    {{ $status }}
+    {{ $label }}
 </span>

@@ -11,7 +11,7 @@ class Website extends Model
         'client', 'jenis_klien', 'pic', 'phone', 'email',
 
         // Website
-        'website', 'url', 'type', 'technology', 'status',
+        'website', 'url', 'type', 'technology', 'status', 'prioritas',
         'internal_pic', 'service_package', 'created_year', 'note',
 
         // Domain
@@ -76,8 +76,18 @@ class Website extends Model
     public function getReminderStatusAttribute(): string
     {
         $days = $this->days_remaining;
-        if ($days < 0) return 'Expired';
-        if ($days < 7) return 'Kritis';
+        if ($days < 0)  return 'Expired';
+        if ($days < 3)  return 'Kritis';
+        if ($days < 30) return 'Segera';
+        return 'Aman';
+    }
+
+    public function getDomainReminderStatusAttribute(): string
+    {
+        if (!$this->domain_exp_date) return 'Aman';
+        $days = $this->domain_days_remaining;
+        if ($days < 0)  return 'Expired';
+        if ($days < 3)  return 'Kritis';
         if ($days < 30) return 'Segera';
         return 'Aman';
     }

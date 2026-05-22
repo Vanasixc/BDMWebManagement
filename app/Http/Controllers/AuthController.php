@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -17,6 +19,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        /** @var \Illuminate\Http\Request $request */
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
@@ -25,17 +28,23 @@ class AuthController extends Controller
             'password.required' => 'Password wajib diisi.',
         ]);
 
-        $user = \App\Models\User::where('name', $request->username)->first();
+        $username = $request->input('username');
+        $password = $request->input('password');
 
-        if (!$user || !\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+        // Cari user berdasarkan kolom 'name' (bukan 'email')
+        /** @var User|null $user */
+        $user = User::firstWhere('name', $username);
+
+        if (!$user || !Hash::check($password, $user->password)) {
             return back()
-                ->withErrors(['username' => 'Username atau password yang Anda masukkan salah!'])
-                ->withInput(['username' => $request->username]);
+                ->withErrors(['login_error' => 'Username atau password yang Anda masukkan salah.'])
+                ->withInput(['username' => $username]);
         }
 
         Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
-        return redirect()->route('dashboard');
+
+        return redirect()->intended(route('dashboard'));
     }
 
     public function logout(Request $request)

@@ -28,6 +28,17 @@ class DashboardController extends Controller
             return $w->days_remaining < 0;
         })->sortBy('days_remaining')->values();
 
+        $expiringDomain = $websites->filter(function ($w) {
+            if (!$w->domain_exp_date) return false;
+            $days = $w->domain_days_remaining;
+            return $days > 0 && $days <= 30;
+        })->sortBy('domain_days_remaining')->values();
+
+        $expiredDomain = $websites->filter(function ($w) {
+            if (!$w->domain_exp_date) return false;
+            return $w->domain_days_remaining < 0;
+        })->sortBy('domain_days_remaining')->values();
+
         $revenueData = $websites
             ->filter(fn($w) => $w->invoice_date !== null)
             ->groupBy(fn($w) => $w->invoice_date->format('Y'))
@@ -49,6 +60,8 @@ class DashboardController extends Controller
             'stats',
             'expiring',
             'expired',
+            'expiringDomain',
+            'expiredDomain',
             'revenueData',
             'domainPriceData',
             'websites'

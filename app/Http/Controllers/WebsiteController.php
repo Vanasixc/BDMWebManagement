@@ -3,17 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\DropdownConfig;
+use App\Models\User;
 use App\Models\Website;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class WebsiteController extends Controller
 {
+    /** Mengembalikan user yang sedang login dengan tipe konkret User (bukan Authenticatable). */
+    private function authUser(): User
+    {
+        /** @var User $u */
+        $u = Auth::user();
+        return $u;
+    }
+
     private array $sectionColumns = [
         'master' => [
             ['key' => 'client',       'label' => 'Nama Client'],
             ['key' => 'pic',          'label' => 'PIC'],
             ['key' => 'website',      'label' => 'Nama Website'],
             ['key' => 'type',         'label' => 'Jenis Website'],
+            ['key' => 'prioritas',    'label' => 'Prioritas',    'prioritas_badge' => true],
             ['key' => 'status',       'label' => 'Status',       'badge' => true],
             ['key' => 'internal_pic', 'label' => 'PIC Internal'],
         ],
@@ -107,7 +118,7 @@ class WebsiteController extends Controller
 
     public function store(Request $request)
     {
-        if (! auth()->user()->canModify()) {
+        if (! $this->authUser()->canModify()) {
             abort(403, 'Anda tidak memiliki akses untuk menambah data.');
         }
 
@@ -123,7 +134,7 @@ class WebsiteController extends Controller
 
     public function update(Request $request, Website $website)
     {
-        if (!auth()->user()->canModify()) {
+        if (! $this->authUser()->canModify()) {
             abort(403, 'Anda tidak memiliki akses untuk mengubah data.');
         }
 
@@ -139,17 +150,17 @@ class WebsiteController extends Controller
 
     public function destroy(Website $website)
     {
-        if (! auth()->user()->canModify()) {
+        if (! $this->authUser()->canModify()) {
             abort(403, 'Anda tidak memiliki akses untuk menghapus data.');
         }
 
-        $website->delete();
+        Website::destroy($website->id);
         return back()->with('success', 'Data website berhasil dihapus!');
     }
 
     public function clear(Request $request, Website $website)
     {
-        $user = auth()->user();
+        $user = $this->authUser();
 
         if ($user->isUser()) {
             abort(403, 'Anda tidak memiliki akses untuk menghapus data');
@@ -216,6 +227,7 @@ class WebsiteController extends Controller
                 'type'            => 'required|string',
                 'technology'      => 'required|string',
                 'status'          => 'required|in:Active,InActive,Suspend',
+                'prioritas'       => 'nullable|string|max:50',
                 'internal_pic'    => 'required|string',
                 'service_package' => 'nullable|string',
                 'created_year'    => 'nullable|date',
@@ -305,15 +317,28 @@ class WebsiteController extends Controller
                 ])->sortByDesc('margin')->take(8)->values()->toArray(),
             ],
             'reminder' => [
-                'aman'    => $all->filter(fn($w) => $w->reminder_status === 'Aman')->count(),
-                'siaga'   => $all->filter(fn($w) => $w->reminder_status === 'Segera')->count(),
-                'darurat' => $all->filter(fn($w) => in_array($w->reminder_status, ['Kritis', 'Expired']))->count(),
+                // --- Hosting ---
+                'aman'      => $all->filter(fn($w) => $w->reminder_status === 'Aman')->count(),
+                'siaga'     => $all->filter(fn($w) => $w->reminder_status === 'Segera')->count(),
+                'darurat'   => $all->filter(fn($w) => in_array($w->reminder_status, ['Kritis', 'Expired']))->count(),
                 'deadlines' => $all->whereNotNull('hosting_exp_date')
                     ->map(fn($w) => [
                         'website'  => $w->website,
                         'days'     => $w->days_remaining,
                         'status'   => $w->reminder_status,
                         'exp_date' => $w->hosting_exp_date?->format('d/m/Y'),
+                    ])
+                    ->sortBy('days')->take(8)->values()->toArray(),
+                // --- Domain ---
+                'domain_aman'      => $all->filter(fn($w) => $w->domain_reminder_status === 'Aman')->count(),
+                'domain_siaga'     => $all->filter(fn($w) => $w->domain_reminder_status === 'Segera')->count(),
+                'domain_darurat'   => $all->filter(fn($w) => in_array($w->domain_reminder_status, ['Kritis', 'Expired']))->count(),
+                'domain_deadlines' => $all->whereNotNull('domain_exp_date')
+                    ->map(fn($w) => [
+                        'website'  => $w->website,
+                        'days'     => $w->domain_days_remaining,
+                        'status'   => $w->domain_reminder_status,
+                        'exp_date' => $w->domain_exp_date?->format('d/m/Y'),
                     ])
                     ->sortBy('days')->take(8)->values()->toArray(),
             ],
@@ -364,7 +389,7 @@ class WebsiteController extends Controller
 
     public function exportFinansial()
     {
-        $websites = Website::orderBy('client')->get();
+        $websites = Website::orderBy('client', 'asc')->get();
 
         $filename = 'finansial_' . now()->format('Ymd_His') . '.csv';
 

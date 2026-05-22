@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('type', 100)->nullable();
             $table->string('technology', 100)->nullable();
             $table->string('status', 50)->default('Active');
+            $table->string('prioritas', 50)->default('Normal');
             $table->string('internal_pic')->nullable();
             $table->string('service_package')->nullable();
             $table->year('created_year')->nullable();

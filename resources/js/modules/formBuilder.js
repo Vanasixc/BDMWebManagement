@@ -1,8 +1,6 @@
-// formBuilder.js — Renders dynamic form HTML inside modal body. Depends on: state.js.
-
 import { CSRF } from "./state.js";
 
-// ─── renderForm ───────────────────────────────────────────────────────────────
+// renderForm
 
 export function renderForm(data, readonly) {
     const section = window.WHSection || "master";
@@ -139,6 +137,8 @@ export function renderForm(data, readonly) {
             html += sel("Status", "status", v.status, statuses, {
                 required: true,
             });
+            html += sel("Prioritas", "prioritas", v.prioritas || 'Normal',
+                dd["prioritas"] || ["VIP", "Normal", "Ekonomis"]);
             html += sel("PIC Internal", "internal_pic", v.internal_pic, pics, {
                 required: true,
             });
@@ -341,6 +341,7 @@ export function renderEditTableForm() {
         type: "Jenis Website",
         technology: "CMS/Teknologi",
         status: "Status",
+        prioritas: "Prioritas",
         internalPic: "PIC Internal",
         hostingType: "Jenis Hosting",
         paySystem: "Sistem Pembayaran",

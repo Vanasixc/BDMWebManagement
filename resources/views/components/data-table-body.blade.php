@@ -18,7 +18,17 @@
 
         @foreach ($columns as $col)
         <td class="px-4 py-3">
-            @if (!empty($col['badge']))
+            @if (!empty($col['prioritas_badge']))
+            @php
+                $p = $website->{$col['key']} ?? 'Normal';
+                $pColor = match($p) {
+                    'VIP'      => 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-500/40',
+                    'Ekonomis' => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/40',
+                    default    => 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400 border border-slate-200 dark:border-slate-600',
+                };
+            @endphp
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $pColor }}">{{ $p }}</span>
+            @elseif (!empty($col['badge']))
             @include('components.status-badge', ['status' => $website->{$col['key']}])
             @elseif (!empty($col['profit_badge']))
             @php $margin = $website->margin; @endphp
@@ -40,7 +50,7 @@
             <span class="text-slate-400">-</span>
             @else
             @php $dd = $website->domain_days_remaining; @endphp
-            <span class="font-bold tabular-nums {{ $dd < 0 ? 'text-rose-600 dark:text-rose-400' : ($dd <= 3 ? 'text-rose-500 dark:text-rose-400' : ($dd <= 30 ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')) }}">
+            <span class="font-bold tabular-nums {{ $dd < 0 ? 'text-rose-600 dark:text-rose-400' : ($dd < 3 ? 'text-rose-500 dark:text-rose-400' : ($dd < 30 ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')) }}">
                 {{ $dd < 0 ? 'Telat '.abs($dd).'h' : $dd.' hari' }}
             </span>
             @endif
@@ -51,7 +61,7 @@
             <span class="text-slate-400">-</span>
             @else
             @php $d = $website->days_remaining; @endphp
-            <span class="font-bold tabular-nums {{ $d < 0 ? 'text-rose-600 dark:text-rose-400' : ($d <= 3 ? 'text-rose-500 dark:text-rose-400' : ($d <= 30 ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')) }}">
+            <span class="font-bold tabular-nums {{ $d < 0 ? 'text-rose-600 dark:text-rose-400' : ($d < 3 ? 'text-rose-500 dark:text-rose-400' : ($d < 30 ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')) }}">
                 {{ $d < 0 ? 'Telat '.abs($d).'h' : $d.' hari' }}
             </span>
             @endif
