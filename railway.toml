@@ -5,9 +5,9 @@
 buildCommand = "composer install --no-dev --optimize-autoloader --no-interaction && rm -rf node_modules && npm install --no-audit --no-fund && npm run build"
 
 [deploy]
-# PENTING: Jangan config:cache dulu sebelum Railway Variables dikonfirmasi benar
-# App akan baca env vars langsung dari Railway Variables tanpa caching
-startCommand = "mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache/data storage/logs bootstrap/cache && chmod -R 775 storage bootstrap/cache && php artisan config:clear && php artisan cache:clear && php artisan serve --host=0.0.0.0 --port=$PORT"
+# Semua perintah dipisah dengan ; (bukan &&) agar php artisan serve SELALU jalan
+# meskipun ada command sebelumnya yang gagal
+startCommand = "mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache/data storage/logs bootstrap/cache; chmod -R 775 storage bootstrap/cache; php artisan config:clear 2>/dev/null; php artisan cache:clear 2>/dev/null; php artisan serve --host=0.0.0.0 --port=$PORT"
 healthcheckPath = "/up"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
