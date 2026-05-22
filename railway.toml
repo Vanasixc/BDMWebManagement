@@ -1,13 +1,15 @@
 # railway.toml — Konfigurasi Nixpacks untuk Railway.app
-# Referensi: https://docs.railway.com/reference/config-as-code
 
 [build]
 buildCommand = "composer install --no-dev --optimize-autoloader --no-interaction && rm -rf node_modules && npm install --no-audit --no-fund && npm run build"
 
 [deploy]
-# Semua seeder sudah idempotent (firstOrCreate / guard count > 0)
-# Aman dijalankan setiap restart — tidak akan duplikasi atau hapus data
-startCommand = "mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache/data storage/logs bootstrap/cache; chmod -R 775 storage bootstrap/cache; touch database/database.sqlite 2>/dev/null; php artisan config:clear 2>/dev/null; php artisan migrate --force 2>/dev/null; php artisan db:seed --class=UserSeeder --force 2>/dev/null; php artisan db:seed --class=DropdownConfigSeeder --force 2>/dev/null; php artisan db:seed --class=WebsiteSeeder --force 2>/dev/null; php artisan serve --host=0.0.0.0 --port=$PORT"
+# Urutan penting:
+# 1. Setup storage & permissions
+# 2. Migrate + seed (idempotent)
+# 3. Cache config/routes/views SETELAH DB siap → performa optimal
+# 4. Serve
+startCommand = "mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache/data storage/logs bootstrap/cache; chmod -R 775 storage bootstrap/cache; php artisan migrate --force 2>/dev/null; php artisan db:seed --class=UserSeeder --force 2>/dev/null; php artisan db:seed --class=DropdownConfigSeeder --force 2>/dev/null; php artisan db:seed --class=WebsiteSeeder --force 2>/dev/null; php artisan config:cache; php artisan route:cache; php artisan view:cache; php artisan serve --host=0.0.0.0 --port=$PORT"
 healthcheckPath = "/up"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
