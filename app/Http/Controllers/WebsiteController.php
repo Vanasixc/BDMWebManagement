@@ -68,8 +68,8 @@ class WebsiteController extends Controller
         $query = Website::query();
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('client', 'like', "%{$search}%")
-                    ->orWhere('website', 'like', "%{$search}%");
+                $q->whereRaw('LOWER(client) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(website) LIKE ?', ['%' . strtolower($search) . '%']);
             });
         }
         $this->applySorting($query, $sortBy, $sortDir);
@@ -333,8 +333,8 @@ class WebsiteController extends Controller
         $query = Website::query();
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('client', 'like', "%{$search}%")
-                    ->orWhere('website', 'like', "%{$search}%");
+                $q->whereRaw('LOWER(client) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(website) LIKE ?', ['%' . strtolower($search) . '%']);
             });
         }
         $this->applySorting($query, $sortBy, $sortDir);
