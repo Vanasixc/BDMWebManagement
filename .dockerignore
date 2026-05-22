@@ -13,8 +13,5 @@ bootstrap/cache/*
 .phpunit.cache
 .vscode
 .idea
-docker
-Dockerfile
 README.md
-*.md
 tests
