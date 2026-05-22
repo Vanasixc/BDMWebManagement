@@ -10,6 +10,11 @@ class WebsiteSeeder extends Seeder
 {
     public function run(): void
     {
+
+        if (DB::table('websites')->count() > 0) {
+            return;
+        }
+
         DB::table('websites')->truncate();
 
         $websites = [

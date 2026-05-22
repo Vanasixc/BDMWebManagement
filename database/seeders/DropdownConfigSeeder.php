@@ -28,7 +28,10 @@ class DropdownConfigSeeder extends Seeder
         ];
 
         foreach ($configs as $config) {
-            DropdownConfig::create($config);
+            DropdownConfig::firstOrCreate(
+                ['page' => $config['page'], 'key' => $config['key']],
+                $config
+            );
         }
     }
 }
