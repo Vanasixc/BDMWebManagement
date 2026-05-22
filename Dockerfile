@@ -47,7 +47,7 @@ WORKDIR /app
 
 # Copy PHP dependencies manifest dulu (layer caching)
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --no-interaction
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --no-scripts --no-autoloader --no-interaction --ignore-platform-reqs
 
 # Copy semua file aplikasi
 COPY . .
@@ -56,7 +56,7 @@ COPY . .
 COPY --from=node-builder /app/public/build ./public/build
 
 # Optimize autoloader
-RUN composer dump-autoload --optimize --no-interaction
+RUN COMPOSER_MEMORY_LIMIT=-1 composer dump-autoload --optimize --no-interaction --ignore-platform-reqs
 
 # Buat direktori storage yang diperlukan + set permissions
 RUN mkdir -p storage/framework/sessions \
