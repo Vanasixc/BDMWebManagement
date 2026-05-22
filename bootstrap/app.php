@@ -11,6 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust all proxies — Railway menggunakan reverse proxy untuk SSL termination
+        // Tanpa ini, asset URL di-generate dengan http:// (mixed content error)
+        $middleware->trustProxies(at: '*');
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
