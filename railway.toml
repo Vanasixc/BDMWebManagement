@@ -7,7 +7,7 @@
 buildCommand = "composer install --no-dev --optimize-autoloader --no-interaction && rm -rf node_modules && npm install --no-audit --no-fund && npm run build"
 
 [deploy]
-startCommand = "php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan serve --host=0.0.0.0 --port=$PORT"
+startCommand = "php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan migrate --force --seed 2>/dev/null; php artisan serve --host=0.0.0.0 --port=$PORT"
 healthcheckPath = "/login"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
