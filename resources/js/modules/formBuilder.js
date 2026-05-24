@@ -30,7 +30,7 @@ export function renderForm(data, readonly) {
         name,
         value,
         type = "text",
-        { pattern = "", placeholder = "", required = false } = {},
+        { pattern = "", placeholder = "", required = false, inputmode = "", oninput = "" } = {},
     ) {
         const val = value !== null && value !== undefined ? value : "";
         const ro = readonly ? "disabled" : "";
@@ -42,9 +42,11 @@ export function renderForm(data, readonly) {
         const reqStar = required
             ? `<span class="text-rose-500 ml-0.5">*</span>`
             : "";
+        const inputmodeAttr = inputmode ? `inputmode="${inputmode}"` : "";
+        const oninputAttr = oninput ? `oninput="${oninput}"` : "";
         return `<div class="space-y-1">
             <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${label}${reqStar}</label>
-            <input type="${type}" name="${name}" value="${String(val).replace(/"/g, "&quot;")}" ${ro} ${patAttr} ${phAttr} ${reqAttr}
+            <input type="${type}" name="${name}" value="${String(val).replace(/"/g, "&quot;")}" ${ro} ${patAttr} ${phAttr} ${reqAttr} ${inputmodeAttr} ${oninputAttr}
                 class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
                        bg-white border-gray-300 text-slate-900
                        dark:bg-slate-700 dark:border-slate-600 dark:text-white
@@ -155,9 +157,12 @@ export function renderForm(data, readonly) {
                 v.created_year ? String(v.created_year).substring(0, 10) : "",
                 "date",
             );
-            html += inp("No. WhatsApp", "phone", v.phone, "text", {
+            html += inp("No. WhatsApp", "phone", v.phone, "tel", {
                 placeholder: "Contoh: 08123456789",
                 required: true,
+                inputmode: "numeric",
+                pattern: "[0-9]+",
+                oninput: "this.value=this.value.replace(/[^0-9]/g,'')",
             });
             html += inp("Email", "email", v.email, "email", {
                 placeholder: "email@client.com",
