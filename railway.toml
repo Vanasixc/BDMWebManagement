@@ -1,8 +1,7 @@
 # railway.toml
 
 [deploy]
-# Migrate + seed dulu, lalu jalankan start.sh (nginx+php-fpm)
-startCommand = "php artisan migrate --force; php artisan db:seed --class=UserSeeder --force 2>/dev/null; php artisan db:seed --class=DropdownConfigSeeder --force 2>/dev/null; php artisan db:seed --class=WebsiteSeeder --force 2>/dev/null; /start.sh"
+startCommand = "/start.sh"
 healthcheckPath = "/up"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"

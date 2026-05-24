@@ -77,9 +77,16 @@ window.submitModalForm = function () {
 
     formData.append("section", window.WHSection || "master");
 
-    // Validasi HTML5 (required, pattern, dll.) sebelum kirim ke server
-    // reportValidity() menampilkan tooltip error native browser jika ada field tidak valid
+
     if (!form.reportValidity()) return;
+
+    const phoneField = form.querySelector('input[name="phone"]');
+    if (phoneField && !/^[0-9]+$/.test(phoneField.value)) {
+        phoneField.setCustomValidity('No. WhatsApp hanya boleh berisi angka.');
+        phoneField.reportValidity();
+        phoneField.setCustomValidity(''); // Reset agar valid berikutnya
+        return;
+    }
 
     // Untuk PUT method (edit), FormData sudah include _method=PUT via hidden field
     fetch(form.action, {
