@@ -30,7 +30,7 @@ export function renderForm(data, readonly) {
         name,
         value,
         type = "text",
-        { pattern = "", placeholder = "", required = false, inputmode = "", oninput = "" } = {},
+        { pattern = "", placeholder = "", required = false, inputmode = "" } = {},
     ) {
         const val = value !== null && value !== undefined ? value : "";
         const ro = readonly ? "disabled" : "";
@@ -43,10 +43,9 @@ export function renderForm(data, readonly) {
             ? `<span class="text-rose-500 ml-0.5">*</span>`
             : "";
         const inputmodeAttr = inputmode ? `inputmode="${inputmode}"` : "";
-        const oninputAttr = oninput ? `oninput="${oninput}"` : "";
         return `<div class="space-y-1">
             <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${label}${reqStar}</label>
-            <input type="${type}" name="${name}" value="${String(val).replace(/"/g, "&quot;")}" ${ro} ${patAttr} ${phAttr} ${reqAttr} ${inputmodeAttr} ${oninputAttr}
+            <input type="${type}" name="${name}" value="${String(val).replace(/"/g, "&quot;")}" ${ro} ${patAttr} ${phAttr} ${reqAttr} ${inputmodeAttr}
                 class="w-full px-3 py-2 border rounded-lg text-sm outline-none transition
                        bg-white border-gray-300 text-slate-900
                        dark:bg-slate-700 dark:border-slate-600 dark:text-white
@@ -162,7 +161,6 @@ export function renderForm(data, readonly) {
                 required: true,
                 inputmode: "numeric",
                 pattern: "[0-9]+",
-                oninput: "this.value=this.value.replace(/[^0-9]/g,'')",
             });
             html += inp("Email", "email", v.email, "email", {
                 placeholder: "email@client.com",
@@ -325,6 +323,21 @@ export function renderForm(data, readonly) {
 
     html += `</div></form>`;
     document.getElementById("modal-body").innerHTML = html;
+
+    // Attach event listener programatically setelah innerHTML di-set.
+    // Inline oninput di innerHTML tidak selalu reliable karena CSP atau browser behavior.
+    const phoneInput = document.querySelector('#modal-body input[name="phone"]');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function () {
+            const pos = this.selectionStart;
+            const cleaned = this.value.replace(/[^0-9]/g, '');
+            if (this.value !== cleaned) {
+                this.value = cleaned;
+                // Pertahankan posisi kursor setelah strip
+                this.setSelectionRange(pos - 1, pos - 1);
+            }
+        });
+    }
 }
 
 // renderEditTableForm
