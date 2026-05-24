@@ -232,7 +232,7 @@ class WebsiteController extends Controller
                 'service_package' => 'nullable|string',
                 'created_year'    => 'nullable|date',
                 'note'            => 'nullable|string',
-                'phone'           => 'required|string|max:20',
+                'phone'           => 'required|digits_between:8,20',
                 'email'           => 'nullable|email',
             ],
             'domain' => [

@@ -1,5 +1,18 @@
 import { CSRF } from "./state.js";
 
+document.addEventListener("input", (e) => {
+    if (e.target.matches('#modal-body input[name="phone"]')) {
+        const input = e.target;
+        const pos = input.selectionStart;
+        const cleaned = input.value.replace(/[^0-9]/g, "");
+        if (input.value !== cleaned) {
+            input.value = cleaned;
+            // Pertahankan posisi kursor setelah karakter dihapus
+            input.setSelectionRange(pos - 1, pos - 1);
+        }
+    }
+});
+
 // renderForm
 
 export function renderForm(data, readonly) {
@@ -323,21 +336,6 @@ export function renderForm(data, readonly) {
 
     html += `</div></form>`;
     document.getElementById("modal-body").innerHTML = html;
-
-    // Attach event listener programatically setelah innerHTML di-set.
-    // Inline oninput di innerHTML tidak selalu reliable karena CSP atau browser behavior.
-    const phoneInput = document.querySelector('#modal-body input[name="phone"]');
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function () {
-            const pos = this.selectionStart;
-            const cleaned = this.value.replace(/[^0-9]/g, '');
-            if (this.value !== cleaned) {
-                this.value = cleaned;
-                // Pertahankan posisi kursor setelah strip
-                this.setSelectionRange(pos - 1, pos - 1);
-            }
-        });
-    }
 }
 
 // renderEditTableForm
