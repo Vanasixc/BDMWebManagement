@@ -37,7 +37,8 @@ class WebsiteController extends Controller
             ['key' => 'domain_price',    'label' => 'Harga/Thn',   'currency' => true],
         ],
         'hosting' => [
-            ['key' => 'website',          'label' => 'Website'],
+            ['key' => 'url',              'label' => 'Domain/Link'],
+            ['key' => 'domain_provider',  'label' => 'Jasa Domain'],
             ['key' => 'hosting_type',     'label' => 'Jenis Hosting'],
             ['key' => 'hosting_provider', 'label' => 'Provider'],
             ['key' => 'storage',          'label' => 'Storage',     'suffix' => ' GB'],
@@ -52,11 +53,13 @@ class WebsiteController extends Controller
         ],
         'finansial' => [
             ['key' => 'client',        'label' => 'Client'],
+            ['key' => 'pay_system',    'label' => 'Sistem Bayar'],
             ['key' => 'sell_price',    'label' => 'Harga Jual',   'currency' => true],
             ['key' => 'domain_price',  'label' => 'B. Domain',    'currency' => true],
             ['key' => 'hosting_price', 'label' => 'B. Hosting',   'currency' => true],
-            ['key' => 'margin',        'label' => 'Margin',       'currency' => true, 'computed' => true, 'sortable' => true, 'highlight' => 'emerald'],
-            ['key' => 'profit_status', 'label' => 'Status',       'profit_badge' => true, 'computed' => true],
+            ['key' => 'margin',        'label' => 'Margin',       'currency' => true, 'computed' => true, 'sortable' => true, 'highlight' => 'emerald', 'margin_col' => true],
+            ['key' => 'profit_status', 'label' => 'Profit',       'profit_badge' => true, 'computed' => true],
+            ['key' => 'pay_status',    'label' => 'Pembayaran',   'pay_badge' => true],
         ],
         'reminder' => [
             ['key' => 'website',              'label' => 'Website'],
@@ -196,6 +199,9 @@ class WebsiteController extends Controller
                 'pay_system'   => 'Tahunan',
                 'pay_status'   => 'Belum',
                 'invoice_date' => null,
+            ],
+            'reminder' => [
+                'note' => null,
             ],
         ];
 

@@ -66,9 +66,16 @@
             </span>
             @endif
             @elseif (!empty($col['currency']))
-            @if (!empty($col['computed']) && $col['key'] === 'margin')
-            <span class="font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
-                Rp {{ number_format($website->margin, 0, ',', '.') }}
+            @if (!empty($col['margin_col']))
+            @php
+                $marginVal = $website->margin;
+                $isMonthly = ($website->pay_system ?? 'Tahunan') === 'Bulanan';
+                $displayMargin = $isMonthly ? (int) round($marginVal / 12) : $marginVal;
+                $marginSuffix  = $isMonthly ? '/bln' : '/thn';
+            @endphp
+            <span class="font-bold {{ $displayMargin >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }} tabular-nums">
+                Rp {{ number_format($displayMargin, 0, ',', '.') }}
+                <span class="text-[10px] font-normal text-slate-400">{{ $marginSuffix }}</span>
             </span>
             @else
             <span class="tabular-nums">
@@ -110,14 +117,35 @@
 
                 @if (auth()->user()->canModify())
 
-                @if ($section !== 'reminder')
+                @if ($section === 'reminder')
+                {{-- Reminder: Edit note + Reset note --}}
+                <button
+                    onclick="openModalEdit({{ $website->id }})"
+                    class="p-1.5 bg-amber-500/10 text-amber-500 rounded-lg hover:bg-amber-500/20 transition cursor-pointer"
+                    title="Edit Catatan">
+                    @include('components.icon', ['name' => 'edit', 'class' => 'w-4 h-4'])
+                </button>
+                <form
+                    method="POST"
+                    action="{{ route('websites.clear', $website->id) }}"
+                    onsubmit="return confirmClear(event, this)"
+                    class="inline">
+                    @csrf @method('PATCH')
+                    <input type="hidden" name="section" value="reminder">
+                    <button
+                        type="submit"
+                        class="p-1.5 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500/20 transition cursor-pointer"
+                        title="Reset Catatan">
+                        @include('components.icon', ['name' => 'refresh-cw', 'class' => 'w-4 h-4'])
+                    </button>
+                </form>
+                @else
                 <button
                     onclick="openModalEdit({{ $website->id }})"
                     class="p-1.5 bg-amber-500/10 text-amber-500 rounded-lg hover:bg-amber-500/20 transition cursor-pointer"
                     title="Edit Data">
                     @include('components.icon', ['name' => 'edit', 'class' => 'w-4 h-4'])
                 </button>
-                @endif
 
                 @if ($section === 'master')
                 <form
@@ -150,6 +178,7 @@
                     </button>
                 </form>
                 @endif
+                @endif {{-- end reminder/else --}}
 
                 @endif {{-- end canModify --}}
 

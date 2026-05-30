@@ -324,12 +324,16 @@ export function renderForm(data, readonly) {
             break;
         }
         case "reminder": {
-            html += inp("Website", "website", v.website, "text", {
-                placeholder: "Nama website",
-            });
-            html =
-                html + `</div><div class="grid grid-cols-1 gap-4 mt-4">`;
-            html += textarea("Catatan Reminder", "note", v.note, true);
+            // Website adalah data master — tampil sebagai info, tidak bisa diubah
+            html += `<div class="space-y-1 col-span-full">
+                <label class="block text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Website <span class="text-[9px] font-normal text-slate-400 normal-case">(tidak dapat diubah)</span></label>
+                <input type="text" name="website" value="${String(v.website || '').replace(/"/g, '&quot;')}" disabled
+                    class="w-full px-3 py-2 border rounded-lg text-sm outline-none
+                           bg-slate-50 border-gray-300 text-slate-500
+                           dark:bg-slate-800 dark:border-slate-600 dark:text-slate-400"/>
+            </div>`;
+            html = html + `</div><div class="grid grid-cols-1 gap-4 mt-4">`;
+            html += textarea("Catatan Client", "note", v.note, true);
             break;
         }
     }

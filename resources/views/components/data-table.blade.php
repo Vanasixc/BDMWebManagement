@@ -34,7 +34,7 @@
             </div>
 
             <div class="flex gap-2 w-full sm:w-auto items-center">
-                @if ($section !== 'reminder')
+                @if (!in_array($section, ['reminder', 'finansial', 'domain']))
                 <button
                     onclick="openModalEditTable()"
                     class="flex-1 sm:flex-none justify-center px-3 py-2 rounded text-sm flex items-center gap-2 transition border cursor-pointer
@@ -113,6 +113,14 @@
         <div id="pagination-links" class="flex items-center gap-1">
             @if ($websites->hasPages())
 
+            {{-- First Page --}}
+            @if ($websites->onFirstPage())
+            <span class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-300 dark:text-gray-600 cursor-not-allowed">&laquo;</span>
+            @else
+            <button type="button" data-page="1"
+                    class="page-btn px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">&laquo;</button>
+            @endif
+
             {{-- Prev --}}
             @if ($websites->onFirstPage())
             <span class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-300 dark:text-gray-600 cursor-not-allowed">&lsaquo;</span>
@@ -137,6 +145,14 @@
                     class="page-btn px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">&rsaquo;</button>
             @else
             <span class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-300 dark:text-gray-600 cursor-not-allowed">&rsaquo;</span>
+            @endif
+
+            {{-- Last Page --}}
+            @if ($websites->hasMorePages())
+            <button type="button" data-page="{{ $websites->lastPage() }}"
+                    class="page-btn px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">&raquo;</button>
+            @else
+            <span class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-300 dark:text-gray-600 cursor-not-allowed">&raquo;</span>
             @endif
 
             @endif
@@ -188,6 +204,13 @@ if (!window.WHSection) {
 
         let html = '';
 
+        // First page
+        if (currentPage <= 1) {
+            html += `<span class="${cls.disabled}">&laquo;</span>`;
+        } else {
+            html += `<button type="button" data-page="1" class="page-btn ${cls.inactive}">&laquo;</button>`;
+        }
+
         // prev
         if (currentPage <= 1) {
             html += `<span class="${cls.disabled}">&lsaquo;</span>`;
@@ -211,6 +234,13 @@ if (!window.WHSection) {
             html += `<span class="${cls.disabled}">&rsaquo;</span>`;
         } else {
             html += `<button type="button" data-page="${currentPage + 1}" class="page-btn ${cls.inactive}">&rsaquo;</button>`;
+        }
+
+        // Last page
+        if (currentPage >= lastPage) {
+            html += `<span class="${cls.disabled}">&raquo;</span>`;
+        } else {
+            html += `<button type="button" data-page="${lastPage}" class="page-btn ${cls.inactive}">&raquo;</button>`;
         }
 
         paginLinks.innerHTML = html;
