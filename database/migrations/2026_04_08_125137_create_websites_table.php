@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('prioritas', 50)->default('Normal');
             $table->string('internal_pic')->nullable();
             $table->string('service_package')->nullable();
-            $table->year('created_year')->nullable();
+            $table->date('created_year')->nullable();
             $table->text('note')->nullable();
             
             // -- Data Domain --
