@@ -7,8 +7,6 @@ use App\Http\Controllers\DropdownConfigController;
 use App\Http\Controllers\WebsiteController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/up', fn() => response()->json(['status' => 'ok']));
-
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])

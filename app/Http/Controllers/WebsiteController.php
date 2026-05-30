@@ -40,7 +40,7 @@ class WebsiteController extends Controller
             ['key' => 'url',              'label' => 'Domain/Link'],
             ['key' => 'domain_provider',  'label' => 'Jasa Domain'],
             ['key' => 'hosting_type',     'label' => 'Jenis Hosting'],
-            ['key' => 'hosting_provider', 'label' => 'Provider'],
+            ['key' => 'hosting_provider', 'label' => 'Provider Hosting'],
             ['key' => 'storage',          'label' => 'Storage',     'suffix' => ' GB'],
             ['key' => 'location',         'label' => 'Lokasi'],
             ['key' => 'hosting_exp_date', 'label' => 'Tgl Expired', 'date' => true],

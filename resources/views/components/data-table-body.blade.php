@@ -39,12 +39,17 @@
                 {{ $margin >= 0 ? 'Untung' : 'Rugi' }}
             </span>
             @elseif (!empty($col['pay_badge']))
+            @php $payVal = $website->{$col['key']} ?? null; @endphp
+            @if ($payVal)
             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
-                                {{ $website->{$col['key']} === 'Lunas'
+                                {{ $payVal === 'Lunas'
                                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                                    : 'bg-rose-500/10 text-rose-600 dark:text-rose-400' }}">
-                {{ $website->{$col['key']} }}
+                {{ $payVal }}
             </span>
+            @else
+            <span class="text-slate-400">-</span>
+            @endif
             @elseif (!empty($col['domain_days_col']))
             @if (!$website->domain_exp_date)
             <span class="text-slate-400">-</span>
