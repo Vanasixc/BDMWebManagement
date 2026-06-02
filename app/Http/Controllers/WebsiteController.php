@@ -429,7 +429,7 @@ class WebsiteController extends Controller
             ]);
 
             foreach ($websites as $index => $w) {
-                $margin = $w->margin;
+                $margin = $w->pay_system === 'Bulanan' ? round($w->margin / 12) : $w->margin;
 
                 fputcsv($handle, [
                     $index + 1,
