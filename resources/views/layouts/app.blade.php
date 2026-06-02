@@ -205,14 +205,33 @@
                 </div>
 
                 @if (session('success'))
-                <script>window.__flashSuccess = @json(session('success'));</script>
+                <script>
+                    window.__flashSuccess = @json(session('success'));
+                </script>
                 @endif
                 @if (session('error'))
-                <script>window.__flashError = @json(session('error'));</script>
+                <script>
+                    window.__flashError = @json(session('error'));
+                </script>
                 @endif
 
                 {{-- Main content slot --}}
                 @yield('content')
+
+                {{-- Footer --}}
+                <div class="pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-center gap-2">
+                    <span class="text-xs text-gray-400 dark:text-gray-500">Built with</span>
+                    <a href="https://zuramai.github.io/mazer/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors duration-200">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm12 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                        </svg>
+                        Mazer
+                    </a>
+                </div>
             </div>
         </div>
     </main>
@@ -223,32 +242,41 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
 
     <script>
-    (function () {
-        function showFlash() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const base = {
-                timer: 2500,
-                timerProgressBar: true,
-                showConfirmButton: false,
-                toast: false,
-                background: isDark ? '#1e293b' : '#ffffff',
-                color: isDark ? '#f1f5f9' : '#0f172a',
-                customClass: {
-                    popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
-                },
-            };
-            if (window.__flashSuccess) {
-                Swal.fire(Object.assign({}, base, { icon: 'success', title: 'Berhasil!', text: window.__flashSuccess }));
-            } else if (window.__flashError) {
-                Swal.fire(Object.assign({}, base, { icon: 'error', title: 'Terjadi Kesalahan!', text: window.__flashError, timer: 4000 }));
+        (function() {
+            function showFlash() {
+                const isDark = document.documentElement.classList.contains('dark');
+                const base = {
+                    timer: 2500,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    toast: false,
+                    background: isDark ? '#1e293b' : '#ffffff',
+                    color: isDark ? '#f1f5f9' : '#0f172a',
+                    customClass: {
+                        popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
+                    },
+                };
+                if (window.__flashSuccess) {
+                    Swal.fire(Object.assign({}, base, {
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: window.__flashSuccess
+                    }));
+                } else if (window.__flashError) {
+                    Swal.fire(Object.assign({}, base, {
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan!',
+                        text: window.__flashError,
+                        timer: 4000
+                    }));
+                }
             }
-        }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', showFlash);
-        } else {
-            showFlash();
-        }
-    })();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', showFlash);
+            } else {
+                showFlash();
+            }
+        })();
     </script>
 
     {{-- Chart.js CDN --}}
