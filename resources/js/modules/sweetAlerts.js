@@ -19,6 +19,19 @@ function swalTheme() {
     };
 }
 
+
+function saveScroll() {
+    const el = document.querySelector(".flex-1.overflow-y-auto");
+    if (el) el._swalSavedScroll = el.scrollTop;
+}
+
+function restoreScroll() {
+    const el = document.querySelector(".flex-1.overflow-y-auto");
+    if (el && el._swalSavedScroll !== undefined) {
+        el.scrollTop = el._swalSavedScroll;
+    }
+}
+
 // confirmDelete
 
 window.confirmDelete = function (e, form) {
@@ -46,6 +59,10 @@ window.confirmDelete = function (e, form) {
         },
         buttonsStyling: true,
         reverseButtons: true,
+        scrollbarPadding: false,
+        heightAuto: false,
+        willOpen: () => saveScroll(),
+        didOpen: () => restoreScroll(),
     }).then((result) => {
         if (result.isConfirmed) form.submit();
     });
@@ -79,6 +96,10 @@ window.confirmClear = function (e, form) {
         },
         buttonsStyling: true,
         reverseButtons: true,
+        scrollbarPadding: false,
+        heightAuto: false,
+        willOpen: () => saveScroll(),
+        didOpen: () => restoreScroll(),
     }).then((result) => {
         if (result.isConfirmed) form.submit();
     });
@@ -101,6 +122,8 @@ export function notifySubmitSuccess(isAdd) {
         background: t.background,
         color: t.color,
         customClass: { popup: t.popupClass },
+        scrollbarPadding: false,
+        heightAuto: false,
     }).then(() => location.reload());
 }
 
@@ -118,6 +141,8 @@ export function notifySubmitError(isAdd, errMsg) {
             popup: t.popupClass,
             confirmButton: t.btnClass,
         },
+        scrollbarPadding: false,
+        heightAuto: false,
         didOpen: () => {
             const sc = document.querySelector(".swal2-container");
             if (sc) sc.style.zIndex = "99999";
@@ -134,6 +159,8 @@ export function notifyConnFail() {
         confirmButtonColor: "#3B82F6",
         background: t.background,
         color: t.color,
+        scrollbarPadding: false,
+        heightAuto: false,
     });
 }
 
@@ -166,6 +193,8 @@ window.addDropdownOption = function (page, key) {
             if (!value || value.trim() === "") return "Opsi tidak boleh kosong!";
         },
         reverseButtons: true,
+        scrollbarPadding: false,
+        heightAuto: false,
         didOpen: () => {
             const swalContainer = document.querySelector(".swal2-container");
             if (swalContainer) swalContainer.style.zIndex = "99999";
@@ -185,7 +214,7 @@ window.addDropdownOption = function (page, key) {
             .then((r) => r.json().catch(() => ({})))
             .then(() => location.reload())
             .catch(() =>
-                Swal.fire({ icon: "error", title: "Gagal", text: "Gagal menambahkan opsi." }),
+                Swal.fire({ icon: "error", title: "Gagal", text: "Gagal menambahkan opsi.", scrollbarPadding: false }),
             );
     });
 };
@@ -210,6 +239,8 @@ window.removeDropdownOption = function (page, key, option) {
             cancelButton: t.btnClass,
         },
         reverseButtons: true,
+        scrollbarPadding: false,
+        heightAuto: false,
         // Pastikan SweetAlert tampil di atas modal (z-index: 9999)
         didOpen: () => {
             const swalContainer = document.querySelector(".swal2-container");
@@ -229,7 +260,7 @@ window.removeDropdownOption = function (page, key, option) {
         })
             .then(() => location.reload())
             .catch(() =>
-                Swal.fire({ icon: "error", title: "Gagal", text: "Gagal menghapus opsi." }),
+                Swal.fire({ icon: "error", title: "Gagal", text: "Gagal menghapus opsi.", scrollbarPadding: false }),
             );
     });
 };

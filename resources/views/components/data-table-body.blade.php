@@ -141,7 +141,7 @@
                         type="submit"
                         class="p-1.5 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500/20 transition cursor-pointer"
                         title="Reset Catatan">
-                        @include('components.icon', ['name' => 'refresh-cw', 'class' => 'w-4 h-4'])
+                        @include('components.icon', ['name' => 'trash', 'class' => 'w-4 h-4'])
                     </button>
                 </form>
                 @else

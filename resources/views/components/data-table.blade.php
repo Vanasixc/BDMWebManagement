@@ -34,7 +34,7 @@
             </div>
 
             <div class="flex gap-2 w-full sm:w-auto items-center">
-                @if (!in_array($section, ['reminder', 'finansial', 'domain']))
+                @if (!in_array($section, ['reminder', 'finansial', 'domain', 'akses']) && auth()->user()->canModify())
                 <button
                     onclick="openModalEditTable()"
                     class="flex-1 sm:flex-none justify-center px-3 py-2 rounded text-sm flex items-center gap-2 transition border cursor-pointer
