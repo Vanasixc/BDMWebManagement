@@ -88,11 +88,10 @@ class WebsiteController extends Controller
         }
         $this->applySorting($query, $sortBy, $sortDir);
 
-        $websites    = $query->paginate($perPage)->withQueryString();
-        $columns     = $this->sectionColumns[$section] ?? $this->sectionColumns['master'];
-        $dropdowns   = DropdownConfig::forPage($section);
-        $allWebsites = Website::all();
-        $statsData   = $this->buildStatsData($section, $allWebsites);
+        $websites  = $query->paginate($perPage)->withQueryString();
+        $columns   = $this->sectionColumns[$section] ?? $this->sectionColumns['master'];
+        $dropdowns = DropdownConfig::forPage($section);
+        $statsData = $this->buildStatsData($section);
 
         return view("sections.{$section}", compact('websites', 'columns', 'section', 'search', 'perPage', 'dropdowns', 'statsData', 'sortBy', 'sortDir'));
     }
@@ -280,21 +279,28 @@ class WebsiteController extends Controller
         };
     }
 
-    private function buildStatsData(string $section, $all): array
+    private function buildStatsData(string $section): array
     {
         return match ($section) {
             'master' => [
-                'active'   => $all->where('status', 'Active')->count(),
-                'inactive' => $all->where('status', 'InActive')->count(),
-                'suspend'  => $all->where('status', 'Suspend')->count(),
-                'total'    => $all->count(),
+                'active'   => Website::where('status', 'Active')->count(),
+                'inactive' => Website::where('status', 'InActive')->count(),
+                'suspend'  => Website::where('status', 'Suspend')->count(),
+                'total'    => Website::count(),
             ],
             'domain' => [
-                'providers' => $all->whereNotNull('domain_provider')->groupBy('domain_provider')
-                    ->map->count()->sortDesc()->take(6)->toArray(),
+                'providers' => Website::whereNotNull('domain_provider')
+                    ->selectRaw('domain_provider, COUNT(*) as total')
+                    ->groupBy('domain_provider')
+                    ->orderByDesc('total')
+                    ->limit(6)
+                    ->pluck('total', 'domain_provider')
+                    ->toArray(),
             ],
             'hosting' => [
-                'expiry_cards' => $all->whereNotNull('hosting_exp_date')
+                'expiry_cards' => Website::whereNotNull('hosting_exp_date')
+                    ->orderBy('hosting_exp_date')
+                    ->get(['website', 'client', 'hosting_exp_date'])
                     ->map(fn($w) => [
                         'website'  => $w->website,
                         'client'   => $w->client,
@@ -302,51 +308,65 @@ class WebsiteController extends Controller
                         'days'     => $w->days_remaining,
                         'status'   => $w->reminder_status,
                     ])
-                    ->sortBy('days')->values()->toArray(),
+                    ->values()->toArray(),
             ],
             'akses' => [
-                'has_admin_url'    => $all->filter(fn($w) => !empty($w->admin_url))->count(),
-                'has_extra_access' => $all->filter(fn($w) => !empty($w->extra_access))->count(),
-                'has_password_loc' => $all->filter(fn($w) => !empty($w->password_loc))->count(),
-                'total'            => $all->count(),
+                'has_admin_url'    => Website::whereNotNull('admin_url')->where('admin_url', '!=', '')->count(),
+                'has_extra_access' => Website::whereNotNull('extra_access')->where('extra_access', '!=', '')->count(),
+                'has_password_loc' => Website::whereNotNull('password_loc')->where('password_loc', '!=', '')->count(),
+                'total'            => Website::count(),
             ],
             'finansial' => [
-                'total_revenue' => $all->sum('sell_price'),
-                'total_domain'  => $all->sum('domain_price'),
-                'total_hosting' => $all->sum('hosting_price'),
-                'total_margin'  => $all->sum(fn($w) => $w->margin),
-                'lunas'         => $all->where('pay_status', 'Lunas')->count(),
-                'belum'         => $all->where('pay_status', 'Belum')->count(),
-                'margins'       => $all->map(fn($w) => [
-                    'website' => $w->website ?? $w->client,
-                    'margin'  => $w->margin,
-                ])->sortByDesc('margin')->take(8)->values()->toArray(),
+                'total_revenue' => Website::sum('sell_price'),
+                'total_domain'  => Website::sum('domain_price'),
+                'total_hosting' => Website::sum('hosting_price'),
+                'total_margin'  => Website::selectRaw('SUM(COALESCE(sell_price,0) - COALESCE(domain_price,0) - COALESCE(hosting_price,0)) as total')->value('total') ?? 0,
+                'lunas'         => Website::where('pay_status', 'Lunas')->count(),
+                'belum'         => Website::where('pay_status', 'Belum')->count(),
+                'margins'       => Website::select(['website', 'client', 'sell_price', 'domain_price', 'hosting_price'])
+                    ->orderByRaw('(COALESCE(sell_price,0) - COALESCE(domain_price,0) - COALESCE(hosting_price,0)) DESC')
+                    ->limit(8)
+                    ->get()
+                    ->map(fn($w) => [
+                        'website' => $w->website ?? $w->client,
+                        'margin'  => $w->margin,
+                    ])->values()->toArray(),
             ],
             'reminder' => [
                 // --- Hosting ---
-                'aman'      => $all->filter(fn($w) => $w->reminder_status === 'Aman')->count(),
-                'siaga'     => $all->filter(fn($w) => $w->reminder_status === 'Segera')->count(),
-                'darurat'   => $all->filter(fn($w) => in_array($w->reminder_status, ['Kritis', 'Expired']))->count(),
-                'deadlines' => $all->whereNotNull('hosting_exp_date')
+                'aman'      => Website::whereNotNull('hosting_exp_date')
+                    ->where('hosting_exp_date', '>', now()->addDays(30))->count(),
+                'siaga'     => Website::whereNotNull('hosting_exp_date')
+                    ->whereBetween('hosting_exp_date', [now(), now()->addDays(30)])->count(),
+                'darurat'   => Website::whereNotNull('hosting_exp_date')
+                    ->where('hosting_exp_date', '<=', now())->count(),
+                'deadlines' => Website::whereNotNull('hosting_exp_date')
+                    ->orderBy('hosting_exp_date')
+                    ->limit(8)
+                    ->get(['website', 'hosting_exp_date'])
                     ->map(fn($w) => [
                         'website'  => $w->website,
                         'days'     => $w->days_remaining,
                         'status'   => $w->reminder_status,
                         'exp_date' => $w->hosting_exp_date?->format('d/m/Y'),
-                    ])
-                    ->sortBy('days')->take(8)->values()->toArray(),
+                    ])->values()->toArray(),
                 // --- Domain ---
-                'domain_aman'      => $all->filter(fn($w) => $w->domain_reminder_status === 'Aman')->count(),
-                'domain_siaga'     => $all->filter(fn($w) => $w->domain_reminder_status === 'Segera')->count(),
-                'domain_darurat'   => $all->filter(fn($w) => in_array($w->domain_reminder_status, ['Kritis', 'Expired']))->count(),
-                'domain_deadlines' => $all->whereNotNull('domain_exp_date')
+                'domain_aman'      => Website::whereNotNull('domain_exp_date')
+                    ->where('domain_exp_date', '>', now()->addDays(30))->count(),
+                'domain_siaga'     => Website::whereNotNull('domain_exp_date')
+                    ->whereBetween('domain_exp_date', [now(), now()->addDays(30)])->count(),
+                'domain_darurat'   => Website::whereNotNull('domain_exp_date')
+                    ->where('domain_exp_date', '<=', now())->count(),
+                'domain_deadlines' => Website::whereNotNull('domain_exp_date')
+                    ->orderBy('domain_exp_date')
+                    ->limit(8)
+                    ->get(['website', 'domain_exp_date'])
                     ->map(fn($w) => [
                         'website'  => $w->website,
                         'days'     => $w->domain_days_remaining,
                         'status'   => $w->domain_reminder_status,
                         'exp_date' => $w->domain_exp_date?->format('d/m/Y'),
-                    ])
-                    ->sortBy('days')->take(8)->values()->toArray(),
+                    ])->values()->toArray(),
             ],
             default => [],
         };

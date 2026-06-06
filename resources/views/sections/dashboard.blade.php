@@ -222,8 +222,8 @@ window.onChartReady(function() {
     const gridColor = isDark ? 'rgba(51,65,85,0.8)' : 'rgba(226,232,240,0.8)';
     const textColor = isDark ? '#94a3b8' : '#64748b';
 
-    const totalRevenue = revenueData.reduce((s, d) => s + (d.revenue ?? 0), 0);
-    const totalMargin  = revenueData.reduce((s, d) => s + (d.margin  ?? 0), 0);
+    const totalRevenue = Math.max(revenueData.revenue ?? 0, 0);
+    const totalMargin  = Math.max(revenueData.margin  ?? 0, 0);
     const maxVal  = Math.max(totalRevenue, totalMargin, 0);
     const JT = 1_000_000;
     const axisMax = maxVal <= 0 ? JT : Math.ceil(maxVal / JT) * JT;
@@ -235,14 +235,14 @@ window.onChartReady(function() {
         return 'Rp ' + label + ' jt';
     };
 
-    // Revenue Bar Chart — linear, tanpa pembagian tahun
+    // Revenue Bar Chart
     new Chart(document.getElementById('revenueChart'), {
         type: 'bar',
         data: {
             labels: ['Pendapatan & Margin'],
             datasets: [
                 {
-                    label: 'Total Revenue',
+                    label: 'Total Pendapatan',
                     data: [totalRevenue],
                     backgroundColor: 'rgba(59,130,246,0.85)',
                     borderRadius: 6,

@@ -39,17 +39,10 @@ class DashboardController extends Controller
             return $w->domain_days_remaining < 0;
         })->sortBy('domain_days_remaining')->values();
 
-        $revenueData = $websites
-            ->filter(fn($w) => $w->invoice_date !== null)
-            ->groupBy(fn($w) => $w->invoice_date->format('Y'))
-            ->map(fn($group, $year) => [
-                'year'    => $year,
-                'revenue' => $group->sum('sell_price'),
-                'margin'  => $group->sum(fn($w) => $w->margin),
-            ])
-            ->sortKeys()
-            ->values()
-            ->toArray();
+        $revenueData = [
+            'revenue' => (int) $websites->sum('sell_price'),
+            'margin'  => (int) $websites->sum(fn($w) => $w->margin),
+        ];
 
         $domainPriceData = $websites->map(fn($w) => [
             'client' => $w->client,

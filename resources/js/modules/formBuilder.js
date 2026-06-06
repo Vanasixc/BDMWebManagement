@@ -369,6 +369,9 @@ export function renderEditTableForm() {
     };
 
     for (const [key, opts] of Object.entries(dd)) {
+        // Status tidak boleh diubah (fixed: Active, InActive, Suspend)
+        if (key === "status") continue;
+
         html += `<div class="p-4 border rounded-xl mb-4 border-gray-200 dark:border-slate-700 bg-gray-50/60 dark:bg-slate-900/50">
             <h4 class="font-bold text-sm mb-3 text-slate-800 dark:text-slate-200">${labelMap[key] || key}</h4>
             <div class="flex flex-wrap gap-2 mb-3" id="opts-${key}">

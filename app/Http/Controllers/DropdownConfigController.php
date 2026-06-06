@@ -15,21 +15,25 @@ class DropdownConfigController extends Controller
             'option' => 'required|string|max:100',
         ]);
 
-        $config = DropdownConfig::where('page', $request->page)
-                                ->where('key', $request->key)
+        $page   = $request->input('page');
+        $key    = $request->input('key');
+        $option = $request->input('option');
+
+        $config = DropdownConfig::where('page', $page)
+                                ->where('key', $key)
                                 ->first();
 
         if (!$config) {
-            return back()->with('error', 'Konfigurasi tidak ditemukan.');
+            return response()->json(['error' => 'Konfigurasi tidak ditemukan.'], 404);
         }
 
-        $options = $config->options;
-        if (!in_array($request->option, $options)) {
-            $options[] = $request->option;
+        $options = $config->options ?? [];
+        if (!in_array($option, $options)) {
+            $options[] = $option;
             $config->update(['options' => $options]);
         }
 
-        return back()->with('success', "Opsi \"{$request->option}\" berhasil ditambahkan.");
+        return response()->json(['success' => "Opsi \"{$option}\" berhasil ditambahkan."]);
     }
 
     public function removeOption(Request $request)
@@ -40,17 +44,21 @@ class DropdownConfigController extends Controller
             'option' => 'required|string',
         ]);
 
-        $config = DropdownConfig::where('page', $request->page)
-                                ->where('key', $request->key)
+        $page   = $request->input('page');
+        $key    = $request->input('key');
+        $option = $request->input('option');
+
+        $config = DropdownConfig::where('page', $page)
+                                ->where('key', $key)
                                 ->first();
 
         if (!$config) {
-            return back()->with('error', 'Konfigurasi tidak ditemukan.');
+            return response()->json(['error' => 'Konfigurasi tidak ditemukan.'], 404);
         }
 
-        $options = array_values(array_filter($config->options, fn($o) => $o !== $request->option));
+        $options = array_values(array_filter($config->options ?? [], fn($o) => $o !== $option));
         $config->update(['options' => $options]);
 
-        return back()->with('success', "Opsi \"{$request->option}\" berhasil dihapus.");
+        return response()->json(['success' => "Opsi \"{$option}\" berhasil dihapus."]);
     }
 }
