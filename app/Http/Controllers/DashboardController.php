@@ -63,8 +63,7 @@ class DashboardController extends Controller
             'expiringDomain',
             'expiredDomain',
             'revenueData',
-            'domainPriceData',
-            'websites'
+            'domainPriceData'
         ));
     }
 }

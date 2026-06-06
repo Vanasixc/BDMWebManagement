@@ -11,6 +11,7 @@
     <link rel="icon" type="png" href="favicon.ico" />
     <link rel="shortcut icon" type="png" href="favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     {{-- Dark mode: jalankan sebelum CSS untuk hindari flash --}}
     <script>
@@ -238,9 +239,6 @@
 
     @include('components.modal-form')
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
-
     <script>
         (function() {
             function showFlash() {
@@ -279,8 +277,12 @@
         })();
     </script>
 
-    {{-- Chart.js CDN --}}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        window.__chartCbs = [];
+        window.onChartReady = function(fn) {
+            if (window.Chart) { fn(); } else { window.__chartCbs.push(fn); }
+        };
+    </script>
 
     {{-- Page-specific scripts --}}
     @stack('scripts')

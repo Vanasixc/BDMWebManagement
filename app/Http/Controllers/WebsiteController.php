@@ -94,7 +94,7 @@ class WebsiteController extends Controller
         $allWebsites = Website::all();
         $statsData   = $this->buildStatsData($section, $allWebsites);
 
-        return view("sections.{$section}", compact('websites', 'columns', 'section', 'search', 'perPage', 'dropdowns', 'allWebsites', 'statsData', 'sortBy', 'sortDir'));
+        return view("sections.{$section}", compact('websites', 'columns', 'section', 'search', 'perPage', 'dropdowns', 'statsData', 'sortBy', 'sortDir'));
     }
 
     private function applySorting($query, ?string $sortBy, ?string $sortDir): void

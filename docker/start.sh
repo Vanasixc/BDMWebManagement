@@ -11,6 +11,14 @@ chown -R www-data:www-data /app/storage /app/bootstrap/cache 2>/dev/null || true
 echo "==> Running migrations..."
 php artisan migrate --force
 
+# Cache config, routes, dan views untuk performa production
+echo "==> Caching config..."
+php artisan config:cache
+echo "==> Caching routes..."
+php artisan route:cache
+echo "==> Caching views..."
+php artisan view:cache
+
 # Generate nginx config
 envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 

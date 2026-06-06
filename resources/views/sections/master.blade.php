@@ -84,7 +84,7 @@
 window.WHSection   = 'master';
 window.WHDropdowns = @json($dropdowns->map(fn($d) => $d->options));
 
-(function() {
+window.onChartReady(function() {
     const isDark    = document.documentElement.classList.contains('dark');
     const textColor = isDark ? '#94a3b8' : '#64748b';
     new Chart(document.getElementById('masterStatusChart'), {
@@ -107,6 +107,6 @@ window.WHDropdowns = @json($dropdowns->map(fn($d) => $d->options));
             cutout: '65%',
         }
     });
-})();
+});
 </script>
 @endpush

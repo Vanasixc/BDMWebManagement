@@ -215,93 +215,94 @@
 
 @push('scripts')
 <script>
-// Revenue Chart
-const revenueCtx = document.getElementById('revenueChart');
-const isDark = document.documentElement.classList.contains('dark');
-const gridColor = isDark ? 'rgba(51,65,85,0.8)' : 'rgba(226,232,240,0.8)';
-const textColor = isDark ? '#94a3b8' : '#64748b';
-
 const revenueData = @json($revenueData);
 
-const allVals = revenueData.flatMap(d => [d.revenue ?? 0, d.margin ?? 0]);
-const maxVal  = Math.max(...allVals, 0);
-const JT = 1_000_000;
-const axisMax = maxVal <= 0 ? JT : Math.ceil(maxVal / JT) * JT;
+window.onChartReady(function() {
+    const isDark    = document.documentElement.classList.contains('dark');
+    const gridColor = isDark ? 'rgba(51,65,85,0.8)' : 'rgba(226,232,240,0.8)';
+    const textColor = isDark ? '#94a3b8' : '#64748b';
 
-const fmtJuta = (v) => {
-    if (v === 0) return 'Rp 0';
-    const juta = v / JT;
-    const label = Number.isInteger(juta) ? juta : parseFloat(juta.toFixed(1));
-    return 'Rp ' + label + ' jt';
-};
+    const totalRevenue = revenueData.reduce((s, d) => s + (d.revenue ?? 0), 0);
+    const totalMargin  = revenueData.reduce((s, d) => s + (d.margin  ?? 0), 0);
+    const maxVal  = Math.max(totalRevenue, totalMargin, 0);
+    const JT = 1_000_000;
+    const axisMax = maxVal <= 0 ? JT : Math.ceil(maxVal / JT) * JT;
 
-new Chart(revenueCtx, {
-    type: 'bar',
-    data: {
-        labels: revenueData.length > 0 ? revenueData.map(d => d.year) : ['Belum ada data'],
-        datasets: [
-            {
-                label: 'Total Revenue',
-                data: revenueData.length > 0 ? revenueData.map(d => d.revenue ?? 0) : [0],
-                backgroundColor: 'rgba(59,130,246,0.85)',
-                borderRadius: 6,
-            },
-            {
-                label: 'Total Margin',
-                data: revenueData.length > 0 ? revenueData.map(d => d.margin ?? 0) : [0],
-                backgroundColor: 'rgba(16,185,129,0.85)',
-                borderRadius: 6,
-            },
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { labels: { color: textColor, font: { size: 12 } } },
-            tooltip: {
-                callbacks: {
-                    label: ctx => 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(ctx.raw)),
-                }
-            }
-        },
-        scales: {
-            x: { ticks: { color: textColor, font: { size: 12 } }, grid: { color: gridColor } },
-            y: {
-                min: 0,
-                max: axisMax,
-                ticks: {
-                    color: textColor,
-                    font: { size: 11 },
-                    callback: v => fmtJuta(v),
+    const fmtJuta = (v) => {
+        if (v === 0) return 'Rp 0';
+        const juta = v / JT;
+        const label = Number.isInteger(juta) ? juta : parseFloat(juta.toFixed(1));
+        return 'Rp ' + label + ' jt';
+    };
+
+    // Revenue Bar Chart — linear, tanpa pembagian tahun
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Pendapatan & Margin'],
+            datasets: [
+                {
+                    label: 'Total Revenue',
+                    data: [totalRevenue],
+                    backgroundColor: 'rgba(59,130,246,0.85)',
+                    borderRadius: 6,
                 },
-                grid: { color: gridColor }
-            },
-        }
-    }
-});
-
-// Status Pie Chart
-const statusCtx = document.getElementById('statusChart');
-new Chart(statusCtx, {
-    type: 'doughnut',
-    data: {
-        labels: ['Active', 'InActive', 'Suspend'],
-        datasets: [{
-            data: [{{ $stats['active'] }}, {{ $stats['inactive'] }}, {{ $stats['suspend'] }}],
-            backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
-            borderWidth: 0,
-            hoverOffset: 6,
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { position: 'bottom', labels: { color: textColor, font: { size: 12 }, padding: 16 } },
+                {
+                    label: 'Total Margin',
+                    data: [totalMargin],
+                    backgroundColor: 'rgba(16,185,129,0.85)',
+                    borderRadius: 6,
+                },
+            ]
         },
-        cutout: '65%',
-    }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: textColor, font: { size: 12 } } },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ctx.dataset.label + ': Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(ctx.raw)),
+                    }
+                }
+            },
+            scales: {
+                x: { ticks: { display: false }, grid: { display: false } },
+                y: {
+                    min: 0,
+                    max: axisMax,
+                    ticks: {
+                        color: textColor,
+                        font: { size: 11 },
+                        callback: v => fmtJuta(v),
+                    },
+                    grid: { color: gridColor }
+                },
+            }
+        }
+    });
+
+    // Status Doughnut Chart
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Active', 'InActive', 'Suspend'],
+            datasets: [{
+                data: [{{ $stats['active'] }}, {{ $stats['inactive'] }}, {{ $stats['suspend'] }}],
+                backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+                borderWidth: 0,
+                hoverOffset: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: textColor, font: { size: 12 }, padding: 16 } },
+            },
+            cutout: '65%',
+        }
+    });
 });
 </script>
 @endpush

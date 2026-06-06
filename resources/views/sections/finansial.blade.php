@@ -96,7 +96,7 @@
     window.WHSection = 'finansial';
     window.WHDropdowns = @json($dropdowns -> map(fn($d) => $d -> options));
 
-    (function() {
+    window.onChartReady(function() {
         const isDark = document.documentElement.classList.contains('dark');
         const gridColor = isDark ? 'rgba(51,65,85,0.8)' : 'rgba(226,232,240,0.8)';
         const textColor = isDark ? '#94a3b8' : '#64748b';
@@ -169,6 +169,6 @@
                 }
             }
         });
-    })();
+    });
 </script>
 @endpush

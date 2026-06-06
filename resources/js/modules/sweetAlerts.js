@@ -1,5 +1,6 @@
 // sweetAlerts.js — SweetAlert2 interactions.
 
+import Swal from "sweetalert2";
 import { CSRF } from "./state.js";
 
 // Helper: SweetAlert theme based on current dark mode
