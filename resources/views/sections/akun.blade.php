@@ -315,7 +315,7 @@
                 body: formData,
             })
             .then(async function(response) {
-                if (response.ok || response.redirected) {
+                if (response.ok) {
                     // Sukses — tutup modal dan tampilkan SweetAlert success
                     document.getElementById('account-modal-overlay').style.display = 'none';
                     document.body.style.overflow = '';
@@ -333,6 +333,10 @@
                         color: isDark ? '#f1f5f9' : '#0f172a',
                         customClass: {
                             popup: 'rounded-2xl shadow-2xl border ' + (isDark ? 'border-slate-700' : 'border-gray-100'),
+                        },
+                        didOpen: function() {
+                            const sc = document.querySelector('.swal2-container');
+                            if (sc) sc.style.zIndex = '99999';
                         },
                     }).then(function() {
                         location.reload();

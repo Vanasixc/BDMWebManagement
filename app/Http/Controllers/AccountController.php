@@ -15,7 +15,7 @@ class AccountController extends Controller
     }
 
     public function store(Request $request)
-    {        
+    {
         $request->validate([
             'name'     => 'required|string|max:100|unique:users,name',
             'email'    => 'required|email|unique:users,email',
@@ -31,7 +31,7 @@ class AccountController extends Controller
             'avatar'   => "https://ui-avatars.com/api/?name={$request->name}&background=3B82F6&color=fff",
         ]);
 
-        return back()->with('success', 'Akun berhasil ditambahkan!');
+        return response()->json(['message' => 'Akun berhasil ditambahkan!']);
     }
 
     public function update(Request $request, User $user)
@@ -49,7 +49,7 @@ class AccountController extends Controller
         }
 
         $user->update($data);
-        return back()->with('success', 'Akun berhasil diperbarui!');
+        return response()->json(['message' => 'Akun berhasil diperbarui!']);
     }
 
     public function destroy(User $user)
